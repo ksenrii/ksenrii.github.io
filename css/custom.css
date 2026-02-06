@@ -1,0 +1,43 @@
+/* 1. 页脚/页头透明化（保留你的原有代码） */
+#footer {
+  background: transparent !important;
+}
+#page-header {
+  background: transparent !important;
+}
+#footer::before {
+  background: transparent !important;
+}
+#page-header::before {
+  background: transparent !important;
+}
+[data-theme="dark"] #footer::before {
+  background: transparent !important;
+}
+[data-theme="dark"] #page-header::before {
+  background: transparent !important;
+}
+
+/* 2. 给页面主体配置背景图（新增！这是显示背景的关键） */
+body {
+  /* 本地图片路径写法（推荐，优先用这个测试） */
+  background-image: url('/images/2126e25907dfdf69707bae26ba6294c.png') !important;
+  /* 若用生成的URL，替换上面这行：
+  background-image: url('你的图片URL') !important;
+  */
+  
+  /* 以下属性必须加，避免图片拉伸/重复/显示不全 */
+  background-repeat: no-repeat !important;   /* 禁止图片重复 */
+  background-size: cover !important;        /* 覆盖整个屏幕 */
+  background-attachment: fixed !important;  /* 滚动时背景固定 */
+  background-position: center center !important; /* 图片居中 */
+  background-color: #f5f5f5 !important;     /* 图片加载失败时的备用底色 */
+}
+
+/* 3. 修复内容区域背景（避免文字区域遮挡背景） */
+#body-wrap {
+  background: transparent !important;
+}
+[data-theme="dark"] #body-wrap {
+  background: transparent !important;
+}
