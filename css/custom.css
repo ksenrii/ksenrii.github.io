@@ -41,3 +41,15 @@ body {
 [data-theme="dark"] #body-wrap {
   background: transparent !important;
 }
+
+/* 首页副标题 - 自定义颜色（默认白天模式） */
+.subtitle {
+  color: #4a6cf7 !important; /* 主色：淡蓝色（可自己改，推荐十六进制色值） */
+  font-size: 16px !important; /* 字体大小，和主标题搭配，可微调 */
+  font-weight: 500 !important; /* 字体粗细，500是中等，不用太粗 */
+}
+
+/* 副标题 - 夜间模式颜色（适配博客夜间主题，避免看不清） */
+[data-theme="dark"] .subtitle {
+  color: #7abaff !important; /* 夜间模式选浅一点的蓝色，和深色背景对比明显 */
+}
