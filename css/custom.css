@@ -53,3 +53,12 @@ body {
 [data-theme="dark"] .subtitle {
   color: #7abaff !important; /* 夜间模式选浅一点的蓝色，和深色背景对比明显 */
 }
+
+/* 让 MathJax/KaTeX 公式与中文之间自动留间距 */
+.mathjax, .katex {
+    margin: 0 0.25em !important;
+}
+/* 行内公式与前后文字的最小间距 */
+span.mathjax, span.katex {
+    margin: 0 0.2em !important;
+}
