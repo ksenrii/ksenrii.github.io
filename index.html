@@ -716,23 +716,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="RSA"><a href="#RSA" class="headerlink" title="RSA"></a>RSA</h1><h3 id="密钥生成"><a href="#密钥生成" class="headerlink" title="密钥生成"></a>密钥生成</h3><ol>
-<li><p>选两大素数 p, q</p>
-</li>
-<li><p>计算模数：<br>$$<br>N &#x3D; p \cdot q<br>$$</p>
-</li>
-<li><p>计算欧拉函数：<br>$$<br>\varphi(N) &#x3D; (p-1)(q-1)<br>$$</p>
-</li>
-<li><p>选一个公开指数 e，满足：<br>$$<br>\gcd(e, \varphi(N)) &#x3D; 1<br>$$</p>
-</li>
-<li><p>计算私钥指数：<br>$$<br>d \equiv e^{-1} \pmod{\varphi(N)}<br>$$</p>
-</li>
-</ol>
-<ul>
-<li>公钥：(N, e)</li>
-<li>私钥：(N, d)</li>
-</ul>
-<hr>
+          <h1 id="RSA"><a href="#RSA" class="headerlink" title="RSA"></a>RSA</h1><p>RSA 加密算法是一种非对称加密算法。在公开密钥加密和电子商业中 RSA 被广泛使用。RSA 是 1977 年由罗纳德 · 李维斯特（Ron Rivest）、阿迪 · 萨莫尔（Adi Shamir）和伦纳德 · 阿德曼（Leonard Adleman）一起提出的。RSA 就是他们三人姓氏开头字母拼在一起组成的</p>
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/2026/02/05/Crypto-Rsa/#more" rel="contents">
