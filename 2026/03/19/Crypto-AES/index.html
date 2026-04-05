@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"ksenrii.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
+
+    <meta name="description" content="AES高级加密标准（AES），又称Rijndael加密法，是美国联邦政府采用的一种区块加密标准。这个标准用来替代原先的DES，已经被多方分析且广为全世界所使用。经过五年的甄选流程，高级加密标准由美国国家标准与技术研究院（NIST）于2001年11月26日发布于FIPS PUB 197，并在2002年5月26日成为有效的标准。现在，高级加密标准已然成为对称密钥加密中最流行的算法之一。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Crypto-AES">
+<meta property="og:url" content="https://ksenrii.github.io/2026/03/19/Crypto-AES/index.html">
+<meta property="og:site_name" content="ksenr&#39;s blog">
+<meta property="og:description" content="AES高级加密标准（AES），又称Rijndael加密法，是美国联邦政府采用的一种区块加密标准。这个标准用来替代原先的DES，已经被多方分析且广为全世界所使用。经过五年的甄选流程，高级加密标准由美国国家标准与技术研究院（NIST）于2001年11月26日发布于FIPS PUB 197，并在2002年5月26日成为有效的标准。现在，高级加密标准已然成为对称密钥加密中最流行的算法之一。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ksenrii.github.io/images/blockstate.png">
+<meta property="og:image" content="https://ksenrii.github.io/images/sbox.png">
+<meta property="article:published_time" content="2026-03-19T03:55:44.000Z">
+<meta property="article:modified_time" content="2026-04-05T03:27:36.276Z">
+<meta property="article:author" content="ksenr">
+<meta property="article:tag" content="密码学">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ksenrii.github.io/images/blockstate.png">
+
+
+<link rel="canonical" href="https://ksenrii.github.io/2026/03/19/Crypto-AES/">
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ksenrii.github.io/2026/03/19/Crypto-AES/","path":"2026/03/19/Crypto-AES/","title":"Crypto-AES"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Crypto-AES | ksenr's blog</title>
+  
+
+
+
+
+
+
+
+
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
+<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
+
+  
+
+
+
+
+
+
+  
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+
+
+
+  
+
+  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
+<script src="/js/third-party/math/mathjax.js" defer></script>
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <div class="column">
+      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">ksenr's blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger" aria-label="搜索" role="button">
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
+  </ul>
+</nav>
+
+
+
+
+</header>
+        
+  
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AES"><span class="nav-number">1.</span> <span class="nav-text">AES</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text">整体架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%8E%E6%96%87%E5%A4%84%E7%90%86"><span class="nav-number">1.3.</span> <span class="nav-text">明文处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%86%E9%92%A5%E5%A4%84%E7%90%86"><span class="nav-number">1.4.</span> <span class="nav-text">密钥处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E8%BD%AE%E5%AF%86%E9%92%A5%E5%8A%A0%EF%BC%88AddRoundKey%EF%BC%89"><span class="nav-number">1.5.</span> <span class="nav-text">初始轮密钥加（AddRoundKey）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%BE%E5%88%9D%E5%A7%8B%E7%8A%B6%E6%80%81%E7%9F%A9%E9%98%B5%E4%B8%BA-mathrm-State-0-begin-bmatrix-s-0-0-0-s-0-1-0-s-0-2-0-s-0-3-0-s-1-0-0-s-1-1-0-s-1-2-0-s-1-3-0-s-2-0-0-s-2-1-0-s-2-2-0-s-2-3-0-s-3-0-0-s-3-1-0-s-3-2-0-s-3-3-0-end-bmatrix-%E7%AC%AC-0-%E8%BD%AE%E8%BD%AE%E5%AF%86%E9%92%A5%E4%B8%BA-K-0-begin-bmatrix-k-0-0-0-k-0-1-0-k-0-2-0-k-0-3-0-k-1-0-0-k-1-1-0-k-1-2-0-k-1-3-0-k-2-0-0-k-2-1-0-k-2-2-0-k-2-3-0-k-3-0-0-k-3-1-0-k-3-2-0-k-3-3-0-end-bmatrix-%E5%88%99%E5%88%9D%E5%A7%8B%E8%BD%AE%E5%AF%86%E9%92%A5%E5%8A%A0%E5%8F%AF%E4%BB%A5%E8%A1%A8%E7%A4%BA%E4%B8%BA-State-1-State-0-oplus-K-0-%E5%8D%B3-begin-bmatrix-s-0-0-1-s-0-1-1-s-0-2-1-s-0-3-1-s-1-0-1-s-1-1-1-s-1-2-1-s-1-3-1-s-2-0-1-s-2-1-1-s-2-2-1-s-2-3-1-s-3-0-1-s-3-1-1-s-3-2-1-s-3-3-1-end-bmatrix"><span class="nav-number">2.</span> <span class="nav-text">设初始状态矩阵为$$\mathrm{State}^{(0)} &#x3D;\begin{bmatrix}s_{0,0}^{(0)} &amp; s_{0,1}^{(0)} &amp; s_{0,2}^{(0)} &amp; s_{0,3}^{(0)} \s_{1,0}^{(0)} &amp; s_{1,1}^{(0)} &amp; s_{1,2}^{(0)} &amp; s_{1,3}^{(0)} \s_{2,0}^{(0)} &amp; s_{2,1}^{(0)} &amp; s_{2,2}^{(0)} &amp; s_{2,3}^{(0)} \s_{3,0}^{(0)} &amp; s_{3,1}^{(0)} &amp; s_{3,2}^{(0)} &amp; s_{3,3}^{(0)}\end{bmatrix}$$第 0 轮轮密钥为$$K^{(0)} &#x3D;\begin{bmatrix}k_{0,0}^{(0)} &amp; k_{0,1}^{(0)} &amp; k_{0,2}^{(0)} &amp; k_{0,3}^{(0)} \k_{1,0}^{(0)} &amp; k_{1,1}^{(0)} &amp; k_{1,2}^{(0)} &amp; k_{1,3}^{(0)} \k_{2,0}^{(0)} &amp; k_{2,1}^{(0)} &amp; k_{2,2}^{(0)} &amp; k_{2,3}^{(0)} \k_{3,0}^{(0)} &amp; k_{3,1}^{(0)} &amp; k_{3,2}^{(0)} &amp; k_{3,3}^{(0)}\end{bmatrix}$$则初始轮密钥加可以表示为$$State^{(1)} &#x3D; State^{(0)} \oplus K^{(0)}$$即$$\begin{bmatrix}s_{0,0}^{(1)} &amp; s_{0,1}^{(1)} &amp; s_{0,2}^{(1)} &amp; s_{0,3}^{(1)} \s_{1,0}^{(1)} &amp; s_{1,1}^{(1)} &amp; s_{1,2}^{(1)} &amp; s_{1,3}^{(1)} \s_{2,0}^{(1)} &amp; s_{2,1}^{(1)} &amp; s_{2,2}^{(1)} &amp; s_{2,3}^{(1)} \s_{3,0}^{(1)} &amp; s_{3,1}^{(1)} &amp; s_{3,2}^{(1)} &amp; s_{3,3}^{(1)}\end{bmatrix}</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E8%8A%82%E4%BB%A3%E6%8D%A2%EF%BC%88SubBytes%EF%BC%89"><span class="nav-number">2.1.</span> <span class="nav-text">字节代换（SubBytes）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%B9%9F%E5%B0%B1%E6%98%AF%E8%AF%B4%EF%BC%8C%E7%9F%A9%E9%98%B5%E4%B8%AD%E7%9A%84%E6%AF%8F%E4%B8%80%E4%B8%AA%E5%85%83%E7%B4%A0%E9%83%BD%E7%8B%AC%E7%AB%8B%E5%9C%B0%E7%BB%8F%E8%BF%87%E4%B8%80%E6%AC%A1-S-%E7%9B%92%E6%98%A0%E5%B0%84%EF%BC%8C%E5%9B%A0%E6%AD%A4%E9%80%90%E5%85%83%E7%B4%A0%E5%8F%AF%E4%BB%A5%E5%86%99%E4%B8%BA-left-State-mathrm-SB-1-right-i-j"><span class="nav-number">3.</span> <span class="nav-text">也就是说，矩阵中的每一个元素都独立地经过一次 S 盒映射，因此逐元素可以写为$$\left(State_{\mathrm{SB}}^{(1)}\right)_{i,j}</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="ksenr"
+      src="/images/EB423E68F516288F90CA5C2BF3E8F12D.jpg">
+  <p class="site-author-name" itemprop="name">ksenr</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    
+  </aside>
+
+
+    </div>
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://ksenrii.github.io/2026/03/19/Crypto-AES/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/EB423E68F516288F90CA5C2BF3E8F12D.jpg">
+      <meta itemprop="name" content="ksenr">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="ksenr's blog">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Crypto-AES | ksenr's blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Crypto-AES
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-03-19 11:55:44" itemprop="dateCreated datePublished" datetime="2026-03-19T11:55:44+08:00">2026-03-19</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E5%AF%86%E7%A0%81%E5%AD%A6/" itemprop="url" rel="index"><span itemprop="name">密码学</span></a>
+        </span>
+    </span>
+
+  
+    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
+      <span class="post-meta-item-icon">
+        <i class="far fa-eye"></i>
+      </span>
+      <span class="post-meta-item-text">阅读次数：</span>
+      <span id="busuanzi_value_page_pv"></span>
+    </span>
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody"><h1 id="AES"><a href="#AES" class="headerlink" title="AES"></a>AES</h1><p>高级加密标准（AES），又称Rijndael加密法，是美国联邦政府采用的一种区块加密标准。这个标准用来替代原先的DES，已经被多方分析且广为全世界所使用。经过五年的甄选流程，高级加密标准由美国国家标准与技术研究院（NIST）于2001年11月26日发布于FIPS PUB 197，并在2002年5月26日成为有效的标准。现在，高级加密标准已然成为对称密钥加密中最流行的算法之一。</p>
+<span id="more"></span>
+
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><strong>AES</strong>（Advanced Encryption Standard，高级加密标准）是目前最广泛使用的对称分组加密算法之一。所谓“对称加密”，指加密和解密使用同一把密钥；所谓“分组加密”，指算法不是一次处理任意长度的数据流，而是把明文切成固定大小的块逐块处理。</p>
+<p><strong>AES</strong> 的分组长度<strong>固定</strong>为 128 bit，常见密钥长度有 128 bit、192 bit 和 256 bit，因此分别称为 AES-128、AES-192 和 AES-256。它被广泛应用于 HTTPS、VPN、磁盘加密、无线通信等场景，可以说是现代信息安全体系中的基础设施之一。</p>
+<h2 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h2><p>对于AES-128，即密钥长度为128bit</p>
+<ul>
+<li>分组长度固定 128 bit</li>
+<li>状态矩阵 State 是 4×4 字节</li>
+<li>加密由若干“轮”组成</li>
+<li>不同密钥长度对应不同轮数</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>密钥长度</th>
+<th>轮数</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>AES-128</td>
+<td>128 bit</td>
+<td>10</td>
+</tr>
+<tr>
+<td>AES-192</td>
+<td>192 bit</td>
+<td>12</td>
+</tr>
+<tr>
+<td>AES-256</td>
+<td>256 bit</td>
+<td>14</td>
+</tr>
+</tbody></table>
+<p>加密时，各轮AES加密循环（除最后一轮外）均包含4个步骤：</p>
+<p><strong>AddRoundKey</strong>——矩阵中的每一个字节都与该次回合密钥（round key）做XOR运算；每个子密钥由密钥生成方案产生。<br><strong>SubBytes</strong>——透过一个非线性的替换函数，用查找表的方式把每个字节替换成对应的字节。<br><strong>ShiftRows</strong>——将矩阵中的每个横列进行循环式移位。<br><strong>MixColumns</strong>——为了充分混合矩阵中各个直行的操作。这个步骤使用线性转换来混合每内联的四个字节。最后一个加密循环中省略MixColumns步骤，而以另一个AddRoundKey取代。</p>
+<h2 id="明文处理"><a href="#明文处理" class="headerlink" title="明文处理"></a>明文处理</h2><p>在加密开始时，首先需要将明文划分为若干个 16 字节分组，并逐组进行处理。</p>
+<p>以下讨论以单个 128 bit 明文分组为例，不考虑具体工作模式和 padding 细节。</p>
+<p>设某个明文分组由 16 个字节组成，记为<br>$$<br>(p_0,p_1,p_2,\dots,p_{15})<br>$$<br>AES 并不会直接把这 16 个字节当作一维序列来操作，而是先将它们按<strong>列优先</strong>的方式填入一个 4×4 的状态矩阵 State 中：<br>$$<br>\mathbf{State}&#x3D;<br>\left[<br>\begin{matrix}<br>p_0 &amp; p_4 &amp; p_8 &amp; p_{12} \\<br>p_1 &amp; p_5 &amp; p_9 &amp; p_{13} \\<br>p_2 &amp; p_6 &amp; p_{10} &amp; p_{14} \\<br>p_3 &amp; p_7 &amp; p_{11} &amp; p_{15}<br>\end{matrix}<br>\right]<br>$$<br>后续 AES 的各轮加密操作，例如字节代换（SubBytes）、行移位（ShiftRows）、列混淆（MixColumns）以及轮密钥加（AddRoundKey），都是围绕这个状态矩阵展开的。</p>
+<p><img src="/images/blockstate.png" alt="blockstate"></p>
+<h2 id="密钥处理"><a href="#密钥处理" class="headerlink" title="密钥处理"></a>密钥处理</h2><p>除了对明文进行分组和状态矩阵初始化之外，AES 在正式加密之前还需要先对密钥进行处理。原因在于，AES 并不是在每一轮都直接使用原始密钥，而是会先通过<strong>密钥扩展（Key Expansion）算法，从原始密钥中生成一组彼此不同的轮密钥（Round Keys）</strong>，供初始轮和后续各轮使用。</p>
+<p>以 AES-128 为例，原始密钥长度为 128 bit，即 16 字节。由于 AES-128 一共需要进行 10 轮加密，再加上最开始的一次初始轮密钥加，因此总共需要 <strong>11 组轮密钥</strong>。每组轮密钥的长度同样为 128 bit，对应一个 4×4 的字节矩阵。</p>
+<p>密钥扩展的作用，是让每一轮都使用不同的密钥材料，而不是简单重复同一个原始密钥。这样可以增强算法的安全性，使密文对密钥变化更加敏感，也避免因轮与轮之间结构过于相似而带来潜在风险。</p>
+<p>在 AES 的密钥扩展过程中，通常会用到以下几种基本操作：</p>
+<ul>
+<li><p><strong>RotWord</strong>：将一个 4 字节字循环左移 1 个字节</p>
+</li>
+<li><p><strong>SubWord</strong>：对一个字中的每个字节做 S 盒替换</p>
+</li>
+<li><p><strong>Rcon</strong>：引入轮常量，保证不同轮之间的差异性</p>
+<p>具体可以参照<a target="_blank" rel="noopener" href="https://zh.wikipedia.org/wiki/Rijndael%E5%AF%86%E9%92%A5%E7%94%9F%E6%88%90%E6%96%B9%E6%A1%88">Rijndael密钥生成方案 - 维基百科，自由的百科全书</a></p>
+</li>
+</ul>
+<p>通过这些操作，AES 可以从初始密钥逐步推导出后续各轮所需的轮密钥。后面的加密过程中，无论是初始轮密钥加，还是每一轮末尾的 AddRoundKey，使用的都是这里生成出的轮密钥。</p>
+<h2 id="初始轮密钥加（AddRoundKey）"><a href="#初始轮密钥加（AddRoundKey）" class="headerlink" title="初始轮密钥加（AddRoundKey）"></a>初始轮密钥加（AddRoundKey）</h2><p>这一步的操作非常直接：将当前状态矩阵 <code>State</code> 与初始轮密钥 <code>RoundKey_0</code> 逐字节进行异或（XOR）运算，得到新的状态矩阵。</p>
+<h1 id="设初始状态矩阵为-mathrm-State-0-begin-bmatrix-s-0-0-0-s-0-1-0-s-0-2-0-s-0-3-0-s-1-0-0-s-1-1-0-s-1-2-0-s-1-3-0-s-2-0-0-s-2-1-0-s-2-2-0-s-2-3-0-s-3-0-0-s-3-1-0-s-3-2-0-s-3-3-0-end-bmatrix-第-0-轮轮密钥为-K-0-begin-bmatrix-k-0-0-0-k-0-1-0-k-0-2-0-k-0-3-0-k-1-0-0-k-1-1-0-k-1-2-0-k-1-3-0-k-2-0-0-k-2-1-0-k-2-2-0-k-2-3-0-k-3-0-0-k-3-1-0-k-3-2-0-k-3-3-0-end-bmatrix-则初始轮密钥加可以表示为-State-1-State-0-oplus-K-0-即-begin-bmatrix-s-0-0-1-s-0-1-1-s-0-2-1-s-0-3-1-s-1-0-1-s-1-1-1-s-1-2-1-s-1-3-1-s-2-0-1-s-2-1-1-s-2-2-1-s-2-3-1-s-3-0-1-s-3-1-1-s-3-2-1-s-3-3-1-end-bmatrix"><a href="#设初始状态矩阵为-mathrm-State-0-begin-bmatrix-s-0-0-0-s-0-1-0-s-0-2-0-s-0-3-0-s-1-0-0-s-1-1-0-s-1-2-0-s-1-3-0-s-2-0-0-s-2-1-0-s-2-2-0-s-2-3-0-s-3-0-0-s-3-1-0-s-3-2-0-s-3-3-0-end-bmatrix-第-0-轮轮密钥为-K-0-begin-bmatrix-k-0-0-0-k-0-1-0-k-0-2-0-k-0-3-0-k-1-0-0-k-1-1-0-k-1-2-0-k-1-3-0-k-2-0-0-k-2-1-0-k-2-2-0-k-2-3-0-k-3-0-0-k-3-1-0-k-3-2-0-k-3-3-0-end-bmatrix-则初始轮密钥加可以表示为-State-1-State-0-oplus-K-0-即-begin-bmatrix-s-0-0-1-s-0-1-1-s-0-2-1-s-0-3-1-s-1-0-1-s-1-1-1-s-1-2-1-s-1-3-1-s-2-0-1-s-2-1-1-s-2-2-1-s-2-3-1-s-3-0-1-s-3-1-1-s-3-2-1-s-3-3-1-end-bmatrix" class="headerlink" title="设初始状态矩阵为$$\mathrm{State}^{(0)} &#x3D;\begin{bmatrix}s_{0,0}^{(0)} &amp; s_{0,1}^{(0)} &amp; s_{0,2}^{(0)} &amp; s_{0,3}^{(0)} \s_{1,0}^{(0)} &amp; s_{1,1}^{(0)} &amp; s_{1,2}^{(0)} &amp; s_{1,3}^{(0)} \s_{2,0}^{(0)} &amp; s_{2,1}^{(0)} &amp; s_{2,2}^{(0)} &amp; s_{2,3}^{(0)} \s_{3,0}^{(0)} &amp; s_{3,1}^{(0)} &amp; s_{3,2}^{(0)} &amp; s_{3,3}^{(0)}\end{bmatrix}$$第 0 轮轮密钥为$$K^{(0)} &#x3D;\begin{bmatrix}k_{0,0}^{(0)} &amp; k_{0,1}^{(0)} &amp; k_{0,2}^{(0)} &amp; k_{0,3}^{(0)} \k_{1,0}^{(0)} &amp; k_{1,1}^{(0)} &amp; k_{1,2}^{(0)} &amp; k_{1,3}^{(0)} \k_{2,0}^{(0)} &amp; k_{2,1}^{(0)} &amp; k_{2,2}^{(0)} &amp; k_{2,3}^{(0)} \k_{3,0}^{(0)} &amp; k_{3,1}^{(0)} &amp; k_{3,2}^{(0)} &amp; k_{3,3}^{(0)}\end{bmatrix}$$则初始轮密钥加可以表示为$$State^{(1)} &#x3D; State^{(0)} \oplus K^{(0)}$$即$$\begin{bmatrix}s_{0,0}^{(1)} &amp; s_{0,1}^{(1)} &amp; s_{0,2}^{(1)} &amp; s_{0,3}^{(1)} \s_{1,0}^{(1)} &amp; s_{1,1}^{(1)} &amp; s_{1,2}^{(1)} &amp; s_{1,3}^{(1)} \s_{2,0}^{(1)} &amp; s_{2,1}^{(1)} &amp; s_{2,2}^{(1)} &amp; s_{2,3}^{(1)} \s_{3,0}^{(1)} &amp; s_{3,1}^{(1)} &amp; s_{3,2}^{(1)} &amp; s_{3,3}^{(1)}\end{bmatrix}"></a>设初始状态矩阵为<br>$$<br>\mathrm{State}^{(0)} &#x3D;<br>\begin{bmatrix}<br>s_{0,0}^{(0)} &amp; s_{0,1}^{(0)} &amp; s_{0,2}^{(0)} &amp; s_{0,3}^{(0)} \<br>s_{1,0}^{(0)} &amp; s_{1,1}^{(0)} &amp; s_{1,2}^{(0)} &amp; s_{1,3}^{(0)} \<br>s_{2,0}^{(0)} &amp; s_{2,1}^{(0)} &amp; s_{2,2}^{(0)} &amp; s_{2,3}^{(0)} \<br>s_{3,0}^{(0)} &amp; s_{3,1}^{(0)} &amp; s_{3,2}^{(0)} &amp; s_{3,3}^{(0)}<br>\end{bmatrix}<br>$$<br>第 0 轮轮密钥为<br>$$<br>K^{(0)} &#x3D;<br>\begin{bmatrix}<br>k_{0,0}^{(0)} &amp; k_{0,1}^{(0)} &amp; k_{0,2}^{(0)} &amp; k_{0,3}^{(0)} \<br>k_{1,0}^{(0)} &amp; k_{1,1}^{(0)} &amp; k_{1,2}^{(0)} &amp; k_{1,3}^{(0)} \<br>k_{2,0}^{(0)} &amp; k_{2,1}^{(0)} &amp; k_{2,2}^{(0)} &amp; k_{2,3}^{(0)} \<br>k_{3,0}^{(0)} &amp; k_{3,1}^{(0)} &amp; k_{3,2}^{(0)} &amp; k_{3,3}^{(0)}<br>\end{bmatrix}<br>$$<br>则初始轮密钥加可以表示为<br>$$<br>State^{(1)} &#x3D; State^{(0)} \oplus K^{(0)}<br>$$<br>即<br>$$<br>\begin{bmatrix}<br>s_{0,0}^{(1)} &amp; s_{0,1}^{(1)} &amp; s_{0,2}^{(1)} &amp; s_{0,3}^{(1)} \<br>s_{1,0}^{(1)} &amp; s_{1,1}^{(1)} &amp; s_{1,2}^{(1)} &amp; s_{1,3}^{(1)} \<br>s_{2,0}^{(1)} &amp; s_{2,1}^{(1)} &amp; s_{2,2}^{(1)} &amp; s_{2,3}^{(1)} \<br>s_{3,0}^{(1)} &amp; s_{3,1}^{(1)} &amp; s_{3,2}^{(1)} &amp; s_{3,3}^{(1)}<br>\end{bmatrix}</h1><p>\begin{bmatrix}<br>s_{0,0}^{(0)} &amp; s_{0,1}^{(0)} &amp; s_{0,2}^{(0)} &amp; s_{0,3}^{(0)} \<br>s_{1,0}^{(0)} &amp; s_{1,1}^{(0)} &amp; s_{1,2}^{(0)} &amp; s_{1,3}^{(0)} \<br>s_{2,0}^{(0)} &amp; s_{2,1}^{(0)} &amp; s_{2,2}^{(0)} &amp; s_{2,3}^{(0)} \<br>s_{3,0}^{(0)} &amp; s_{3,1}^{(0)} &amp; s_{3,2}^{(0)} &amp; s_{3,3}^{(0)}<br>\end{bmatrix}<br>\oplus<br>\begin{bmatrix}<br>k_{0,0}^{(0)} &amp; k_{0,1}^{(0)} &amp; k_{0,2}^{(0)} &amp; k_{0,3}^{(0)} \<br>k_{1,0}^{(0)} &amp; k_{1,1}^{(0)} &amp; k_{1,2}^{(0)} &amp; k_{1,3}^{(0)} \<br>k_{2,0}^{(0)} &amp; k_{2,1}^{(0)} &amp; k_{2,2}^{(0)} &amp; k_{2,3}^{(0)} \<br>k_{3,0}^{(0)} &amp; k_{3,1}^{(0)} &amp; k_{3,2}^{(0)} &amp; k_{3,3}^{(0)}<br>\end{bmatrix}<br>$$<br>这里的异或是逐元素进行的，即<br>$$<br>s_{i,j}^{(1)} &#x3D; s_{i,j}^{(0)} \oplus k_{i,j}^{(0)}, \qquad 0 \le i,j \le 3<br>$$</p>
+<h2 id="字节代换（SubBytes）"><a href="#字节代换（SubBytes）" class="headerlink" title="字节代换（SubBytes）"></a>字节代换（SubBytes）</h2><p>在完成初始轮密钥加之后，AES 进入标准轮变换的第一步，即 <strong>字节代换（SubBytes）</strong>。这一步会对状态矩阵中的每一个字节分别进行替换，替换规则由一张固定的查找表决定，这张表称为 <strong>S 盒</strong>。</p>
+<p>经过<strong>初始轮密钥加（AddRoundKey）</strong>,我们得到了<br>$$<br>State^{(1)}<br>$$<br>在 SubBytes 变换中，状态矩阵中的每一个字节都会通过 AES 的 <strong>S 盒</strong>进行替换。变换后得到新的状态矩阵，记为<br>$$<br>State_{\mathrm{SB}}^{(1)} &#x3D; \mathrm{SubBytes}(State^{(1)})<br>$$<br>即<br>$$<br>State_{\mathrm{SB}}^{(1)} &#x3D;<br>\begin{bmatrix}<br>S!\left(s_{0,0}^{(1)}\right) &amp; S!\left(s_{0,1}^{(1)}\right) &amp; S!\left(s_{0,2}^{(1)}\right) &amp; S!\left(s_{0,3}^{(1)}\right) \<br>S!\left(s_{1,0}^{(1)}\right) &amp; S!\left(s_{1,1}^{(1)}\right) &amp; S!\left(s_{1,2}^{(1)}\right) &amp; S!\left(s_{1,3}^{(1)}\right) \<br>S!\left(s_{2,0}^{(1)}\right) &amp; S!\left(s_{2,1}^{(1)}\right) &amp; S!\left(s_{2,2}^{(1)}\right) &amp; S!\left(s_{2,3}^{(1)}\right) \<br>S!\left(s_{3,0}^{(1)}\right) &amp; S!\left(s_{3,1}^{(1)}\right) &amp; S!\left(s_{3,2}^{(1)}\right) &amp; S!\left(s_{3,3}^{(1)}\right)<br>\end{bmatrix}<br>$$</p>
+<p>$$<br>其中，S(\cdot) 表示 AES 的 S 盒替换函数。<br>$$</p>
+<h1 id="也就是说，矩阵中的每一个元素都独立地经过一次-S-盒映射，因此逐元素可以写为-left-State-mathrm-SB-1-right-i-j"><a href="#也就是说，矩阵中的每一个元素都独立地经过一次-S-盒映射，因此逐元素可以写为-left-State-mathrm-SB-1-right-i-j" class="headerlink" title="也就是说，矩阵中的每一个元素都独立地经过一次 S 盒映射，因此逐元素可以写为$$\left(State_{\mathrm{SB}}^{(1)}\right)_{i,j}"></a>也就是说，矩阵中的每一个元素都独立地经过一次 S 盒映射，因此逐元素可以写为<br>$$<br>\left(State_{\mathrm{SB}}^{(1)}\right)_{i,j}</h1><p>S!\left(s_{i,j}^{(1)}\right), \qquad 0 \le i,j \le 3<br>$$<br>SubBytes 的作用是为 AES 引入<strong>非线性</strong>。这一过程并不改变字节在状态矩阵中的位置，而是只改变每个字节本身的取值。因此，SubBytes 可以理解为“改值不改位”的变换：它负责把原有字节替换为新的字节值，而不打乱矩阵结构。</p>
+<p>例如，若某个位置上的字节为<br>$$<br>s_{i,j}^{(1)} &#x3D; \texttt{0x53}<br>$$</p>
+<ol>
+<li>将 <strong>8 位输入字节</strong> 拆分为高 4 位和低 4 位。</li>
+<li><strong>高 4 位</strong> 作为 <strong>行号</strong>（0 ~ F），<strong>低 4 位</strong> 作为 <strong>列号</strong>（0 ~ F）。</li>
+<li>查表得到行列交叉处的值，即为 S 盒输出。</li>
+</ol>
+<p><img src="/images/sbox.png" alt="sbox"></p>
+<p>则在查 S 盒后，能得到<br>$$<br>S(\texttt{0x53}) &#x3D; \texttt{0xed}<br>$$</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E5%AF%86%E7%A0%81%E5%AD%A6/" rel="tag"># 密码学</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2026/03/16/Diffie-Hellman/" rel="prev" title="Diffie-Hellman">
+                  <i class="fa fa-angle-left"></i> Diffie-Hellman
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+  <div class="copyright">
+    &copy; 
+    <span itemprop="copyrightYear">2026</span>
+    <span class="with-love">
+      <i class="fa fa-heart"></i>
+    </span>
+    <span class="author" itemprop="copyrightHolder">ksenr</span>
+  </div>
+<div class="busuanzi-count">
+    <span class="post-meta-item" id="busuanzi_container_site_uv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+  <div class="sidebar-dimmer"></div>
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up fa-lg"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+</body>
+</html>
