@@ -219,7 +219,7 @@ article {
 	<div class="search-form__inner">
 		<div>
 			<i class="iconfont icon-search"></i>
-			<input class="text-input" placeholder="Enter Key..." type="search">
+			<input class="text-input" placeholder="Search..." type="search">
 		</div>
 	</div>
 </form>
@@ -235,11 +235,6 @@ article {
 				
 				<li class="current-menu-item">
 					<a href="/daily-pause/" target="_self">Daily Pause</a>
-				</li>
-			
-				
-				<li class="current-menu-item">
-					<a href="https://github.com/ksenrii" target="_blank">GitHub</a>
 				</li>
 			
 		</ul>
@@ -262,7 +257,7 @@ article {
 <!--文章列表-->
 <div class="wrapper">
   
-    <!--文章-->
+    <!-- article -->
 <article>
 	
   
@@ -271,6 +266,33 @@ article {
     </h1>
   
 
+	
+	
+		<aside class="post-toc">
+			<div class="post-toc-title">&#30446;&#24405;</div>
+			
+				<a class="level-1" href="#SM4">SM4</a>
+			
+				<a class="level-2" href="#概述">概述</a>
+			
+				<a class="level-2" href="#整体架构">整体架构</a>
+			
+				<a class="level-2" href="#明文处理">明文处理</a>
+			
+				<a class="level-2" href="#密钥处理">密钥处理</a>
+			
+				<a class="level-2" href="#轮函数F">轮函数F</a>
+			
+				<a class="level-2" href="#合成置换T">合成置换T</a>
+			
+				<a class="level-2" href="#非线性变换τ">非线性变换τ</a>
+			
+				<a class="level-2" href="#线性变换-L">线性变换 L</a>
+			
+				<a class="level-2" href="#总结">总结</a>
+			
+		</aside>
+	
 	<div class='post-body mb'>
 		<h1 id="SM4"><a href="#SM4" class="headerlink" title="SM4"></a>SM4</h1><p>SM4（原名SMS4）是中華人民共和國政府采用的一种分组密码标准，由国家密码管理局于2012年3月21日发布[。2016年8月，成为中国国家密码标准（GB&#x2F;T 32907-2016。在商用密码体系中，SM4主要用于数据加密，其算法公开，分组长度与密钥长度均为128bit，加密算法与密钥扩展算法都采用32轮非线性迭代结构，S盒为固定的8比特输入8比特输出。</p>
 <span id="more"></span>
@@ -719,12 +741,11 @@ X_{i+4}=X_i\oplus T(X_{i+1}\oplus X_{i+2}\oplus X_{i+3}\oplus rk_i),\qquad i=0,1
 
 	</div>
 	<div class="meta split">
-		
 		<time class="post-date" datetime="2026-03-23T03:55:44.000Z" itemprop="datePublished">2026-03-23</time>
 	</div>
 </article>
 
-<!--评论-->
+<!-- comments -->
 
 
   
@@ -749,39 +770,14 @@ X_{i+4}=X_i\oplus T(X_{i+1}\oplus X_{i+2}\oplus X_{i+3}\oplus rk_i),\qquad i=0,1
 		<div class="layout layout--center">
 			<div class="layout__item palm-mb">
 				<div class="media">
-					<img class="headimg" src='https://imgchr.github.la/steve.jpeg' alt='ksenr'>
+					<img class="headimg" src='/images/avatar.gif' alt='ksenr'>
 					<div class="media__body">
-						<h4>justpsvm</h4>
-						<p class='site-description'>Stay Hungry,Stay Foolish.</p>
+						<h4>ksenrii</h4>
+						<p class='site-description'>淇℃伅瀹夊叏瀛︿範绗旇</p>
 					</div>
 				</div>
 				<div class="author-contact">
 					<ul>
-						
-							
-							<li>
-				        		<a href="https://github.com/ksenrii" target="_blank">
-				        			
-				        		</a>
-				        	</li>
-						
-							
-							<li>
-				        		<a href="https://github.com/" target="_blank">
-				        			
-				        				<i class="iconfont icon-github"></i>
-				        			
-				        		</a>
-				        	</li>
-						
-							
-							<li>
-				        		<a href="https://www.zhihu.com/" target="_blank">
-				        			
-										<i class="iconfont icon-zhihu"></i>
-				        			
-				        		</a>
-				        	</li>
 						
 					</ul>
 				</div>
@@ -789,18 +785,12 @@ X_{i+4}=X_i\oplus T(X_{i+1}\oplus X_{i+2}\oplus X_{i+3}\oplus rk_i),\qquad i=0,1
 		</div>
 	</div>
 </div>
-
 <footer class="footer" role="contentinfo">
 	<div class="wrapper wrapper--wide split split--responsive">
-		
-		<span>Theme by <a target="_blank" rel="noopener" href="http://github.com/justpsvm">justpsvm</a>. Powered by <a target="_blank" rel="noopener" href="http://hexo.io">Hexo</a></span>
+		<span>&copy; 2026 ksenr</span>
 	</div>
 </footer>
 
-	<!-－这里导入了 lib.js 里面涵盖了 jQuery 等框架 所以注释掉-->
-	<!--
-<script src="http://lib.sinaapp.com/js/jquery/2.0/jquery.min.js"></script>
--->
 	
 <script src="/js/lib.js"></script>
 
@@ -810,7 +800,6 @@ X_{i+4}=X_i\oplus T(X_{i+1}\oplus X_{i+2}\oplus X_{i+3}\oplus rk_i),\qquad i=0,1
 	
 <script src="/js/script.js"></script>
 
-	
 	<!-- hexo injector body_end start -->
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script>
@@ -901,5 +890,3 @@ X_{i+4}=X_i\oplus T(X_{i+1}\oplus X_{i+2}\oplus X_{i+3}\oplus rk_i),\qquad i=0,1
 })();
 </script><!-- hexo injector body_end end --></body>
 </html>
-
-
