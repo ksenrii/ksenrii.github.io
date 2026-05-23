@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    
+    <title>archive_a | ksenr&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    
+      <link rel="icon" href="/favicon.png">
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+<link rel="stylesheet" href="/js/google-code-prettify/tomorrow-night-eighties.min.css">
+
+
+  <!-- hexo injector head_end start -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [["\\(", "\\)"]],
+    displayMath: [["\\[", "\\]"]],
+    processEscapes: true,
+    processEnvironments: true,
+    tags: "ams"
+  },
+  options: {
+    skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"]
+  },
+  chtml: {
+    scale: 1,
+    matchFontHeight: false
+  }
+};
+</script>
+<style>
+.post-body .math-display {
+  margin: 1.25rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.post-body mjx-container {
+  max-width: 100%;
+}
+.post-body mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.35rem 0;
+}
+.post-body mjx-container svg {
+  max-width: none;
+}
+
+.post-body figure.highlight {
+  position: relative;
+  margin: 1.6rem 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #1f2329;
+  box-shadow: 0 12px 34px rgba(17, 24, 39, 0.16);
+}
+.post-body figure.highlight table {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  overflow-x: auto;
+  border-collapse: collapse;
+  background: #282c34;
+}
+.post-body figure.highlight tbody,
+.post-body figure.highlight tr {
+  display: table;
+  width: 100%;
+}
+.post-body figure.highlight td {
+  border: 0;
+  padding: 0;
+  vertical-align: top;
+}
+.post-body figure.highlight .gutter {
+  width: 3.7rem;
+  min-width: 3.7rem;
+  user-select: none;
+  background: #21252b;
+  color: #6b7280;
+  text-align: right;
+}
+.post-body figure.highlight .code {
+  width: 100%;
+  background: #282c34;
+}
+.post-body figure.highlight pre {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  overflow: visible !important;
+  color: #abb2bf;
+  font-family: Consolas, Monaco, "Cascadia Code", "Fira Code", monospace;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.post-body figure.highlight .code pre {
+  min-width: max-content;
+}
+.post-body figure.highlight .line {
+  min-height: 1.65em;
+}
+.post-body figure.highlight .keyword,
+.post-body figure.highlight .type {
+  color: #c678dd;
+}
+.post-body figure.highlight .string {
+  color: #98c379;
+}
+.post-body figure.highlight .number,
+.post-body figure.highlight .literal {
+  color: #d19a66;
+}
+.post-body figure.highlight .comment {
+  color: #7f848e;
+}
+.post-body figure.highlight .meta,
+.post-body figure.highlight .built_in,
+.post-body figure.highlight .function .title {
+  color: #61afef;
+}
+.code-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 2.4rem;
+  padding: 0 0.75rem 0 1rem;
+  background: #1b1f27;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: #9ca3af;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.code-copy-button {
+  border: 0;
+  border-radius: 6px;
+  padding: 0.32rem 0.65rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: #d1d5db;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+.code-copy-button:hover {
+  background: #35bfab;
+  color: #111827;
+}
+
+article {
+  position: relative;
+}
+.post-toc {
+  position: fixed;
+  top: 128px;
+  right: max(24px, calc((100vw - 1180px) / 2));
+  width: 235px;
+  max-height: calc(100vh - 160px);
+  overflow: auto;
+  padding: 1rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 10px 34px rgba(17, 24, 39, 0.10);
+  backdrop-filter: blur(12px);
+  z-index: 1;
+}
+.post-toc-title {
+  margin-bottom: 0.7rem;
+  color: #334f52;
+  font-weight: 600;
+}
+.post-toc a {
+  display: block;
+  padding: 0.32rem 0.45rem;
+  border-left: 2px solid transparent;
+  border-radius: 4px;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.5;
+  text-decoration: none;
+}
+.post-toc a.level-3 {
+  padding-left: 1.05rem;
+}
+.post-toc a.level-4 {
+  padding-left: 1.65rem;
+}
+.post-toc a.is-active,
+.post-toc a:hover {
+  border-left-color: #35bfab;
+  background: rgba(53, 191, 171, 0.12);
+  color: #243b3d;
+}
+@media screen and (max-width: 1180px) {
+  .post-toc {
+    position: static;
+    width: auto;
+    max-height: none;
+    margin: 0 0 1.6rem;
+  }
+}
+</style><!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+
+<header>
+	
+		<i class="js-toggle-search iconfont icon-search"></i>
+
+
+<form class="js-search search-form search-form--modal" method="get" action="http://gushi.li" role="search">
+	<div class="search-form__inner">
+		<div>
+			<i class="iconfont icon-search"></i>
+			<input class="text-input" placeholder="Enter Key..." type="search">
+		</div>
+	</div>
+</form>
+	
+
+	
+		<a id="nav-toggle" href="#"><span></span></a>
+
+<nav>
+	<div class="menu-top-container">
+		<ul id="menu-top" class="menu">
+			
+				
+				<li class="current-menu-item">
+					<a href="/daily-pause/" target="_self">Daily Pause</a>
+				</li>
+			
+				
+				<li class="current-menu-item">
+					<a href="https://github.com/ksenrii" target="_blank">GitHub</a>
+				</li>
+			
+		</ul>
+	</div>
+</nav>
+	
+</header>
+
+<div class="m-header ">
+	<section id="hero1" class="hero">
+		<div class="inner">
+		</div>
+	</section>
+	
+		<figure class="top-image" style='background-image: url(/banner/4.jpg)' data-enable=false></figure>
+	
+</div>
+
+
+<!--文章列表-->
+<div class="wrapper">
+  
+    <ul class="posts-list mb+ js-posts">
+      
+                <!--<div class="type">
+          <div class="mask">
+            <i class="iconfont"></i>
+          </div>
+          </div>-->
+        <li class="post">
+          
+            <i class="post-status iconfont icon-icon"></i>  
+          
+          <h2 class="no-background"  >
+            <span><a href="/2026/02/06/Crypto-Knapsack%20Problem/">Crypto-Knapsack Problem</a></span>
+            <time class="post-time" datetime="2026-02-06T07:08:32.000Z" itemprop="datePublished">2026-02-06</time>
+          </h2>
+        </li>
+      
+                <!--<div class="type">
+          <div class="mask">
+            <i class="iconfont"></i>
+          </div>
+          </div>-->
+        <li class="post">
+          
+          <h2 class="no-background"  >
+            <span><a href="/2026/02/05/Crypto-Rsa/">Crypto-Rsa</a></span>
+            <time class="post-time" datetime="2026-02-05T03:55:44.000Z" itemprop="datePublished">2026-02-05</time>
+          </h2>
+        </li>
+      
+    </ul>
+    
+      <div class="pagination mb+ js-pagination">
+        <div class="js-next pagination__load">
+            
+        </div>
+    </div>
+    
+
+  
+</div>
+
+
+
+
+
+<div class="fat-footer">
+	<div class="wrapper">
+		<div class="layout layout--center">
+			<div class="layout__item palm-mb">
+				<div class="media">
+					<img class="headimg" src='https://imgchr.github.la/steve.jpeg' alt='ksenr'>
+					<div class="media__body">
+						<h4>justpsvm</h4>
+						<p class='site-description'>Stay Hungry,Stay Foolish.</p>
+					</div>
+				</div>
+				<div class="author-contact">
+					<ul>
+						
+							
+							<li>
+				        		<a href="https://github.com/ksenrii" target="_blank">
+				        			
+				        		</a>
+				        	</li>
+						
+							
+							<li>
+				        		<a href="https://github.com/" target="_blank">
+				        			
+				        				<i class="iconfont icon-github"></i>
+				        			
+				        		</a>
+				        	</li>
+						
+							
+							<li>
+				        		<a href="https://www.zhihu.com/" target="_blank">
+				        			
+										<i class="iconfont icon-zhihu"></i>
+				        			
+				        		</a>
+				        	</li>
+						
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<footer class="footer" role="contentinfo">
+	<div class="wrapper wrapper--wide split split--responsive">
+		
+		<span>Theme by <a target="_blank" rel="noopener" href="http://github.com/justpsvm">justpsvm</a>. Powered by <a target="_blank" rel="noopener" href="http://hexo.io">Hexo</a></span>
+	</div>
+</footer>
+
+	<!-－这里导入了 lib.js 里面涵盖了 jQuery 等框架 所以注释掉-->
+	<!--
+<script src="http://lib.sinaapp.com/js/jquery/2.0/jquery.min.js"></script>
+-->
+	
+<script src="/js/lib.js"></script>
+
+	
+<script src="/js/module.js"></script>
+
+	
+<script src="/js/script.js"></script>
+
+	
+	<!-- hexo injector body_end start -->
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>
+(function () {
+  function getCodeText(block) {
+    var code = block.querySelector(".code pre") || block.querySelector("pre");
+    return code ? code.innerText.replace(/\n$/, "") : "";
+  }
+
+  document.querySelectorAll(".post-body figure.highlight").forEach(function (block) {
+    if (block.querySelector(".code-toolbar")) return;
+
+    var language = Array.from(block.classList).filter(function (name) {
+      return name !== "highlight";
+    })[0] || "code";
+
+    var toolbar = document.createElement("div");
+    toolbar.className = "code-toolbar";
+    toolbar.innerHTML = "<span>" + language.toUpperCase() + "</span><button class=\"code-copy-button\" type=\"button\">澶嶅埗</button>";
+    block.insertBefore(toolbar, block.firstChild);
+
+    toolbar.querySelector("button").addEventListener("click", function () {
+      var button = this;
+      var text = getCodeText(block);
+      var copied = function () {
+        button.textContent = "宸插鍒?;
+        setTimeout(function () {
+          button.textContent = "澶嶅埗";
+        }, 1500);
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(copied);
+      } else {
+        var textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+        copied();
+      }
+    });
+  });
+
+  var article = document.querySelector("article");
+  var body = article && article.querySelector(".post-body");
+  if (!article || !body || article.querySelector(".post-toc")) return;
+
+  var headings = Array.from(body.querySelectorAll("h2, h3, h4")).filter(function (heading) {
+    return heading.textContent.trim().length > 0;
+  });
+  if (headings.length < 2) return;
+
+  var nav = document.createElement("aside");
+  nav.className = "post-toc";
+  nav.innerHTML = '<div class="post-toc-title">鐩綍</div>';
+
+  headings.forEach(function (heading, index) {
+    if (!heading.id) {
+      heading.id = "toc-heading-" + index;
+    }
+    var link = document.createElement("a");
+    link.href = "#" + encodeURIComponent(heading.id);
+    link.className = "level-" + heading.tagName.slice(1);
+    link.textContent = heading.textContent.trim();
+    nav.appendChild(link);
+  });
+
+  article.insertBefore(nav, body);
+
+  var links = Array.from(nav.querySelectorAll("a"));
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      links.forEach(function (link) {
+        link.classList.toggle("is-active", decodeURIComponent(link.hash.slice(1)) === entry.target.id);
+      });
+    });
+  }, { rootMargin: "-20% 0px -70% 0px", threshold: 0 });
+
+  headings.forEach(function (heading) {
+    observer.observe(heading);
+  });
+})();
+</script><!-- hexo injector body_end end --></body>
+</html>
+
+

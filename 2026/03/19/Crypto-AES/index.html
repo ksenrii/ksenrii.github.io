@@ -1,253 +1,278 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+<html>
+  <head>
+    <meta charset="utf-8">
+    
+    <title>Crypto-AES | ksenr&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    
+      <link rel="icon" href="/favicon.png">
+    
 
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
-
-<script class="next-config" data-name="main" type="application/json">{"hostname":"ksenrii.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
-
-    <meta name="description" content="AES高级加密标准（AES），又称Rijndael加密法，是美国联邦政府采用的一种区块加密标准。这个标准用来替代原先的DES，已经被多方分析且广为全世界所使用。经过五年的甄选流程，高级加密标准由美国国家标准与技术研究院（NIST）于2001年11月26日发布于FIPS PUB 197，并在2002年5月26日成为有效的标准。现在，高级加密标准已然成为对称密钥加密中最流行的算法之一。">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Crypto-AES">
-<meta property="og:url" content="https://ksenrii.github.io/2026/03/19/Crypto-AES/index.html">
-<meta property="og:site_name" content="ksenr&#39;s blog">
-<meta property="og:description" content="AES高级加密标准（AES），又称Rijndael加密法，是美国联邦政府采用的一种区块加密标准。这个标准用来替代原先的DES，已经被多方分析且广为全世界所使用。经过五年的甄选流程，高级加密标准由美国国家标准与技术研究院（NIST）于2001年11月26日发布于FIPS PUB 197，并在2002年5月26日成为有效的标准。现在，高级加密标准已然成为对称密钥加密中最流行的算法之一。">
-<meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://ksenrii.github.io/images/blockstate.png">
-<meta property="og:image" content="https://ksenrii.github.io/images/sbox.png">
-<meta property="article:published_time" content="2026-03-19T03:55:44.000Z">
-<meta property="article:modified_time" content="2026-04-05T05:07:04.614Z">
-<meta property="article:author" content="ksenr">
-<meta property="article:tag" content="密码学">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://ksenrii.github.io/images/blockstate.png">
+    
+<link rel="stylesheet" href="/css/style.css">
 
 
-<link rel="canonical" href="https://ksenrii.github.io/2026/03/19/Crypto-AES/">
+    
+<link rel="stylesheet" href="/js/google-code-prettify/tomorrow-night-eighties.min.css">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ksenrii.github.io/2026/03/19/Crypto-AES/","path":"2026/03/19/Crypto-AES/","title":"Crypto-AES"}</script>
+  <!-- hexo injector head_end start -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [["\\(", "\\)"]],
+    displayMath: [["\\[", "\\]"]],
+    processEscapes: true,
+    processEnvironments: true,
+    tags: "ams"
+  },
+  options: {
+    skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"]
+  },
+  chtml: {
+    scale: 1,
+    matchFontHeight: false
+  }
+};
+</script>
+<style>
+.post-body .math-display {
+  margin: 1.25rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.post-body mjx-container {
+  max-width: 100%;
+}
+.post-body mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.35rem 0;
+}
+.post-body mjx-container svg {
+  max-width: none;
+}
 
-<script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Crypto-AES | ksenr's blog</title>
-  
+.post-body figure.highlight {
+  position: relative;
+  margin: 1.6rem 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #1f2329;
+  box-shadow: 0 12px 34px rgba(17, 24, 39, 0.16);
+}
+.post-body figure.highlight table {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  overflow-x: auto;
+  border-collapse: collapse;
+  background: #282c34;
+}
+.post-body figure.highlight tbody,
+.post-body figure.highlight tr {
+  display: table;
+  width: 100%;
+}
+.post-body figure.highlight td {
+  border: 0;
+  padding: 0;
+  vertical-align: top;
+}
+.post-body figure.highlight .gutter {
+  width: 3.7rem;
+  min-width: 3.7rem;
+  user-select: none;
+  background: #21252b;
+  color: #6b7280;
+  text-align: right;
+}
+.post-body figure.highlight .code {
+  width: 100%;
+  background: #282c34;
+}
+.post-body figure.highlight pre {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  overflow: visible !important;
+  color: #abb2bf;
+  font-family: Consolas, Monaco, "Cascadia Code", "Fira Code", monospace;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.post-body figure.highlight .code pre {
+  min-width: max-content;
+}
+.post-body figure.highlight .line {
+  min-height: 1.65em;
+}
+.post-body figure.highlight .keyword,
+.post-body figure.highlight .type {
+  color: #c678dd;
+}
+.post-body figure.highlight .string {
+  color: #98c379;
+}
+.post-body figure.highlight .number,
+.post-body figure.highlight .literal {
+  color: #d19a66;
+}
+.post-body figure.highlight .comment {
+  color: #7f848e;
+}
+.post-body figure.highlight .meta,
+.post-body figure.highlight .built_in,
+.post-body figure.highlight .function .title {
+  color: #61afef;
+}
+.code-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 2.4rem;
+  padding: 0 0.75rem 0 1rem;
+  background: #1b1f27;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: #9ca3af;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.code-copy-button {
+  border: 0;
+  border-radius: 6px;
+  padding: 0.32rem 0.65rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: #d1d5db;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+.code-copy-button:hover {
+  background: #35bfab;
+  color: #111827;
+}
+
+article {
+  position: relative;
+}
+.post-toc {
+  position: fixed;
+  top: 128px;
+  right: max(24px, calc((100vw - 1180px) / 2));
+  width: 235px;
+  max-height: calc(100vh - 160px);
+  overflow: auto;
+  padding: 1rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 10px 34px rgba(17, 24, 39, 0.10);
+  backdrop-filter: blur(12px);
+  z-index: 1;
+}
+.post-toc-title {
+  margin-bottom: 0.7rem;
+  color: #334f52;
+  font-weight: 600;
+}
+.post-toc a {
+  display: block;
+  padding: 0.32rem 0.45rem;
+  border-left: 2px solid transparent;
+  border-radius: 4px;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.5;
+  text-decoration: none;
+}
+.post-toc a.level-3 {
+  padding-left: 1.05rem;
+}
+.post-toc a.level-4 {
+  padding-left: 1.65rem;
+}
+.post-toc a.is-active,
+.post-toc a:hover {
+  border-left-color: #35bfab;
+  background: rgba(53, 191, 171, 0.12);
+  color: #243b3d;
+}
+@media screen and (max-width: 1180px) {
+  .post-toc {
+    position: static;
+    width: auto;
+    max-height: none;
+    margin: 0 0 1.6rem;
+  }
+}
+</style><!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+
+<header>
+	
+		<i class="js-toggle-search iconfont icon-search"></i>
 
 
+<form class="js-search search-form search-form--modal" method="get" action="http://gushi.li" role="search">
+	<div class="search-form__inner">
+		<div>
+			<i class="iconfont icon-search"></i>
+			<input class="text-input" placeholder="Enter Key..." type="search">
+		</div>
+	</div>
+</form>
+	
 
+	
+		<a id="nav-toggle" href="#"><span></span></a>
 
-
-
-
-
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
-
-  
-
-
-
-
-
-
-  
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-
-
-
-  
-
-  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
-<script src="/js/third-party/math/mathjax.js" defer></script>
-
-
-
-  <noscript>
-    <link rel="stylesheet" href="/css/noscript.css">
-  </noscript>
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
-  <div class="headband"></div>
-
-  <main class="main">
-    <div class="column">
-      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏" role="button">
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <i class="logo-line"></i>
-      <p class="site-title">ksenr's blog</p>
-      <i class="logo-line"></i>
-    </a>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger" aria-label="搜索" role="button">
-    </div>
-  </div>
-</div>
-
-
-
-<nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
-  </ul>
+<nav>
+	<div class="menu-top-container">
+		<ul id="menu-top" class="menu">
+			
+				
+				<li class="current-menu-item">
+					<a href="/daily-pause/" target="_self">Daily Pause</a>
+				</li>
+			
+				
+				<li class="current-menu-item">
+					<a href="https://github.com/ksenrii" target="_blank">GitHub</a>
+				</li>
+			
+		</ul>
+	</div>
 </nav>
-
-
-
-
+	
 </header>
-        
-  
-  <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
-      <ul class="sidebar-nav">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <div class="sidebar-panel-container">
-        <!--noindex-->
-        <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#AES"><span class="nav-number">1.</span> <span class="nav-text">AES</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A6%82%E8%BF%B0"><span class="nav-number">1.1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84"><span class="nav-number">1.2.</span> <span class="nav-text">整体架构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%98%8E%E6%96%87%E5%A4%84%E7%90%86"><span class="nav-number">1.3.</span> <span class="nav-text">明文处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%86%E9%92%A5%E5%A4%84%E7%90%86"><span class="nav-number">1.4.</span> <span class="nav-text">密钥处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E5%A7%8B%E8%BD%AE%E5%AF%86%E9%92%A5%E5%8A%A0"><span class="nav-number">1.5.</span> <span class="nav-text">初始轮密钥加</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%97%E8%8A%82%E4%BB%A3%E6%8D%A2%EF%BC%88SubBytes%EF%BC%89"><span class="nav-number">1.6.</span> <span class="nav-text">字节代换（SubBytes）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#left-mathbf-State-mathrm-SB-1-right-i-j"><span class="nav-number">2.</span> <span class="nav-text">$$\left(\mathbf{State}{\mathrm{SB}}^{(1)}\right){i,j}</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A1%8C%E7%A7%BB%E4%BD%8D%EF%BC%88ShiftRows%EF%BC%89"><span class="nav-number">2.1.</span> <span class="nav-text">行移位（ShiftRows）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9C%A8%E5%AE%8C%E6%88%90%E5%AD%97%E8%8A%82%E4%BB%A3%E6%8D%A2%E4%B9%8B%E5%90%8E%EF%BC%8C%E7%8A%B6%E6%80%81%E7%9F%A9%E9%98%B5%E7%94%B1%E5%8F%98%E4%B8%BA-State-mathrm-SB-1"><span class="nav-number">3.</span> <span class="nav-text">在完成字节代换之后，状态矩阵由变为$$State_{\mathrm{SB}}^{(1)}</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BB%8F%E8%BF%87%E8%A1%8C%E7%A7%BB%E4%BD%8D%E5%90%8E%EF%BC%8C%E5%BE%97%E5%88%B0%E6%96%B0%E7%9A%84%E7%8A%B6%E6%80%81%E7%9F%A9%E9%98%B5%EF%BC%8C%E8%AE%B0%E4%B8%BA-State-mathrm-SR-1-mathrm-ShiftRows-left-State-mathrm-SB-1-right-%E5%85%B6%E5%85%B7%E4%BD%93%E5%BD%A2%E5%BC%8F%E4%B8%BA-State-mathrm-SR-1"><span class="nav-number">4.</span> <span class="nav-text">经过行移位后，得到新的状态矩阵，记为$$State_{\mathrm{SR}}^{(1)}&#x3D;\mathrm{ShiftRows}!\left(State_{\mathrm{SB}}^{(1)}\right)$$其具体形式为$$State_{\mathrm{SR}}^{(1)}</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%97%E6%B7%B7%E6%B7%86%EF%BC%88MixColumns%EF%BC%89"><span class="nav-number">4.1.</span> <span class="nav-text">列混淆（MixColumns）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9C%A8%E5%AE%8C%E6%88%90%E8%A1%8C%E7%A7%BB%E4%BD%8D%E4%B9%8B%E5%90%8E%EF%BC%8C%E7%AC%AC%E4%B8%80%E8%BD%AE%E5%BD%93%E5%89%8D%E7%9A%84%E7%8A%B6%E6%80%81%E7%9F%A9%E9%98%B5%E4%B8%BA-State-mathrm-SR-1"><span class="nav-number">5.</span> <span class="nav-text">在完成行移位之后，第一轮当前的状态矩阵为$$State_{\mathrm{SR}}^{(1)}</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#begin-bmatrix-b-0-0-b-0-1-b-0-2-b-0-3-b-1-1-b-1-2-b-1-3-b-1-0-b-2-2-b-2-3-b-2-0-b-2-1-b-3-3-b-3-0-b-3-1-b-3-2-end-bmatrix-MixColumns-%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3%E6%98%AF%EF%BC%9A%E5%B0%86%E7%8A%B6%E6%80%81%E7%9F%A9%E9%98%B5%E7%9A%84%E6%AF%8F%E4%B8%80%E5%88%97%E5%88%86%E5%88%AB%E7%9C%8B%E4%BD%9C%E4%B8%80%E4%B8%AA-4-%E7%BB%B4%E5%88%97%E5%90%91%E9%87%8F%EF%BC%8C%E7%84%B6%E5%90%8E%E4%B8%8E%E4%B8%80%E4%B8%AA%E5%9B%BA%E5%AE%9A%E7%9F%A9%E9%98%B5M%E5%9C%A8%E6%9C%89%E9%99%90%E5%9F%9F-GF-2-8-%E4%B8%8A%E7%9B%B8%E4%B9%98%EF%BC%8C%E4%BB%8E%E8%80%8C%E5%BE%97%E5%88%B0%E6%96%B0%E7%9A%84%E5%88%97%E3%80%82%E6%89%80%E4%BD%BF%E7%94%A8%E7%9A%84%E5%9B%BA%E5%AE%9A%E7%9F%A9%E9%98%B5%E4%B8%BA-M-begin-bmatrix-02-03-01-01-01-02-03-01-01-01-02-03-03-01-01-02-end-bmatrix-%E7%BB%8F%E8%BF%87%E5%88%97%E6%B7%B7%E6%B7%86%E5%90%8E%EF%BC%8C%E5%BE%97%E5%88%B0%E6%96%B0%E7%9A%84%E7%8A%B6%E6%80%81%E7%9F%A9%E9%98%B5%EF%BC%8C%E8%AE%B0%E4%B8%BA-State-mathrm-MC-1-mathrm-MixColumns-left-State-mathrm-SR-1-right-%E5%8D%B3-State-mathrm-MC-1"><span class="nav-number">6.</span> <span class="nav-text">\begin{bmatrix}b_{0,0} &amp; b_{0,1} &amp; b_{0,2} &amp; b_{0,3} \\b_{1,1} &amp; b_{1,2} &amp; b_{1,3} &amp; b_{1,0} \\b_{2,2} &amp; b_{2,3} &amp; b_{2,0} &amp; b_{2,1} \\b_{3,3} &amp; b_{3,0} &amp; b_{3,1} &amp; b_{3,2}\end{bmatrix}$$MixColumns 的基本思想是：将状态矩阵的每一列分别看作一个 4 维列向量，然后与一个固定矩阵M在有限域 GF(2^8) 上相乘，从而得到新的列。所使用的固定矩阵为$$M&#x3D;\begin{bmatrix}02 &amp; 03 &amp; 01 &amp; 01 \\01 &amp; 02 &amp; 03 &amp; 01 \\01 &amp; 01 &amp; 02 &amp; 03 \\03 &amp; 01 &amp; 01 &amp; 02\end{bmatrix}$$经过列混淆后，得到新的状态矩阵，记为$$State_{\mathrm{MC}}^{(1)}&#x3D;\mathrm{MixColumns}!\left(State_{\mathrm{SR}}^{(1)}\right)$$即$$State_{\mathrm{MC}}^{(1)}</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%AF%B9%E4%BA%8E%E7%AC%AC%E4%B8%80%E5%88%97-begin-bmatrix-b-0-0-b-1-1-b-2-2-b-3-3-end-bmatrix-%E8%BF%9B%E8%A1%8C%E5%88%97%E6%B7%B7%E6%B7%86%EF%BC%8C%E6%9C%89-begin-bmatrix-c-0-0-c-1-0-c-2-0-c-3-0-end-bmatrix"><span class="nav-number">7.</span> <span class="nav-text">对于第一列$$\begin{bmatrix}b_{0,0}\\b_{1,1}\\b_{2,2}\\b_{3,3}\end{bmatrix}$$进行列混淆，有$$\begin{bmatrix}c_{0,0}\\c_{1,0}\\c_{2,0}\\c_{3,0}\end{bmatrix}</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9B%A0%E6%AD%A4%EF%BC%8C%E7%AC%AC%E4%B8%80%E8%BD%AE%E7%BB%8F%E8%BF%87%E5%88%97%E6%B7%B7%E6%B7%86%E5%90%8E%E7%9A%84%E7%8A%B6%E6%80%81%E7%9F%A9%E9%98%B5%E5%8F%AF%E4%BB%A5%E5%86%99%E4%B8%BA-State-mathrm-MC-1"><span class="nav-number">8.</span> <span class="nav-text">因此，第一轮经过列混淆后的状态矩阵可以写为$$State_{\mathrm{MC}}^{(1)}</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BD%AE%E5%AF%86%E9%92%A5%E5%8A%A0%EF%BC%88AddRoundKey%EF%BC%89"><span class="nav-number">8.1.</span> <span class="nav-text">轮密钥加（AddRoundKey）</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%9C%A8%E5%AE%8C%E6%88%90%E5%88%97%E6%B7%B7%E6%B7%86%E4%B9%8B%E5%90%8E%EF%BC%8C%E7%AC%AC%E4%B8%80%E8%BD%AE%E5%BD%93%E5%89%8D%E7%9A%84%E7%8A%B6%E6%80%81%E7%9F%A9%E9%98%B5%E4%B8%BA-State-mathrm-MC-1"><span class="nav-number">9.</span> <span class="nav-text">在完成列混淆之后，第一轮当前的状态矩阵为$$State_{\mathrm{MC}}^{(1)}</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%80%BB%E7%BB%93"><span class="nav-number">9.1.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AES%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F"><span class="nav-number">9.2.</span> <span class="nav-text">AES工作模式</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ECB"><span class="nav-number">9.3.</span> <span class="nav-text">ECB</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CBC"><span class="nav-number">9.4.</span> <span class="nav-text">CBC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#CTR"><span class="nav-number">9.5.</span> <span class="nav-text">CTR</span></a></li></ol></li></ol></div>
-        </div>
-        <!--/noindex-->
-
-        <div class="site-overview-wrap sidebar-panel">
-          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <img class="site-author-image" itemprop="image" alt="ksenr"
-      src="/images/EB423E68F516288F90CA5C2BF3E8F12D.jpg">
-  <p class="site-author-name" itemprop="name">ksenr</p>
-  <div class="site-description" itemprop="description"></div>
-</div>
-<div class="site-state-wrap animated">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-        <a href="/archives/">
-          <span class="site-state-item-count">10</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-        <span class="site-state-item-count">2</span>
-        <span class="site-state-item-name">分类</span>
-      </div>
-      <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">2</span>
-        <span class="site-state-item-name">标签</span>
-      </div>
-  </nav>
+<div class="m-header ">
+	<section id="hero1" class="hero">
+		<div class="inner">
+		</div>
+	</section>
+	
+		<figure class="top-image" style='background-image: url(/banner/4.jpg)' data-enable=false></figure>
+	
 </div>
 
-        </div>
-      </div>
-    </div>
 
-    
-  </aside>
-
-
-    </div>
-
-    <div class="main-inner post posts-expand">
-
-
+<!--文章列表-->
+<div class="wrapper">
+  
+    <!--文章-->
+<article>
+	
+  
+    <h1 class="post-title" itemprop="name">
+      Crypto-AES
+    </h1>
   
 
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://ksenrii.github.io/2026/03/19/Crypto-AES/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/EB423E68F516288F90CA5C2BF3E8F12D.jpg">
-      <meta itemprop="name" content="ksenr">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ksenr's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="Crypto-AES | ksenr's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Crypto-AES
-        </h1>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2026-03-19 11:55:44" itemprop="dateCreated datePublished" datetime="2026-03-19T11:55:44+08:00">2026-03-19</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%AF%86%E7%A0%81%E5%AD%A6/" itemprop="url" rel="index"><span itemprop="name">密码学</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
-      <span class="post-meta-item-icon">
-        <i class="far fa-eye"></i>
-      </span>
-      <span class="post-meta-item-text">阅读次数：</span>
-      <span id="busuanzi_value_page_pv"></span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody"><h1 id="AES"><a href="#AES" class="headerlink" title="AES"></a>AES</h1><p>高级加密标准（AES），又称Rijndael加密法，是美国联邦政府采用的一种区块加密标准。这个标准用来替代原先的DES，已经被多方分析且广为全世界所使用。经过五年的甄选流程，高级加密标准由美国国家标准与技术研究院（NIST）于2001年11月26日发布于FIPS PUB 197，并在2002年5月26日成为有效的标准。现在，高级加密标准已然成为对称密钥加密中最流行的算法之一。</p>
+	<div class='post-body mb'>
+		<h1 id="AES"><a href="#AES" class="headerlink" title="AES"></a>AES</h1><p>高级加密标准（AES），又称Rijndael加密法，是美国联邦政府采用的一种区块加密标准。这个标准用来替代原先的DES，已经被多方分析且广为全世界所使用。经过五年的甄选流程，高级加密标准由美国国家标准与技术研究院（NIST）于2001年11月26日发布于FIPS PUB 197，并在2002年5月26日成为有效的标准。现在，高级加密标准已然成为对称密钥加密中最流行的算法之一。</p>
 <span id="more"></span>
 
 <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><strong>AES</strong>（Advanced Encryption Standard，高级加密标准）是目前最广泛使用的对称分组加密算法之一。所谓“对称加密”，指加密和解密使用同一把密钥；所谓“分组加密”，指算法不是一次处理任意长度的数据流，而是把明文切成固定大小的块逐块处理。</p>
@@ -287,7 +312,35 @@
 <p><strong>AddRoundKey</strong>——矩阵中的每一个字节都与该次回合密钥（round key）做XOR运算；每个子密钥由密钥生成方案产生。<br><strong>SubBytes</strong>——透过一个非线性的替换函数，用查找表的方式把每个字节替换成对应的字节。<br><strong>ShiftRows</strong>——将矩阵中的每个横列进行循环式移位。<br><strong>MixColumns</strong>——为了充分混合矩阵中各个直行的操作。这个步骤使用线性转换来混合每内联的四个字节。最后一个加密循环中省略MixColumns步骤，而以另一个AddRoundKey取代。</p>
 <h2 id="明文处理"><a href="#明文处理" class="headerlink" title="明文处理"></a>明文处理</h2><p>在加密开始时，首先需要将明文划分为若干个 16 字节分组，并逐组进行处理。</p>
 <p>以下讨论以单个 128 bit 明文分组为例，不考虑具体工作模式和 padding 细节。</p>
-<p>设某个明文分组由 16 个字节组成，记为<br>$$<br>(p_0,p_1,p_2,\dots,p_{15})<br>$$<br>AES 并不会直接把这 16 个字节当作一维序列来操作，而是先将它们按<strong>列优先</strong>的方式填入一个 4×4 的状态矩阵 State 中：<br>$$<br>\mathbf{State}&#x3D;<br>\left[<br>\begin{matrix}<br>p_0 &amp; p_4 &amp; p_8 &amp; p_{12} \\<br>p_1 &amp; p_5 &amp; p_9 &amp; p_{13} \\<br>p_2 &amp; p_6 &amp; p_{10} &amp; p_{14} \\<br>p_3 &amp; p_7 &amp; p_{11} &amp; p_{15}<br>\end{matrix}<br>\right]<br>$$<br>后续 AES 的各轮加密操作，例如字节代换（SubBytes）、行移位（ShiftRows）、列混淆（MixColumns）以及轮密钥加（AddRoundKey），都是围绕这个状态矩阵展开的。</p>
+<p>设某个明文分组由 16 个字节组成，记为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+(p_0,p_1,p_2,\dots,p_{15})
+\]</div>
+
+</div>
+
+
+<p>AES 并不会直接把这 16 个字节当作一维序列来操作，而是先将它们按<strong>列优先</strong>的方式填入一个 4×4 的状态矩阵 State 中：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\mathbf{State}=
+\left[
+\begin{matrix}
+p_0 &amp;amp; p_4 &amp;amp; p_8 &amp;amp; p_{12} \\\\
+p_1 &amp;amp; p_5 &amp;amp; p_9 &amp;amp; p_{13} \\\\
+p_2 &amp;amp; p_6 &amp;amp; p_{10} &amp;amp; p_{14} \\\\
+p_3 &amp;amp; p_7 &amp;amp; p_{11} &amp;amp; p_{15}
+\end{matrix}
+\right]
+\]</div>
+
+</div>
+
+
+<p>后续 AES 的各轮加密操作，例如字节代换（SubBytes）、行移位（ShiftRows）、列混淆（MixColumns）以及轮密钥加（AddRoundKey），都是围绕这个状态矩阵展开的。</p>
 <p><img src="/images/blockstate.png" alt="blockstate"></p>
 <h2 id="密钥处理"><a href="#密钥处理" class="headerlink" title="密钥处理"></a>密钥处理</h2><p>除了对明文进行分组和状态矩阵初始化之外，AES 在正式加密之前还需要先对密钥进行处理。原因在于，AES 并不是在每一轮都直接使用原始密钥，而是会先通过<strong>密钥扩展（Key Expansion）算法，从原始密钥中生成一组彼此不同的轮密钥（Round Keys）</strong>，供初始轮和后续各轮使用。</p>
 <p>以 AES-128 为例，原始密钥长度为 128 bit，即 16 字节。由于 AES-128 一共需要进行 10 轮加密，再加上最开始的一次初始轮密钥加，因此总共需要 <strong>11 组轮密钥</strong>。每组轮密钥的长度同样为 128 bit，对应一个 4×4 的字节矩阵。</p>
@@ -303,24 +356,166 @@
 </li>
 </ul>
 <p>通过这些操作，AES 可以从初始密钥逐步推导出后续各轮所需的轮密钥。后面的加密过程中，无论是初始轮密钥加，还是每一轮末尾的 AddRoundKey，使用的都是这里生成出的轮密钥。</p>
-<p>以 AES-128 为例，原始密钥长度为 128 bit，也就是 16 字节。<br> 密钥扩展会把这 16 字节扩展成 44 个字（word）：<br>$$<br>W_0, W_1, W_2, \dots, W_{43}<br>$$<br>每个字是 32 bit，也就是 4 字节。</p>
-<p>然后每 4 个字组成一组轮密钥：<br>$$<br>K^{(0)} &#x3D; (W_0, W_1, W_2, W_3)<br>$$<br>…<br>$$<br>K^{(10)} &#x3D; (W_{40}, W_{41}, W_{42}, W_{43})<br>$$</p>
+<p>以 AES-128 为例，原始密钥长度为 128 bit，也就是 16 字节。<br> 密钥扩展会把这 16 字节扩展成 44 个字（word）：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+W_0, W_1, W_2, \dots, W_{43}
+\]</div>
+
+</div>
+
+
+<p>每个字是 32 bit，也就是 4 字节。</p>
+<p>然后每 4 个字组成一组轮密钥：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+K^{(0)} = (W_0, W_1, W_2, W_3)
+\]</div>
+
+</div>
+
+
+<p>…</p>
+<div class="math-display">
+
+<div class="math-display">\[
+K^{(10)} = (W_{40}, W_{41}, W_{42}, W_{43})
+\]</div>
+
+</div>
+
+
+
 <h2 id="初始轮密钥加"><a href="#初始轮密钥加" class="headerlink" title="初始轮密钥加"></a>初始轮密钥加</h2><p>这一步的操作非常直接：将当前状态矩阵 <code>State</code> 与初始轮密钥 <code>RoundKey_0</code> 逐字节进行异或（XOR）运算，得到新的状态矩阵。</p>
-<p>设初始状态矩阵为<br>$$<br>\mathbf{State}^{(0)}&#x3D;<br>\left[<br>\begin{matrix}<br>s_{0,0}^{(0)} &amp; s_{0,1}^{(0)} &amp; s_{0,2}^{(0)} &amp; s_{0,3}^{(0)} \\<br>s_{1,0}^{(0)} &amp; s_{1,1}^{(0)} &amp; s_{1,2}^{(0)} &amp; s_{1,3}^{(0)} \\<br>s_{2,0}^{(0)} &amp; s_{2,1}^{(0)} &amp; s_{2,2}^{(0)} &amp; s_{2,3}^{(0)} \\<br>s_{3,0}^{(0)} &amp; s_{3,1}^{(0)} &amp; s_{3,2}^{(0)} &amp; s_{3,3}^{(0)}<br>\end{matrix}<br>\right]<br>$$<br>第 0 轮轮密钥为<br>$$<br>\mathbf{K}^{(0)}&#x3D;<br>\left[<br>\begin{matrix}<br>k_{0,0}^{(0)} &amp; k_{0,1}^{(0)} &amp; k_{0,2}^{(0)} &amp; k_{0,3}^{(0)} \\<br>k_{1,0}^{(0)} &amp; k_{1,1}^{(0)} &amp; k_{1,2}^{(0)} &amp; k_{1,3}^{(0)} \\<br>k_{2,0}^{(0)} &amp; k_{2,1}^{(0)} &amp; k_{2,2}^{(0)} &amp; k_{2,3}^{(0)} \\<br>k_{3,0}^{(0)} &amp; k_{3,1}^{(0)} &amp; k_{3,2}^{(0)} &amp; k_{3,3}^{(0)}<br>\end{matrix}<br>\right]<br>$$<br>则初始轮密钥加可以表示为<br>$$<br>State^{(1)} &#x3D; State^{(0)} \oplus K^{(0)}<br>$$<br>这里的异或是逐元素进行的，即<br>$$<br>s_{i,j}^{(1)} &#x3D; s_{i,j}^{(0)} \oplus k_{i,j}^{(0)}, \qquad 0 \le i,j \le 3<br>$$</p>
+<p>设初始状态矩阵为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\mathbf{State}^{(0)}=
+\left[
+\begin{matrix}
+s_{0,0}^{(0)} &amp;amp; s_{0,1}^{(0)} &amp;amp; s_{0,2}^{(0)} &amp;amp; s_{0,3}^{(0)} \\\\
+s_{1,0}^{(0)} &amp;amp; s_{1,1}^{(0)} &amp;amp; s_{1,2}^{(0)} &amp;amp; s_{1,3}^{(0)} \\\\
+s_{2,0}^{(0)} &amp;amp; s_{2,1}^{(0)} &amp;amp; s_{2,2}^{(0)} &amp;amp; s_{2,3}^{(0)} \\\\
+s_{3,0}^{(0)} &amp;amp; s_{3,1}^{(0)} &amp;amp; s_{3,2}^{(0)} &amp;amp; s_{3,3}^{(0)}
+\end{matrix}
+\right]
+\]</div>
+
+</div>
+
+
+<p>第 0 轮轮密钥为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\mathbf{K}^{(0)}=
+\left[
+\begin{matrix}
+k_{0,0}^{(0)} &amp;amp; k_{0,1}^{(0)} &amp;amp; k_{0,2}^{(0)} &amp;amp; k_{0,3}^{(0)} \\\\
+k_{1,0}^{(0)} &amp;amp; k_{1,1}^{(0)} &amp;amp; k_{1,2}^{(0)} &amp;amp; k_{1,3}^{(0)} \\\\
+k_{2,0}^{(0)} &amp;amp; k_{2,1}^{(0)} &amp;amp; k_{2,2}^{(0)} &amp;amp; k_{2,3}^{(0)} \\\\
+k_{3,0}^{(0)} &amp;amp; k_{3,1}^{(0)} &amp;amp; k_{3,2}^{(0)} &amp;amp; k_{3,3}^{(0)}
+\end{matrix}
+\right]
+\]</div>
+
+</div>
+
+
+<p>则初始轮密钥加可以表示为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+State^{(1)} = State^{(0)} \oplus K^{(0)}
+\]</div>
+
+</div>
+
+
+<p>这里的异或是逐元素进行的，即</p>
+<div class="math-display">
+
+<div class="math-display">\[
+s_{i,j}^{(1)} = s_{i,j}^{(0)} \oplus k_{i,j}^{(0)}, \qquad 0 \le i,j \le 3
+\]</div>
+
+</div>
+
+
+
 <p>它的作用是先把密钥混进明文状态矩阵里。<br> 这一步<strong>不属于标准轮内部的 4 步</strong>，它是轮开始前额外先做的一次。</p>
 <h2 id="字节代换（SubBytes）"><a href="#字节代换（SubBytes）" class="headerlink" title="字节代换（SubBytes）"></a>字节代换（SubBytes）</h2><p>在完成初始轮密钥加之后，AES 进入标准轮变换的第一步，即 <strong>字节代换（SubBytes）</strong>。这一步会对状态矩阵中的每一个字节分别进行替换，替换规则由一张固定的查找表决定，这张表称为 <strong>S 盒</strong>。</p>
 <p>经过初始轮密钥加后，状态矩阵记为</p>
-<p>$$<br>\mathbf{State}^{(1)}<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\mathbf{State}^{(1)}
+\]</div>
+
+</div>
+
+
+
 <p>在 SubBytes 变换中，状态矩阵中的每一个字节都会通过 AES 的 <strong>S 盒</strong>进行替换。变换后得到新的状态矩阵，记为</p>
-<p>$$<br>\mathbf{State}_{\mathrm{SB}}^{(1)} &#x3D; \mathrm{SubBytes}!\left(\mathbf{State}^{(1)}\right)<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\mathbf{State}_{\mathrm{SB}}^{(1)} = \mathrm{SubBytes}\!\left(\mathbf{State}^{(1)}\right)
+\]</div>
+
+</div>
+
+
+
 <p>展开写为</p>
-<p>$$<br>\mathbf{State}<em>{\mathrm{SB}}^{(1)}&#x3D;<br>\left[<br>\begin{matrix}<br>S!\left(s</em>{0,0}^{(1)}\right) &amp; S!\left(s_{0,1}^{(1)}\right) &amp; S!\left(s_{0,2}^{(1)}\right) &amp; S!\left(s_{0,3}^{(1)}\right) \\<br>S!\left(s_{1,0}^{(1)}\right) &amp; S!\left(s_{1,1}^{(1)}\right) &amp; S!\left(s_{1,2}^{(1)}\right) &amp; S!\left(s_{1,3}^{(1)}\right) \\<br>S!\left(s_{2,0}^{(1)}\right) &amp; S!\left(s_{2,1}^{(1)}\right) &amp; S!\left(s_{2,2}^{(1)}\right) &amp; S!\left(s_{2,3}^{(1)}\right) \\<br>S!\left(s_{3,0}^{(1)}\right) &amp; S!\left(s_{3,1}^{(1)}\right) &amp; S!\left(s_{3,2}^{(1)}\right) &amp; S!\left(s_{3,3}^{(1)}\right)<br>\end{matrix}<br>\right]<br>$$</p>
-<p>其中，$S(\cdot)$ 表示 AES 的 S 盒替换函数。</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\mathbf{State}_{\mathrm{SB}}^{(1)}=
+\left[
+\begin{matrix}
+S\!\left(s_{0,0}^{(1)}\right) &amp;amp; S\!\left(s_{0,1}^{(1)}\right) &amp;amp; S\!\left(s_{0,2}^{(1)}\right) &amp;amp; S\!\left(s_{0,3}^{(1)}\right) \\\\
+S\!\left(s_{1,0}^{(1)}\right) &amp;amp; S\!\left(s_{1,1}^{(1)}\right) &amp;amp; S\!\left(s_{1,2}^{(1)}\right) &amp;amp; S\!\left(s_{1,3}^{(1)}\right) \\\\
+S\!\left(s_{2,0}^{(1)}\right) &amp;amp; S\!\left(s_{2,1}^{(1)}\right) &amp;amp; S\!\left(s_{2,2}^{(1)}\right) &amp;amp; S\!\left(s_{2,3}^{(1)}\right) \\\\
+S\!\left(s_{3,0}^{(1)}\right) &amp;amp; S\!\left(s_{3,1}^{(1)}\right) &amp;amp; S\!\left(s_{3,2}^{(1)}\right) &amp;amp; S\!\left(s_{3,3}^{(1)}\right)
+\end{matrix}
+\right]
+\]</div>
+
+</div>
+
+
+
+<p>其中，<span class="math-inline">(S(\cdot))</span> 表示 AES 的 S 盒替换函数。</p>
 <p>也就是说，矩阵中的每一个元素都独立地经过一次 S 盒映射，因此逐元素可以写为</p>
-<h1 id="left-mathbf-State-mathrm-SB-1-right-i-j"><a href="#left-mathbf-State-mathrm-SB-1-right-i-j" class="headerlink" title="$$\left(\mathbf{State}{\mathrm{SB}}^{(1)}\right){i,j}"></a>$$<br>\left(\mathbf{State}<em>{\mathrm{SB}}^{(1)}\right)</em>{i,j}</h1><p>S!\left(s_{i,j}^{(1)}\right),<br>\qquad 0 \le i,j \le 3<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\left(\mathbf{State}_{\mathrm{SB}}^{(1)}\right)_{i,j}
+=
+S\!\left(s_{i,j}^{(1)}\right),
+\qquad 0 \le i,j \le 3
+\]</div>
+
+</div>
+
+
+
 <p>SubBytes 的作用是为 AES 引入<strong>非线性</strong>。这一过程并不改变字节在状态矩阵中的位置，而是只改变每个字节本身的取值。因此，SubBytes 可以理解为“改值不改位”的变换：它负责把原有字节替换为新的字节值，而不打乱矩阵结构。</p>
 <p>例如，若某个位置上的字节为</p>
-<p>$$<br>s_{i,j}^{(1)} &#x3D; \texttt{0x53}<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+s_{i,j}^{(1)} = \texttt{0x53}
+\]</div>
+
+</div>
+
+
+
 <ol>
 <li>将 <strong>8 位输入字节</strong> 拆分为高 4 位和低 4 位。</li>
 <li><strong>高 4 位</strong> 作为 <strong>行号</strong>（0 ~ F），<strong>低 4 位</strong> 作为 <strong>列号</strong>（0 ~ F）。</li>
@@ -328,32 +523,333 @@
 </ol>
 <p><img src="/images/sbox.png" alt="sbox"></p>
 <p>则在查 S 盒后，能得到</p>
-<p>$$<br>S(\texttt{0x53}) &#x3D; \texttt{0xed}<br>$$</p>
-<h2 id="行移位（ShiftRows）"><a href="#行移位（ShiftRows）" class="headerlink" title="行移位（ShiftRows）"></a>行移位（ShiftRows）</h2><h1 id="在完成字节代换之后，状态矩阵由变为-State-mathrm-SB-1"><a href="#在完成字节代换之后，状态矩阵由变为-State-mathrm-SB-1" class="headerlink" title="在完成字节代换之后，状态矩阵由变为$$State_{\mathrm{SB}}^{(1)}"></a>在完成字节代换之后，状态矩阵由变为<br>$$<br>State_{\mathrm{SB}}^{(1)}</h1><p>\begin{bmatrix}<br>b_{0,0} &amp; b_{0,1} &amp; b_{0,2} &amp; b_{0,3} \\<br>b_{1,0} &amp; b_{1,1} &amp; b_{1,2} &amp; b_{1,3} \\<br>b_{2,0} &amp; b_{2,1} &amp; b_{2,2} &amp; b_{2,3} \\<br>b_{3,0} &amp; b_{3,1} &amp; b_{3,2} &amp; b_{3,3}<br>\end{bmatrix}<br>$$<br>ShiftRows 的规则非常简单：对状态矩阵的各行分别进行<strong>循环左移</strong>，其中：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+S(\texttt{0x53}) = \texttt{0xed}
+\]</div>
+
+</div>
+
+
+
+<h2 id="行移位（ShiftRows）"><a href="#行移位（ShiftRows）" class="headerlink" title="行移位（ShiftRows）"></a>行移位（ShiftRows）</h2><p>在完成字节代换之后，状态矩阵由变为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+State_{\mathrm{SB}}^{(1)}
+=
+\begin{bmatrix}
+b_{0,0} &amp;amp; b_{0,1} &amp;amp; b_{0,2} &amp;amp; b_{0,3} \\\\
+b_{1,0} &amp;amp; b_{1,1} &amp;amp; b_{1,2} &amp;amp; b_{1,3} \\\\
+b_{2,0} &amp;amp; b_{2,1} &amp;amp; b_{2,2} &amp;amp; b_{2,3} \\\\
+b_{3,0} &amp;amp; b_{3,1} &amp;amp; b_{3,2} &amp;amp; b_{3,3}
+\end{bmatrix}
+\]</div>
+
+</div>
+
+
+<p>ShiftRows 的规则非常简单：对状态矩阵的各行分别进行<strong>循环左移</strong>，其中：</p>
 <ul>
 <li>第 0 行左移 0 位，即保持不变；</li>
 <li>第 1 行左移 1 位；</li>
 <li>第 2 行左移 2 位；</li>
 <li>第 3 行左移 3 位。</li>
 </ul>
-<h1 id="经过行移位后，得到新的状态矩阵，记为-State-mathrm-SR-1-mathrm-ShiftRows-left-State-mathrm-SB-1-right-其具体形式为-State-mathrm-SR-1"><a href="#经过行移位后，得到新的状态矩阵，记为-State-mathrm-SR-1-mathrm-ShiftRows-left-State-mathrm-SB-1-right-其具体形式为-State-mathrm-SR-1" class="headerlink" title="经过行移位后，得到新的状态矩阵，记为$$State_{\mathrm{SR}}^{(1)}&#x3D;\mathrm{ShiftRows}!\left(State_{\mathrm{SB}}^{(1)}\right)$$其具体形式为$$State_{\mathrm{SR}}^{(1)}"></a>经过行移位后，得到新的状态矩阵，记为<br>$$<br>State_{\mathrm{SR}}^{(1)}&#x3D;\mathrm{ShiftRows}!\left(State_{\mathrm{SB}}^{(1)}\right)<br>$$<br>其具体形式为<br>$$<br>State_{\mathrm{SR}}^{(1)}</h1><p>\begin{bmatrix}<br>b_{0,0} &amp; b_{0,1} &amp; b_{0,2} &amp; b_{0,3} \\<br>b_{1,1} &amp; b_{1,2} &amp; b_{1,3} &amp; b_{1,0} \\<br>b_{2,2} &amp; b_{2,3} &amp; b_{2,0} &amp; b_{2,1} \\<br>b_{3,3} &amp; b_{3,0} &amp; b_{3,1} &amp; b_{3,2}<br>\end{bmatrix}<br>$$<br>从这个矩阵可以看出，ShiftRows <strong>不会改变字节本身的值</strong>，它只改变这些字节在状态矩阵中的位置。因此，ShiftRows 可以理解为“<strong>改位不改值</strong>”的变换。</p>
+<p>经过行移位后，得到新的状态矩阵，记为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+State_{\mathrm{SR}}^{(1)}=\mathrm{ShiftRows}\!\left(State_{\mathrm{SB}}^{(1)}\right)
+\]</div>
+
+</div>
+
+
+<p>其具体形式为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+State_{\mathrm{SR}}^{(1)}
+=
+\begin{bmatrix}
+b_{0,0} &amp;amp; b_{0,1} &amp;amp; b_{0,2} &amp;amp; b_{0,3} \\\\
+b_{1,1} &amp;amp; b_{1,2} &amp;amp; b_{1,3} &amp;amp; b_{1,0} \\\\
+b_{2,2} &amp;amp; b_{2,3} &amp;amp; b_{2,0} &amp;amp; b_{2,1} \\\\
+b_{3,3} &amp;amp; b_{3,0} &amp;amp; b_{3,1} &amp;amp; b_{3,2}
+\end{bmatrix}
+\]</div>
+
+</div>
+
+
+<p>从这个矩阵可以看出，ShiftRows <strong>不会改变字节本身的值</strong>，它只改变这些字节在状态矩阵中的位置。因此，ShiftRows 可以理解为“<strong>改位不改值</strong>”的变换。</p>
 <p>SubBytes 和 ShiftRows 连在一起看会更清楚：</p>
 <ul>
 <li><strong>SubBytes</strong>：改变每个字节的取值，但不改变位置；</li>
 <li><strong>ShiftRows</strong>：改变字节的位置，但不改变取值。</li>
 </ul>
 <p>这两步配合起来，就能同时实现“内容扰动”和“位置打散”。</p>
-<h2 id="列混淆（MixColumns）"><a href="#列混淆（MixColumns）" class="headerlink" title="列混淆（MixColumns）"></a>列混淆（MixColumns）</h2><h1 id="在完成行移位之后，第一轮当前的状态矩阵为-State-mathrm-SR-1"><a href="#在完成行移位之后，第一轮当前的状态矩阵为-State-mathrm-SR-1" class="headerlink" title="在完成行移位之后，第一轮当前的状态矩阵为$$State_{\mathrm{SR}}^{(1)}"></a>在完成行移位之后，第一轮当前的状态矩阵为<br>$$<br>State_{\mathrm{SR}}^{(1)}</h1><h1 id="begin-bmatrix-b-0-0-b-0-1-b-0-2-b-0-3-b-1-1-b-1-2-b-1-3-b-1-0-b-2-2-b-2-3-b-2-0-b-2-1-b-3-3-b-3-0-b-3-1-b-3-2-end-bmatrix-MixColumns-的基本思想是：将状态矩阵的每一列分别看作一个-4-维列向量，然后与一个固定矩阵M在有限域-GF-2-8-上相乘，从而得到新的列。所使用的固定矩阵为-M-begin-bmatrix-02-03-01-01-01-02-03-01-01-01-02-03-03-01-01-02-end-bmatrix-经过列混淆后，得到新的状态矩阵，记为-State-mathrm-MC-1-mathrm-MixColumns-left-State-mathrm-SR-1-right-即-State-mathrm-MC-1"><a href="#begin-bmatrix-b-0-0-b-0-1-b-0-2-b-0-3-b-1-1-b-1-2-b-1-3-b-1-0-b-2-2-b-2-3-b-2-0-b-2-1-b-3-3-b-3-0-b-3-1-b-3-2-end-bmatrix-MixColumns-的基本思想是：将状态矩阵的每一列分别看作一个-4-维列向量，然后与一个固定矩阵M在有限域-GF-2-8-上相乘，从而得到新的列。所使用的固定矩阵为-M-begin-bmatrix-02-03-01-01-01-02-03-01-01-01-02-03-03-01-01-02-end-bmatrix-经过列混淆后，得到新的状态矩阵，记为-State-mathrm-MC-1-mathrm-MixColumns-left-State-mathrm-SR-1-right-即-State-mathrm-MC-1" class="headerlink" title="\begin{bmatrix}b_{0,0} &amp; b_{0,1} &amp; b_{0,2} &amp; b_{0,3} \\b_{1,1} &amp; b_{1,2} &amp; b_{1,3} &amp; b_{1,0} \\b_{2,2} &amp; b_{2,3} &amp; b_{2,0} &amp; b_{2,1} \\b_{3,3} &amp; b_{3,0} &amp; b_{3,1} &amp; b_{3,2}\end{bmatrix}$$MixColumns 的基本思想是：将状态矩阵的每一列分别看作一个 4 维列向量，然后与一个固定矩阵M在有限域 GF(2^8) 上相乘，从而得到新的列。所使用的固定矩阵为$$M&#x3D;\begin{bmatrix}02 &amp; 03 &amp; 01 &amp; 01 \\01 &amp; 02 &amp; 03 &amp; 01 \\01 &amp; 01 &amp; 02 &amp; 03 \\03 &amp; 01 &amp; 01 &amp; 02\end{bmatrix}$$经过列混淆后，得到新的状态矩阵，记为$$State_{\mathrm{MC}}^{(1)}&#x3D;\mathrm{MixColumns}!\left(State_{\mathrm{SR}}^{(1)}\right)$$即$$State_{\mathrm{MC}}^{(1)}"></a>\begin{bmatrix}<br>b_{0,0} &amp; b_{0,1} &amp; b_{0,2} &amp; b_{0,3} \\<br>b_{1,1} &amp; b_{1,2} &amp; b_{1,3} &amp; b_{1,0} \\<br>b_{2,2} &amp; b_{2,3} &amp; b_{2,0} &amp; b_{2,1} \\<br>b_{3,3} &amp; b_{3,0} &amp; b_{3,1} &amp; b_{3,2}<br>\end{bmatrix}<br>$$<br>MixColumns 的基本思想是：将状态矩阵的<strong>每一列</strong>分别看作一个 4 维列向量，然后与一个固定矩阵M在有限域 GF(2^8) 上相乘，从而得到新的列。所使用的固定矩阵为<br>$$<br>M&#x3D;<br>\begin{bmatrix}<br>02 &amp; 03 &amp; 01 &amp; 01 \\<br>01 &amp; 02 &amp; 03 &amp; 01 \\<br>01 &amp; 01 &amp; 02 &amp; 03 \\<br>03 &amp; 01 &amp; 01 &amp; 02<br>\end{bmatrix}<br>$$<br>经过列混淆后，得到新的状态矩阵，记为<br>$$<br>State_{\mathrm{MC}}^{(1)}&#x3D;\mathrm{MixColumns}!\left(State_{\mathrm{SR}}^{(1)}\right)<br>$$<br>即<br>$$<br>State_{\mathrm{MC}}^{(1)}</h1><p>\begin{bmatrix}<br>c_{0,0} &amp; c_{0,1} &amp; c_{0,2} &amp; c_{0,3} \\<br>c_{1,0} &amp; c_{1,1} &amp; c_{1,2} &amp; c_{1,3} \\<br>c_{2,0} &amp; c_{2,1} &amp; c_{2,2} &amp; c_{2,3} \\<br>c_{3,0} &amp; c_{3,1} &amp; c_{3,2} &amp; c_{3,3}<br>\end{bmatrix}<br>$$<br><strong>具体实现如下：</strong></p>
-<h1 id="对于第一列-begin-bmatrix-b-0-0-b-1-1-b-2-2-b-3-3-end-bmatrix-进行列混淆，有-begin-bmatrix-c-0-0-c-1-0-c-2-0-c-3-0-end-bmatrix"><a href="#对于第一列-begin-bmatrix-b-0-0-b-1-1-b-2-2-b-3-3-end-bmatrix-进行列混淆，有-begin-bmatrix-c-0-0-c-1-0-c-2-0-c-3-0-end-bmatrix" class="headerlink" title="对于第一列$$\begin{bmatrix}b_{0,0}\\b_{1,1}\\b_{2,2}\\b_{3,3}\end{bmatrix}$$进行列混淆，有$$\begin{bmatrix}c_{0,0}\\c_{1,0}\\c_{2,0}\\c_{3,0}\end{bmatrix}"></a>对于第一列<br>$$<br>\begin{bmatrix}<br>b_{0,0}\\<br>b_{1,1}\\<br>b_{2,2}\\<br>b_{3,3}<br>\end{bmatrix}<br>$$<br>进行列混淆，有<br>$$<br>\begin{bmatrix}<br>c_{0,0}\\<br>c_{1,0}\\<br>c_{2,0}\\<br>c_{3,0}<br>\end{bmatrix}</h1><p>\begin{bmatrix}<br>02 &amp; 03 &amp; 01 &amp; 01 \\<br>01 &amp; 02 &amp; 03 &amp; 01 \\<br>01 &amp; 01 &amp; 02 &amp; 03 \\<br>03 &amp; 01 &amp; 01 &amp; 02<br>\end{bmatrix}<br>\begin{bmatrix}<br>b_{0,0}\\<br>b_{1,1}\\<br>b_{2,2}\\<br>b_{3,3}<br>\end{bmatrix}<br>$$<br>展开后可得<br>$$<br>c_{0,0}&#x3D;(02\cdot b_{0,0})\oplus(03\cdot b_{1,1})\oplus(01\cdot b_{2,2})\oplus(01\cdot b_{3,3})<br>$$</p>
-<p>$$<br>c_{1,0}&#x3D;(01\cdot b_{0,0})\oplus(02\cdot b_{1,1})\oplus(03\cdot b_{2,2})\oplus(01\cdot b_{3,3})<br>$$</p>
-<p>$$<br>c_{2,0}&#x3D;(01\cdot b_{0,0})\oplus(01\cdot b_{1,1})\oplus(02\cdot b_{2,2})\oplus(03\cdot b_{3,3})<br>$$</p>
-<p>$$<br>c_{3,0}&#x3D;(03\cdot b_{0,0})\oplus(01\cdot b_{1,1})\oplus(01\cdot b_{2,2})\oplus(02\cdot b_{3,3})<br>$$</p>
+<h2 id="列混淆（MixColumns）"><a href="#列混淆（MixColumns）" class="headerlink" title="列混淆（MixColumns）"></a>列混淆（MixColumns）</h2><p>在完成行移位之后，第一轮当前的状态矩阵为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+State_{\mathrm{SR}}^{(1)}
+=
+\begin{bmatrix}
+b_{0,0} &amp;amp; b_{0,1} &amp;amp; b_{0,2} &amp;amp; b_{0,3} \\\\
+b_{1,1} &amp;amp; b_{1,2} &amp;amp; b_{1,3} &amp;amp; b_{1,0} \\\\
+b_{2,2} &amp;amp; b_{2,3} &amp;amp; b_{2,0} &amp;amp; b_{2,1} \\\\
+b_{3,3} &amp;amp; b_{3,0} &amp;amp; b_{3,1} &amp;amp; b_{3,2}
+\end{bmatrix}
+\]</div>
+
+</div>
+
+
+<p>MixColumns 的基本思想是：将状态矩阵的<strong>每一列</strong>分别看作一个 4 维列向量，然后与一个固定矩阵M在有限域 GF(2^8) 上相乘，从而得到新的列。所使用的固定矩阵为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+M=
+\begin{bmatrix}
+02 &amp;amp; 03 &amp;amp; 01 &amp;amp; 01 \\\\
+01 &amp;amp; 02 &amp;amp; 03 &amp;amp; 01 \\\\
+01 &amp;amp; 01 &amp;amp; 02 &amp;amp; 03 \\\\
+03 &amp;amp; 01 &amp;amp; 01 &amp;amp; 02
+\end{bmatrix}
+\]</div>
+
+</div>
+
+
+<p>经过列混淆后，得到新的状态矩阵，记为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+State_{\mathrm{MC}}^{(1)}=\mathrm{MixColumns}\!\left(State_{\mathrm{SR}}^{(1)}\right)
+\]</div>
+
+</div>
+
+
+<p>即</p>
+<div class="math-display">
+
+<div class="math-display">\[
+State_{\mathrm{MC}}^{(1)}
+=
+\begin{bmatrix}
+c_{0,0} &amp;amp; c_{0,1} &amp;amp; c_{0,2} &amp;amp; c_{0,3} \\\\
+c_{1,0} &amp;amp; c_{1,1} &amp;amp; c_{1,2} &amp;amp; c_{1,3} \\\\
+c_{2,0} &amp;amp; c_{2,1} &amp;amp; c_{2,2} &amp;amp; c_{2,3} \\\\
+c_{3,0} &amp;amp; c_{3,1} &amp;amp; c_{3,2} &amp;amp; c_{3,3}
+\end{bmatrix}
+\]</div>
+
+</div>
+
+
+<p><strong>具体实现如下：</strong></p>
+<p>对于第一列</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\begin{bmatrix}
+b_{0,0}\\\\
+b_{1,1}\\\\
+b_{2,2}\\\\
+b_{3,3}
+\end{bmatrix}
+\]</div>
+
+</div>
+
+
+<p>进行列混淆，有</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\begin{bmatrix}
+c_{0,0}\\\\
+c_{1,0}\\\\
+c_{2,0}\\\\
+c_{3,0}
+\end{bmatrix}
+=
+\begin{bmatrix}
+02 &amp;amp; 03 &amp;amp; 01 &amp;amp; 01 \\\\
+01 &amp;amp; 02 &amp;amp; 03 &amp;amp; 01 \\\\
+01 &amp;amp; 01 &amp;amp; 02 &amp;amp; 03 \\\\
+03 &amp;amp; 01 &amp;amp; 01 &amp;amp; 02
+\end{bmatrix}
+\begin{bmatrix}
+b_{0,0}\\\\
+b_{1,1}\\\\
+b_{2,2}\\\\
+b_{3,3}
+\end{bmatrix}
+\]</div>
+
+</div>
+
+
+<p>展开后可得</p>
+<div class="math-display">
+
+<div class="math-display">\[
+c_{0,0}=(02\cdot b_{0,0})\oplus(03\cdot b_{1,1})\oplus(01\cdot b_{2,2})\oplus(01\cdot b_{3,3})
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+c_{1,0}=(01\cdot b_{0,0})\oplus(02\cdot b_{1,1})\oplus(03\cdot b_{2,2})\oplus(01\cdot b_{3,3})
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+c_{2,0}=(01\cdot b_{0,0})\oplus(01\cdot b_{1,1})\oplus(02\cdot b_{2,2})\oplus(03\cdot b_{3,3})
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+c_{3,0}=(03\cdot b_{0,0})\oplus(01\cdot b_{1,1})\oplus(01\cdot b_{2,2})\oplus(02\cdot b_{3,3})
+\]</div>
+
+</div>
+
+
+
 <p>对于2,3,4列同理</p>
-<h1 id="因此，第一轮经过列混淆后的状态矩阵可以写为-State-mathrm-MC-1"><a href="#因此，第一轮经过列混淆后的状态矩阵可以写为-State-mathrm-MC-1" class="headerlink" title="因此，第一轮经过列混淆后的状态矩阵可以写为$$State_{\mathrm{MC}}^{(1)}"></a>因此，第一轮经过列混淆后的状态矩阵可以写为<br>$$<br>State_{\mathrm{MC}}^{(1)}</h1><p>\begin{bmatrix}<br>c_{0,0} &amp; c_{0,1} &amp; c_{0,2} &amp; c_{0,3} \\<br>c_{1,0} &amp; c_{1,1} &amp; c_{1,2} &amp; c_{1,3} \\<br>c_{2,0} &amp; c_{2,1} &amp; c_{2,2} &amp; c_{2,3} \\<br>c_{3,0} &amp; c_{3,1} &amp; c_{3,2} &amp; c_{3,3}<br>\end{bmatrix}<br>$$</p>
-<h2 id="轮密钥加（AddRoundKey）"><a href="#轮密钥加（AddRoundKey）" class="headerlink" title="轮密钥加（AddRoundKey）"></a>轮密钥加（AddRoundKey）</h2><h1 id="在完成列混淆之后，第一轮当前的状态矩阵为-State-mathrm-MC-1"><a href="#在完成列混淆之后，第一轮当前的状态矩阵为-State-mathrm-MC-1" class="headerlink" title="在完成列混淆之后，第一轮当前的状态矩阵为$$State_{\mathrm{MC}}^{(1)}"></a>在完成列混淆之后，第一轮当前的状态矩阵为<br>$$<br>State_{\mathrm{MC}}^{(1)}</h1><p>\begin{bmatrix}<br>c_{0,0} &amp; c_{0,1} &amp; c_{0,2} &amp; c_{0,3} \\<br>c_{1,0} &amp; c_{1,1} &amp; c_{1,2} &amp; c_{1,3} \\<br>c_{2,0} &amp; c_{2,1} &amp; c_{2,2} &amp; c_{2,3} \\<br>c_{3,0} &amp; c_{3,1} &amp; c_{3,2} &amp; c_{3,3}<br>\end{bmatrix}<br>$$<br>接下来，需要将其与第一轮轮密钥 K^{(1)} 逐元素进行异或，得到第一轮结束后的状态矩阵 State^{(2)}：<br>$$<br>State^{(2)} &#x3D; State_{\mathrm{MC}}^{(1)} \oplus K^{(1)}<br>$$<br>也就是说，矩阵中的每一个位置都与对应位置上的轮密钥字节进行异或，因此逐元素可写为<br>$$<br>s_{i,j}^{(2)} &#x3D; c_{i,j} \oplus k_{i,j}^{(1)}, \qquad 0 \le i,j \le 3<br>$$<br>至此，第一轮的完整过程可以总结为<br>$$<br>State^{(1)}<br>;\xrightarrow{\mathrm{SubBytes}};<br>State_{\mathrm{SB}}^{(1)}<br>;\xrightarrow{\mathrm{ShiftRows}};<br>State_{\mathrm{SR}}^{(1)}<br>;\xrightarrow{\mathrm{MixColumns}};<br>State_{\mathrm{MC}}^{(1)}<br>;\xrightarrow{\mathrm{AddRoundKey}};<br>State^{(2)}<br>$$</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在完成第一轮之后，AES 后续各轮的处理方式与第一轮基本相同。对于 AES-128 而言，接下来的第 2 轮到第 9 轮，都会重复执行以下四个步骤：<br>$$<br>\mathrm{SubBytes}<br>;\rightarrow;<br>\mathrm{ShiftRows}<br>;\rightarrow;<br>\mathrm{MixColumns}<br>;\rightarrow;<br>\mathrm{AddRoundKey}<br>$$<br>也就是说，第一轮中已经展示过的状态矩阵变换过程，在后续标准轮中会不断重复。<strong>只是每一轮所使用的轮密钥不同</strong>，分别由密钥扩展算法生成。</p>
+<p>因此，第一轮经过列混淆后的状态矩阵可以写为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+State_{\mathrm{MC}}^{(1)}
+=
+\begin{bmatrix}
+c_{0,0} &amp;amp; c_{0,1} &amp;amp; c_{0,2} &amp;amp; c_{0,3} \\\\
+c_{1,0} &amp;amp; c_{1,1} &amp;amp; c_{1,2} &amp;amp; c_{1,3} \\\\
+c_{2,0} &amp;amp; c_{2,1} &amp;amp; c_{2,2} &amp;amp; c_{2,3} \\\\
+c_{3,0} &amp;amp; c_{3,1} &amp;amp; c_{3,2} &amp;amp; c_{3,3}
+\end{bmatrix}
+\]</div>
+
+</div>
+
+
+
+<h2 id="轮密钥加（AddRoundKey）"><a href="#轮密钥加（AddRoundKey）" class="headerlink" title="轮密钥加（AddRoundKey）"></a>轮密钥加（AddRoundKey）</h2><p>在完成列混淆之后，第一轮当前的状态矩阵为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+State_{\mathrm{MC}}^{(1)}
+=
+\begin{bmatrix}
+c_{0,0} &amp;amp; c_{0,1} &amp;amp; c_{0,2} &amp;amp; c_{0,3} \\\\
+c_{1,0} &amp;amp; c_{1,1} &amp;amp; c_{1,2} &amp;amp; c_{1,3} \\\\
+c_{2,0} &amp;amp; c_{2,1} &amp;amp; c_{2,2} &amp;amp; c_{2,3} \\\\
+c_{3,0} &amp;amp; c_{3,1} &amp;amp; c_{3,2} &amp;amp; c_{3,3}
+\end{bmatrix}
+\]</div>
+
+</div>
+
+
+<p>接下来，需要将其与第一轮轮密钥 K^{(1)} 逐元素进行异或，得到第一轮结束后的状态矩阵 State^{(2)}：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+State^{(2)} = State_{\mathrm{MC}}^{(1)} \oplus K^{(1)}
+\]</div>
+
+</div>
+
+
+<p>也就是说，矩阵中的每一个位置都与对应位置上的轮密钥字节进行异或，因此逐元素可写为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+s_{i,j}^{(2)} = c_{i,j} \oplus k_{i,j}^{(1)}, \qquad 0 \le i,j \le 3
+\]</div>
+
+</div>
+
+
+<p>至此，第一轮的完整过程可以总结为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+State^{(1)}
+\;\xrightarrow{\mathrm{SubBytes}}\;
+State_{\mathrm{SB}}^{(1)}
+\;\xrightarrow{\mathrm{ShiftRows}}\;
+State_{\mathrm{SR}}^{(1)}
+\;\xrightarrow{\mathrm{MixColumns}}\;
+State_{\mathrm{MC}}^{(1)}
+\;\xrightarrow{\mathrm{AddRoundKey}}\;
+State^{(2)}
+\]</div>
+
+</div>
+
+
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>在完成第一轮之后，AES 后续各轮的处理方式与第一轮基本相同。对于 AES-128 而言，接下来的第 2 轮到第 9 轮，都会重复执行以下四个步骤：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\mathrm{SubBytes}
+\;\rightarrow\;
+\mathrm{ShiftRows}
+\;\rightarrow\;
+\mathrm{MixColumns}
+\;\rightarrow\;
+\mathrm{AddRoundKey}
+\]</div>
+
+</div>
+
+
+<p>也就是说，第一轮中已经展示过的状态矩阵变换过程，在后续标准轮中会不断重复。<strong>只是每一轮所使用的轮密钥不同</strong>，分别由密钥扩展算法生成。</p>
 <p>因此，从整体上看，AES-128 的中间各轮可以概括为：先对当前状态矩阵进行字节代换，再进行行移位，然后执行列混淆，最后与该轮对应的轮密钥异或，得到下一轮的输入状态矩阵。</p>
-<p>需要注意的是，<strong>最后一轮与前面的标准轮并不完全相同</strong>。在最后一轮中，AES 仍然会执行字节代换、行移位和轮密钥加，但<strong>不再执行列混淆</strong>。因此，最后一轮的过程为：<br>$$<br>\mathrm{SubBytes}<br>;\rightarrow;<br>\mathrm{ShiftRows}<br>;\rightarrow;<br>\mathrm{AddRoundKey}<br>$$<br>若将 AES-128 的整体加密过程整理出来，则可以表示为：</p>
+<p>需要注意的是，<strong>最后一轮与前面的标准轮并不完全相同</strong>。在最后一轮中，AES 仍然会执行字节代换、行移位和轮密钥加，但<strong>不再执行列混淆</strong>。因此，最后一轮的过程为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\mathrm{SubBytes}
+\;\rightarrow\;
+\mathrm{ShiftRows}
+\;\rightarrow\;
+\mathrm{AddRoundKey}
+\]</div>
+
+</div>
+
+
+<p>若将 AES-128 的整体加密过程整理出来，则可以表示为：</p>
 <ol>
 <li><p>明文分组并初始化状态矩阵；</p>
 </li>
@@ -368,11 +864,31 @@
 </ol>
 <h2 id="AES工作模式"><a href="#AES工作模式" class="headerlink" title="AES工作模式"></a>AES工作模式</h2><p>上文讨论的是 AES 对单个 128 bit 分组的加密过程，即 AES 算法本体的内部结构。然而，在实际应用中，待加密的数据往往远不止一个分组，因此仅仅知道单个分组如何加密还不够。为了将 AES 用于任意长度的消息，还需要结合具体的<strong>工作模式（Mode of Operation）</strong>。不同的工作模式决定了多个分组之间如何关联，也会影响算法是否需要填充、是否能并行处理，以及整体的安全特性。</p>
 <h2 id="ECB"><a href="#ECB" class="headerlink" title="ECB"></a>ECB</h2><p>ECB（Electronic Codebook，电子密码本模式）</p>
-<p>ECB 是最简单的分组加密模式。它的基本思想是：将明文分成若干个 128 bit 分组后，对每个分组分别独立使用 AES 加密：<br>$$<br>C_i &#x3D; E_K(P_i)<br>$$<br>其中，P_i 表示第 i 个明文分组，C_i 表示对应的密文分组，E_K 表示使用密钥 K 的 AES 加密操作。</p>
+<p>ECB 是最简单的分组加密模式。它的基本思想是：将明文分成若干个 128 bit 分组后，对每个分组分别独立使用 AES 加密：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+C_i = E_K(P_i)
+\]</div>
+
+</div>
+
+
+<p>其中，P_i 表示第 i 个明文分组，C_i 表示对应的密文分组，E_K 表示使用密钥 K 的 AES 加密操作。</p>
 <p>ECB 的优点是结构简单、实现方便，而且各分组之间彼此独立，可以并行加密和解密。然而，它也有一个非常严重的问题：<strong>相同的明文分组会得到相同的密文分组</strong>。这意味着如果原始数据中存在重复结构，那么这些结构会在密文中被保留下来，从而泄露明文的模式信息。</p>
 <p>因此，ECB 虽然概念简单，但通常<strong>不适合在实际系统中直接使用</strong>。</p>
 <h2 id="CBC"><a href="#CBC" class="headerlink" title="CBC"></a>CBC</h2><p>CBC（Cipher Block Chaining，密码分组链接模式）</p>
-<p>CBC 模式在 ECB 的基础上引入了“前一个密文分组”的影响。对于第一个明文分组，先与初始化向量 IV 异或，再进行加密；对于后续分组，则先与前一个密文分组异或，再进行加密：<br>$$<br>C_1 &#x3D; E_K(P_1 \oplus IV)<br>$$<br>这样做的好处是，即使两个明文分组内容相同，只要它们前面的上下文不同，最终得到的密文也通常不同，因此比 ECB 更安全。</p>
+<p>CBC 模式在 ECB 的基础上引入了“前一个密文分组”的影响。对于第一个明文分组，先与初始化向量 IV 异或，再进行加密；对于后续分组，则先与前一个密文分组异或，再进行加密：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+C_1 = E_K(P_1 \oplus IV)
+\]</div>
+
+</div>
+
+
+<p>这样做的好处是，即使两个明文分组内容相同，只要它们前面的上下文不同，最终得到的密文也通常不同，因此比 ECB 更安全。</p>
 <p>CBC 的特点是：</p>
 <ul>
 <li>能隐藏重复分组的模式</li>
@@ -382,7 +898,17 @@
 </ul>
 <p>因此，当明文长度不是 16 字节整数倍时，CBC 模式通常需要使用 <strong>PKCS#7</strong> 等填充方式补齐。</p>
 <h2 id="CTR"><a href="#CTR" class="headerlink" title="CTR"></a>CTR</h2><p>CTR（Counter Mode，计数器模式）</p>
-<p>CTR 模式的思路与前两种不同。它并不是直接对明文分组本身做链接处理，而是先对一系列计数器进行 AES 加密，生成密钥流，然后再与明文逐块异或：<br>$$<br>C_i &#x3D; P_i \oplus E_K(\mathrm{CTR}_i)<br>$$<br>其中，CTR_i 表示第 i 个计数器块，通常由 nonce 和递增计数器组成。</p>
+<p>CTR 模式的思路与前两种不同。它并不是直接对明文分组本身做链接处理，而是先对一系列计数器进行 AES 加密，生成密钥流，然后再与明文逐块异或：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+C_i = P_i \oplus E_K(\mathrm{CTR}_i)
+\]</div>
+
+</div>
+
+
+<p>其中，CTR_i 表示第 i 个计数器块，通常由 nonce 和递增计数器组成。</p>
 <p>CTR 模式的优点在于：</p>
 <ul>
 <li>可以并行加密和解密</li>
@@ -390,94 +916,192 @@
 <li><strong>通常不需要 padding</strong>，因为它本质上更接近流加密</li>
 </ul>
 <p>不过，CTR 模式对 nonce &#x2F; counter 的唯一性要求很高；如果同一密钥下重复使用相同的计数器序列，会带来严重安全问题。</p>
-
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/%E5%AF%86%E7%A0%81%E5%AD%A6/" rel="tag"># 密码学</a>
-          </div>
-
-        
-
-          <div class="post-nav">
-            <div class="post-nav-item">
-                <a href="/2026/03/19/%E5%93%88%E5%B8%8C%E5%87%BD%E6%95%B0/" rel="prev" title="Hash">
-                  <i class="fa fa-angle-left"></i> Hash
-                </a>
-            </div>
-            <div class="post-nav-item">
-                <a href="/2026/03/23/SM4/" rel="next" title="SM4">
-                  SM4 <i class="fa fa-angle-right"></i>
-                </a>
-            </div>
-          </div>
-    </footer>
-  </article>
-</div>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="type">uint8_t</span> SBOX[<span class="number">256</span>] = &#123;</span><br><span class="line"><span class="number">0x63</span>,<span class="number">0x7c</span>,<span class="number">0x77</span>,<span class="number">0x7b</span>,<span class="number">0xf2</span>,<span class="number">0x6b</span>,<span class="number">0x6f</span>,<span class="number">0xc5</span>,<span class="number">0x30</span>,<span class="number">0x01</span>,<span class="number">0x67</span>,<span class="number">0x2b</span>,<span class="number">0xfe</span>,<span class="number">0xd7</span>,<span class="number">0xab</span>,<span class="number">0x76</span>,</span><br><span class="line"><span class="number">0xca</span>,<span class="number">0x82</span>,<span class="number">0xc9</span>,<span class="number">0x7d</span>,<span class="number">0xfa</span>,<span class="number">0x59</span>,<span class="number">0x47</span>,<span class="number">0xf0</span>,<span class="number">0xad</span>,<span class="number">0xd4</span>,<span class="number">0xa2</span>,<span class="number">0xaf</span>,<span class="number">0x9c</span>,<span class="number">0xa4</span>,<span class="number">0x72</span>,<span class="number">0xc0</span>,</span><br><span class="line"><span class="number">0xb7</span>,<span class="number">0xfd</span>,<span class="number">0x93</span>,<span class="number">0x26</span>,<span class="number">0x36</span>,<span class="number">0x3f</span>,<span class="number">0xf7</span>,<span class="number">0xcc</span>,<span class="number">0x34</span>,<span class="number">0xa5</span>,<span class="number">0xe5</span>,<span class="number">0xf1</span>,<span class="number">0x71</span>,<span class="number">0xd8</span>,<span class="number">0x31</span>,<span class="number">0x15</span>,</span><br><span class="line"><span class="number">0x04</span>,<span class="number">0xc7</span>,<span class="number">0x23</span>,<span class="number">0xc3</span>,<span class="number">0x18</span>,<span class="number">0x96</span>,<span class="number">0x05</span>,<span class="number">0x9a</span>,<span class="number">0x07</span>,<span class="number">0x12</span>,<span class="number">0x80</span>,<span class="number">0xe2</span>,<span class="number">0xeb</span>,<span class="number">0x27</span>,<span class="number">0xb2</span>,<span class="number">0x75</span>,</span><br><span class="line"><span class="number">0x09</span>,<span class="number">0x83</span>,<span class="number">0x2c</span>,<span class="number">0x1a</span>,<span class="number">0x1b</span>,<span class="number">0x6e</span>,<span class="number">0x5a</span>,<span class="number">0xa0</span>,<span class="number">0x52</span>,<span class="number">0x3b</span>,<span class="number">0xd6</span>,<span class="number">0xb3</span>,<span class="number">0x29</span>,<span class="number">0xe3</span>,<span class="number">0x2f</span>,<span class="number">0x84</span>,</span><br><span class="line"><span class="number">0x53</span>,<span class="number">0xd1</span>,<span class="number">0x00</span>,<span class="number">0xed</span>,<span class="number">0x20</span>,<span class="number">0xfc</span>,<span class="number">0xb1</span>,<span class="number">0x5b</span>,<span class="number">0x6a</span>,<span class="number">0xcb</span>,<span class="number">0xbe</span>,<span class="number">0x39</span>,<span class="number">0x4a</span>,<span class="number">0x4c</span>,<span class="number">0x58</span>,<span class="number">0xcf</span>,</span><br><span class="line"><span class="number">0xd0</span>,<span class="number">0xef</span>,<span class="number">0xaa</span>,<span class="number">0xfb</span>,<span class="number">0x43</span>,<span class="number">0x4d</span>,<span class="number">0x33</span>,<span class="number">0x85</span>,<span class="number">0x45</span>,<span class="number">0xf9</span>,<span class="number">0x02</span>,<span class="number">0x7f</span>,<span class="number">0x50</span>,<span class="number">0x3c</span>,<span class="number">0x9f</span>,<span class="number">0xa8</span>,</span><br><span class="line"><span class="number">0x51</span>,<span class="number">0xa3</span>,<span class="number">0x40</span>,<span class="number">0x8f</span>,<span class="number">0x92</span>,<span class="number">0x9d</span>,<span class="number">0x38</span>,<span class="number">0xf5</span>,<span class="number">0xbc</span>,<span class="number">0xb6</span>,<span class="number">0xda</span>,<span class="number">0x21</span>,<span class="number">0x10</span>,<span class="number">0xff</span>,<span class="number">0xf3</span>,<span class="number">0xd2</span>,</span><br><span class="line"><span class="number">0xcd</span>,<span class="number">0x0c</span>,<span class="number">0x13</span>,<span class="number">0xec</span>,<span class="number">0x5f</span>,<span class="number">0x97</span>,<span class="number">0x44</span>,<span class="number">0x17</span>,<span class="number">0xc4</span>,<span class="number">0xa7</span>,<span class="number">0x7e</span>,<span class="number">0x3d</span>,<span class="number">0x64</span>,<span class="number">0x5d</span>,<span class="number">0x19</span>,<span class="number">0x73</span>,</span><br><span class="line"><span class="number">0x60</span>,<span class="number">0x81</span>,<span class="number">0x4f</span>,<span class="number">0xdc</span>,<span class="number">0x22</span>,<span class="number">0x2a</span>,<span class="number">0x90</span>,<span class="number">0x88</span>,<span class="number">0x46</span>,<span class="number">0xee</span>,<span class="number">0xb8</span>,<span class="number">0x14</span>,<span class="number">0xde</span>,<span class="number">0x5e</span>,<span class="number">0x0b</span>,<span class="number">0xdb</span>,</span><br><span class="line"><span class="number">0xe0</span>,<span class="number">0x32</span>,<span class="number">0x3a</span>,<span class="number">0x0a</span>,<span class="number">0x49</span>,<span class="number">0x06</span>,<span class="number">0x24</span>,<span class="number">0x5c</span>,<span class="number">0xc2</span>,<span class="number">0xd3</span>,<span class="number">0xac</span>,<span class="number">0x62</span>,<span class="number">0x91</span>,<span class="number">0x95</span>,<span class="number">0xe4</span>,<span class="number">0x79</span>,</span><br><span class="line"><span class="number">0xe7</span>,<span class="number">0xc8</span>,<span class="number">0x37</span>,<span class="number">0x6d</span>,<span class="number">0x8d</span>,<span class="number">0xd5</span>,<span class="number">0x4e</span>,<span class="number">0xa9</span>,<span class="number">0x6c</span>,<span class="number">0x56</span>,<span class="number">0xf4</span>,<span class="number">0xea</span>,<span class="number">0x65</span>,<span class="number">0x7a</span>,<span class="number">0xae</span>,<span class="number">0x08</span>,</span><br><span class="line"><span class="number">0xba</span>,<span class="number">0x78</span>,<span class="number">0x25</span>,<span class="number">0x2e</span>,<span class="number">0x1c</span>,<span class="number">0xa6</span>,<span class="number">0xb4</span>,<span class="number">0xc6</span>,<span class="number">0xe8</span>,<span class="number">0xdd</span>,<span class="number">0x74</span>,<span class="number">0x1f</span>,<span class="number">0x4b</span>,<span class="number">0xbd</span>,<span class="number">0x8b</span>,<span class="number">0x8a</span>,</span><br><span class="line"><span class="number">0x70</span>,<span class="number">0x3e</span>,<span class="number">0xb5</span>,<span class="number">0x66</span>,<span class="number">0x48</span>,<span class="number">0x03</span>,<span class="number">0xf6</span>,<span class="number">0x0e</span>,<span class="number">0x61</span>,<span class="number">0x35</span>,<span class="number">0x57</span>,<span class="number">0xb9</span>,<span class="number">0x86</span>,<span class="number">0xc1</span>,<span class="number">0x1d</span>,<span class="number">0x9e</span>,</span><br><span class="line"><span class="number">0xe1</span>,<span class="number">0xf8</span>,<span class="number">0x98</span>,<span class="number">0x11</span>,<span class="number">0x69</span>,<span class="number">0xd9</span>,<span class="number">0x8e</span>,<span class="number">0x94</span>,<span class="number">0x9b</span>,<span class="number">0x1e</span>,<span class="number">0x87</span>,<span class="number">0xe9</span>,<span class="number">0xce</span>,<span class="number">0x55</span>,<span class="number">0x28</span>,<span class="number">0xdf</span>,</span><br><span class="line"><span class="number">0x8c</span>,<span class="number">0xa1</span>,<span class="number">0x89</span>,<span class="number">0x0d</span>,<span class="number">0xbf</span>,<span class="number">0xe6</span>,<span class="number">0x42</span>,<span class="number">0x68</span>,<span class="number">0x41</span>,<span class="number">0x99</span>,<span class="number">0x2d</span>,<span class="number">0x0f</span>,<span class="number">0xb0</span>,<span class="number">0x54</span>,<span class="number">0xbb</span>,<span class="number">0x16</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="type">uint8_t</span> INV_SBOX[<span class="number">256</span>] = &#123;</span><br><span class="line"><span class="number">0x52</span>,<span class="number">0x09</span>,<span class="number">0x6a</span>,<span class="number">0xd5</span>,<span class="number">0x30</span>,<span class="number">0x36</span>,<span class="number">0xa5</span>,<span class="number">0x38</span>,<span class="number">0xbf</span>,<span class="number">0x40</span>,<span class="number">0xa3</span>,<span class="number">0x9e</span>,<span class="number">0x81</span>,<span class="number">0xf3</span>,<span class="number">0xd7</span>,<span class="number">0xfb</span>,</span><br><span class="line"><span class="number">0x7c</span>,<span class="number">0xe3</span>,<span class="number">0x39</span>,<span class="number">0x82</span>,<span class="number">0x9b</span>,<span class="number">0x2f</span>,<span class="number">0xff</span>,<span class="number">0x87</span>,<span class="number">0x34</span>,<span class="number">0x8e</span>,<span class="number">0x43</span>,<span class="number">0x44</span>,<span class="number">0xc4</span>,<span class="number">0xde</span>,<span class="number">0xe9</span>,<span class="number">0xcb</span>,</span><br><span class="line"><span class="number">0x54</span>,<span class="number">0x7b</span>,<span class="number">0x94</span>,<span class="number">0x32</span>,<span class="number">0xa6</span>,<span class="number">0xc2</span>,<span class="number">0x23</span>,<span class="number">0x3d</span>,<span class="number">0xee</span>,<span class="number">0x4c</span>,<span class="number">0x95</span>,<span class="number">0x0b</span>,<span class="number">0x42</span>,<span class="number">0xfa</span>,<span class="number">0xc3</span>,<span class="number">0x4e</span>,</span><br><span class="line"><span class="number">0x08</span>,<span class="number">0x2e</span>,<span class="number">0xa1</span>,<span class="number">0x66</span>,<span class="number">0x28</span>,<span class="number">0xd9</span>,<span class="number">0x24</span>,<span class="number">0xb2</span>,<span class="number">0x76</span>,<span class="number">0x5b</span>,<span class="number">0xa2</span>,<span class="number">0x49</span>,<span class="number">0x6d</span>,<span class="number">0x8b</span>,<span class="number">0xd1</span>,<span class="number">0x25</span>,</span><br><span class="line"><span class="number">0x72</span>,<span class="number">0xf8</span>,<span class="number">0xf6</span>,<span class="number">0x64</span>,<span class="number">0x86</span>,<span class="number">0x68</span>,<span class="number">0x98</span>,<span class="number">0x16</span>,<span class="number">0xd4</span>,<span class="number">0xa4</span>,<span class="number">0x5c</span>,<span class="number">0xcc</span>,<span class="number">0x5d</span>,<span class="number">0x65</span>,<span class="number">0xb6</span>,<span class="number">0x92</span>,</span><br><span class="line"><span class="number">0x6c</span>,<span class="number">0x70</span>,<span class="number">0x48</span>,<span class="number">0x50</span>,<span class="number">0xfd</span>,<span class="number">0xed</span>,<span class="number">0xb9</span>,<span class="number">0xda</span>,<span class="number">0x5e</span>,<span class="number">0x15</span>,<span class="number">0x46</span>,<span class="number">0x57</span>,<span class="number">0xa7</span>,<span class="number">0x8d</span>,<span class="number">0x9d</span>,<span class="number">0x84</span>,</span><br><span class="line"><span class="number">0x90</span>,<span class="number">0xd8</span>,<span class="number">0xab</span>,<span class="number">0x00</span>,<span class="number">0x8c</span>,<span class="number">0xbc</span>,<span class="number">0xd3</span>,<span class="number">0x0a</span>,<span class="number">0xf7</span>,<span class="number">0xe4</span>,<span class="number">0x58</span>,<span class="number">0x05</span>,<span class="number">0xb8</span>,<span class="number">0xb3</span>,<span class="number">0x45</span>,<span class="number">0x06</span>,</span><br><span class="line"><span class="number">0xd0</span>,<span class="number">0x2c</span>,<span class="number">0x1e</span>,<span class="number">0x8f</span>,<span class="number">0xca</span>,<span class="number">0x3f</span>,<span class="number">0x0f</span>,<span class="number">0x02</span>,<span class="number">0xc1</span>,<span class="number">0xaf</span>,<span class="number">0xbd</span>,<span class="number">0x03</span>,<span class="number">0x01</span>,<span class="number">0x13</span>,<span class="number">0x8a</span>,<span class="number">0x6b</span>,</span><br><span class="line"><span class="number">0x3a</span>,<span class="number">0x91</span>,<span class="number">0x11</span>,<span class="number">0x41</span>,<span class="number">0x4f</span>,<span class="number">0x67</span>,<span class="number">0xdc</span>,<span class="number">0xea</span>,<span class="number">0x97</span>,<span class="number">0xf2</span>,<span class="number">0xcf</span>,<span class="number">0xce</span>,<span class="number">0xf0</span>,<span class="number">0xb4</span>,<span class="number">0xe6</span>,<span class="number">0x73</span>,</span><br><span class="line"><span class="number">0x96</span>,<span class="number">0xac</span>,<span class="number">0x74</span>,<span class="number">0x22</span>,<span class="number">0xe7</span>,<span class="number">0xad</span>,<span class="number">0x35</span>,<span class="number">0x85</span>,<span class="number">0xe2</span>,<span class="number">0xf9</span>,<span class="number">0x37</span>,<span class="number">0xe8</span>,<span class="number">0x1c</span>,<span class="number">0x75</span>,<span class="number">0xdf</span>,<span class="number">0x6e</span>,</span><br><span class="line"><span class="number">0x47</span>,<span class="number">0xf1</span>,<span class="number">0x1a</span>,<span class="number">0x71</span>,<span class="number">0x1d</span>,<span class="number">0x29</span>,<span class="number">0xc5</span>,<span class="number">0x89</span>,<span class="number">0x6f</span>,<span class="number">0xb7</span>,<span class="number">0x62</span>,<span class="number">0x0e</span>,<span class="number">0xaa</span>,<span class="number">0x18</span>,<span class="number">0xbe</span>,<span class="number">0x1b</span>,</span><br><span class="line"><span class="number">0xfc</span>,<span class="number">0x56</span>,<span class="number">0x3e</span>,<span class="number">0x4b</span>,<span class="number">0xc6</span>,<span class="number">0xd2</span>,<span class="number">0x79</span>,<span class="number">0x20</span>,<span class="number">0x9a</span>,<span class="number">0xdb</span>,<span class="number">0xc0</span>,<span class="number">0xfe</span>,<span class="number">0x78</span>,<span class="number">0xcd</span>,<span class="number">0x5a</span>,<span class="number">0xf4</span>,</span><br><span class="line"><span class="number">0x1f</span>,<span class="number">0xdd</span>,<span class="number">0xa8</span>,<span class="number">0x33</span>,<span class="number">0x88</span>,<span class="number">0x07</span>,<span class="number">0xc7</span>,<span class="number">0x31</span>,<span class="number">0xb1</span>,<span class="number">0x12</span>,<span class="number">0x10</span>,<span class="number">0x59</span>,<span class="number">0x27</span>,<span class="number">0x80</span>,<span class="number">0xec</span>,<span class="number">0x5f</span>,</span><br><span class="line"><span class="number">0x60</span>,<span class="number">0x51</span>,<span class="number">0x7f</span>,<span class="number">0xa9</span>,<span class="number">0x19</span>,<span class="number">0xb5</span>,<span class="number">0x4a</span>,<span class="number">0x0d</span>,<span class="number">0x2d</span>,<span class="number">0xe5</span>,<span class="number">0x7a</span>,<span class="number">0x9f</span>,<span class="number">0x93</span>,<span class="number">0xc9</span>,<span class="number">0x9c</span>,<span class="number">0xef</span>,</span><br><span class="line"><span class="number">0xa0</span>,<span class="number">0xe0</span>,<span class="number">0x3b</span>,<span class="number">0x4d</span>,<span class="number">0xae</span>,<span class="number">0x2a</span>,<span class="number">0xf5</span>,<span class="number">0xb0</span>,<span class="number">0xc8</span>,<span class="number">0xeb</span>,<span class="number">0xbb</span>,<span class="number">0x3c</span>,<span class="number">0x83</span>,<span class="number">0x53</span>,<span class="number">0x99</span>,<span class="number">0x61</span>,</span><br><span class="line"><span class="number">0x17</span>,<span class="number">0x2b</span>,<span class="number">0x04</span>,<span class="number">0x7e</span>,<span class="number">0xba</span>,<span class="number">0x77</span>,<span class="number">0xd6</span>,<span class="number">0x26</span>,<span class="number">0xe1</span>,<span class="number">0x69</span>,<span class="number">0x14</span>,<span class="number">0x63</span>,<span class="number">0x55</span>,<span class="number">0x21</span>,<span class="number">0x0c</span>,<span class="number">0x7d</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="type">uint8_t</span> RCON[<span class="number">16</span>] = &#123;<span class="number">0x00</span>,<span class="number">0x01</span>,<span class="number">0x02</span>,<span class="number">0x04</span>,<span class="number">0x08</span>,<span class="number">0x10</span>,<span class="number">0x20</span>,<span class="number">0x40</span>,<span class="number">0x80</span>,<span class="number">0x1b</span>,<span class="number">0x36</span>,<span class="number">0x6c</span>,<span class="number">0xd8</span>,<span class="number">0xab</span>,<span class="number">0x4d</span>,<span class="number">0x9a</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> State = array&lt;array&lt;<span class="type">uint8_t</span>,<span class="number">4</span>&gt;,<span class="number">4</span>&gt;;</span><br><span class="line"></span><br><span class="line"><span class="function">vector&lt;<span class="type">uint8_t</span>&gt; <span class="title">hexToBytes</span><span class="params">(<span class="type">const</span> string &amp;s)</span> </span>&#123;</span><br><span class="line">    vector&lt;<span class="type">uint8_t</span>&gt; out;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">size_t</span> i=<span class="number">0</span>; i&lt;s.<span class="built_in">size</span>(); i+=<span class="number">2</span>) out.<span class="built_in">push_back</span>((<span class="type">uint8_t</span>)<span class="built_in">stoi</span>(s.<span class="built_in">substr</span>(i,<span class="number">2</span>), <span class="literal">nullptr</span>, <span class="number">16</span>));</span><br><span class="line">    <span class="keyword">return</span> out;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">string <span class="title">bytesToHex</span><span class="params">(<span class="type">const</span> vector&lt;<span class="type">uint8_t</span>&gt; &amp;v)</span> </span>&#123;</span><br><span class="line">    stringstream ss; ss &lt;&lt; hex &lt;&lt; <span class="built_in">setfill</span>(<span class="string">&#x27;0&#x27;</span>) &lt;&lt; nouppercase;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> b: v) ss &lt;&lt; <span class="built_in">setw</span>(<span class="number">2</span>) &lt;&lt; (<span class="type">int</span>)b;</span><br><span class="line">    <span class="keyword">return</span> ss.<span class="built_in">str</span>();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">State <span class="title">bytesToState</span><span class="params">(<span class="type">const</span> vector&lt;<span class="type">uint8_t</span>&gt; &amp;b)</span> </span>&#123;</span><br><span class="line">    State s&#123;&#125;;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) <span class="keyword">for</span> (<span class="type">int</span> r=<span class="number">0</span>;r&lt;<span class="number">4</span>;r++) s[r][c]=b[<span class="number">4</span>*c+r];</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">vector&lt;<span class="type">uint8_t</span>&gt; <span class="title">stateToBytes</span><span class="params">(<span class="type">const</span> State &amp;s)</span> </span>&#123;</span><br><span class="line">    vector&lt;<span class="type">uint8_t</span>&gt; b;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) <span class="keyword">for</span> (<span class="type">int</span> r=<span class="number">0</span>;r&lt;<span class="number">4</span>;r++) b.<span class="built_in">push_back</span>(s[r][c]);</span><br><span class="line">    <span class="keyword">return</span> b;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">string <span class="title">stateHex</span><span class="params">(<span class="type">const</span> State &amp;s)</span> </span>&#123; <span class="keyword">return</span> <span class="built_in">bytesToHex</span>(<span class="built_in">stateToBytes</span>(s)); &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">uint8_t</span> <span class="title">gmul</span><span class="params">(<span class="type">uint8_t</span> a, <span class="type">uint8_t</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="type">uint8_t</span> p=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">8</span>;i++) &#123;</span><br><span class="line">        <span class="keyword">if</span>(b&amp;<span class="number">1</span>) p^=a;</span><br><span class="line">        <span class="type">bool</span> hi=a&amp;<span class="number">0x80</span>;</span><br><span class="line">        a &lt;&lt;= <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span>(hi) a ^= <span class="number">0x1b</span>;</span><br><span class="line">        b &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">State <span class="title">addRoundKey</span><span class="params">(<span class="type">const</span> State &amp;a, <span class="type">const</span> State &amp;k)</span> </span>&#123;</span><br><span class="line">    State o&#123;&#125;; <span class="keyword">for</span>(<span class="type">int</span> r=<span class="number">0</span>;r&lt;<span class="number">4</span>;r++) <span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) o[r][c]=a[r][c]^k[r][c]; <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">State <span class="title">subBytes</span><span class="params">(<span class="type">const</span> State &amp;s)</span> </span>&#123;</span><br><span class="line">    State o&#123;&#125;; <span class="keyword">for</span>(<span class="type">int</span> r=<span class="number">0</span>;r&lt;<span class="number">4</span>;r++) <span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) o[r][c]=SBOX[s[r][c]]; <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">State <span class="title">invSubBytes</span><span class="params">(<span class="type">const</span> State &amp;s)</span> </span>&#123;</span><br><span class="line">    State o&#123;&#125;; <span class="keyword">for</span>(<span class="type">int</span> r=<span class="number">0</span>;r&lt;<span class="number">4</span>;r++) <span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) o[r][c]=INV_SBOX[s[r][c]]; <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">State <span class="title">shiftRows</span><span class="params">(<span class="type">const</span> State &amp;s)</span> </span>&#123;</span><br><span class="line">    State o&#123;&#125;;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> r=<span class="number">0</span>;r&lt;<span class="number">4</span>;r++) <span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) o[r][c]=s[r][(c+r)%<span class="number">4</span>];</span><br><span class="line">    <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">State <span class="title">invShiftRows</span><span class="params">(<span class="type">const</span> State &amp;s)</span> </span>&#123;</span><br><span class="line">    State o&#123;&#125;;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> r=<span class="number">0</span>;r&lt;<span class="number">4</span>;r++) <span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) o[r][(c+r)%<span class="number">4</span>]=s[r][c];</span><br><span class="line">    <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">State <span class="title">mixColumns</span><span class="params">(<span class="type">const</span> State &amp;s)</span> </span>&#123;</span><br><span class="line">    State o&#123;&#125;;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) &#123;</span><br><span class="line">        <span class="type">uint8_t</span> a0=s[<span class="number">0</span>][c], a1=s[<span class="number">1</span>][c], a2=s[<span class="number">2</span>][c], a3=s[<span class="number">3</span>][c];</span><br><span class="line">        o[<span class="number">0</span>][c]=<span class="built_in">gmul</span>(a0,<span class="number">2</span>)^<span class="built_in">gmul</span>(a1,<span class="number">3</span>)^a2^a3;</span><br><span class="line">        o[<span class="number">1</span>][c]=a0^<span class="built_in">gmul</span>(a1,<span class="number">2</span>)^<span class="built_in">gmul</span>(a2,<span class="number">3</span>)^a3;</span><br><span class="line">        o[<span class="number">2</span>][c]=a0^a1^<span class="built_in">gmul</span>(a2,<span class="number">2</span>)^<span class="built_in">gmul</span>(a3,<span class="number">3</span>);</span><br><span class="line">        o[<span class="number">3</span>][c]=<span class="built_in">gmul</span>(a0,<span class="number">3</span>)^a1^a2^<span class="built_in">gmul</span>(a3,<span class="number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">State <span class="title">invMixColumns</span><span class="params">(<span class="type">const</span> State &amp;s)</span> </span>&#123;</span><br><span class="line">    State o&#123;&#125;;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) &#123;</span><br><span class="line">        <span class="type">uint8_t</span> a0=s[<span class="number">0</span>][c], a1=s[<span class="number">1</span>][c], a2=s[<span class="number">2</span>][c], a3=s[<span class="number">3</span>][c];</span><br><span class="line">        o[<span class="number">0</span>][c]=<span class="built_in">gmul</span>(a0,<span class="number">14</span>)^<span class="built_in">gmul</span>(a1,<span class="number">11</span>)^<span class="built_in">gmul</span>(a2,<span class="number">13</span>)^<span class="built_in">gmul</span>(a3,<span class="number">9</span>);</span><br><span class="line">        o[<span class="number">1</span>][c]=<span class="built_in">gmul</span>(a0,<span class="number">9</span>)^<span class="built_in">gmul</span>(a1,<span class="number">14</span>)^<span class="built_in">gmul</span>(a2,<span class="number">11</span>)^<span class="built_in">gmul</span>(a3,<span class="number">13</span>);</span><br><span class="line">        o[<span class="number">2</span>][c]=<span class="built_in">gmul</span>(a0,<span class="number">13</span>)^<span class="built_in">gmul</span>(a1,<span class="number">9</span>)^<span class="built_in">gmul</span>(a2,<span class="number">14</span>)^<span class="built_in">gmul</span>(a3,<span class="number">11</span>);</span><br><span class="line">        o[<span class="number">3</span>][c]=<span class="built_in">gmul</span>(a0,<span class="number">11</span>)^<span class="built_in">gmul</span>(a1,<span class="number">13</span>)^<span class="built_in">gmul</span>(a2,<span class="number">9</span>)^<span class="built_in">gmul</span>(a3,<span class="number">14</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">vector&lt;State&gt; <span class="title">keyExpansion</span><span class="params">(<span class="type">const</span> vector&lt;<span class="type">uint8_t</span>&gt; &amp;key)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> Nk = (<span class="type">int</span>)key.<span class="built_in">size</span>()/<span class="number">4</span>;</span><br><span class="line">    <span class="type">int</span> Nr = Nk + <span class="number">6</span>;</span><br><span class="line">    vector&lt;array&lt;<span class="type">uint8_t</span>,4&gt;&gt; w;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;Nk;i++) w.<span class="built_in">push_back</span>(&#123;key[<span class="number">4</span>*i],key[<span class="number">4</span>*i<span class="number">+1</span>],key[<span class="number">4</span>*i<span class="number">+2</span>],key[<span class="number">4</span>*i<span class="number">+3</span>]&#125;);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=Nk;i&lt;<span class="number">4</span>*(Nr<span class="number">+1</span>);i++) &#123;</span><br><span class="line">        <span class="keyword">auto</span> temp = w[i<span class="number">-1</span>];</span><br><span class="line">        <span class="keyword">if</span>(i%Nk==<span class="number">0</span>) &#123;</span><br><span class="line">            temp = &#123;temp[<span class="number">1</span>],temp[<span class="number">2</span>],temp[<span class="number">3</span>],temp[<span class="number">0</span>]&#125;;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">auto</span> &amp;x:temp) x=SBOX[x];</span><br><span class="line">            temp[<span class="number">0</span>] ^= RCON[i/Nk];</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span>(Nk&gt;<span class="number">6</span> &amp;&amp; i%Nk==<span class="number">4</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">auto</span> &amp;x:temp) x=SBOX[x];</span><br><span class="line">        &#125;</span><br><span class="line">        array&lt;<span class="type">uint8_t</span>,4&gt; nw&#123;&#125;;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;<span class="number">4</span>;j++) nw[j]=w[i-Nk][j]^temp[j];</span><br><span class="line">        w.<span class="built_in">push_back</span>(nw);</span><br><span class="line">    &#125;</span><br><span class="line">    vector&lt;State&gt; rks;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> r=<span class="number">0</span>;r&lt;=Nr;r++) &#123;</span><br><span class="line">        vector&lt;<span class="type">uint8_t</span>&gt; rb;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">4</span>*r;i&lt;<span class="number">4</span>*r<span class="number">+4</span>;i++) <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;<span class="number">4</span>;j++) rb.<span class="built_in">push_back</span>(w[i][j]);</span><br><span class="line">        rks.<span class="built_in">push_back</span>(<span class="built_in">bytesToState</span>(rb));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> rks;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">string <span class="title">encryptBlock</span><span class="params">(<span class="type">const</span> string &amp;ptHex, <span class="type">const</span> string &amp;keyHex, vector&lt;State&gt;* savedKeys=<span class="literal">nullptr</span>)</span> </span>&#123;</span><br><span class="line">    vector&lt;<span class="type">uint8_t</span>&gt; pt=<span class="built_in">hexToBytes</span>(ptHex), key=<span class="built_in">hexToBytes</span>(keyHex);</span><br><span class="line">    <span class="type">int</span> Nr=(<span class="type">int</span>)key.<span class="built_in">size</span>()/<span class="number">4</span><span class="number">+6</span>;</span><br><span class="line">    <span class="keyword">auto</span> rks=<span class="built_in">keyExpansion</span>(key);</span><br><span class="line">    <span class="keyword">if</span>(savedKeys) *savedKeys = rks;</span><br><span class="line">    State s=<span class="built_in">bytesToState</span>(pt);</span><br><span class="line">    s=<span class="built_in">addRoundKey</span>(s,rks[<span class="number">0</span>]);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> r=<span class="number">1</span>;r&lt;Nr;r++) s=<span class="built_in">addRoundKey</span>(<span class="built_in">mixColumns</span>(<span class="built_in">shiftRows</span>(<span class="built_in">subBytes</span>(s))),rks[r]);</span><br><span class="line">    s=<span class="built_in">addRoundKey</span>(<span class="built_in">shiftRows</span>(<span class="built_in">subBytes</span>(s)),rks[Nr]);</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">stateHex</span>(s);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">string <span class="title">decryptBlock</span><span class="params">(<span class="type">const</span> string &amp;ctHex, <span class="type">const</span> string &amp;keyHex)</span> </span>&#123;</span><br><span class="line">    vector&lt;<span class="type">uint8_t</span>&gt; ct=<span class="built_in">hexToBytes</span>(ctHex), key=<span class="built_in">hexToBytes</span>(keyHex);</span><br><span class="line">    <span class="type">int</span> Nr=(<span class="type">int</span>)key.<span class="built_in">size</span>()/<span class="number">4</span><span class="number">+6</span>;</span><br><span class="line">    <span class="keyword">auto</span> rks=<span class="built_in">keyExpansion</span>(key);</span><br><span class="line">    State s=<span class="built_in">bytesToState</span>(ct);</span><br><span class="line">    s=<span class="built_in">addRoundKey</span>(s,rks[Nr]);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> r=Nr<span class="number">-1</span>;r&gt;=<span class="number">1</span>;r--) s=<span class="built_in">invMixColumns</span>(<span class="built_in">addRoundKey</span>(<span class="built_in">invSubBytes</span>(<span class="built_in">invShiftRows</span>(s)),rks[r]));</span><br><span class="line">    s=<span class="built_in">addRoundKey</span>(<span class="built_in">invSubBytes</span>(<span class="built_in">invShiftRows</span>(s)),rks[<span class="number">0</span>]);</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">stateHex</span>(s);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">Test</span> &#123; string type, pt, key; &#125;;</span><br><span class="line">    vector&lt;Test&gt; tests = &#123;</span><br><span class="line">        &#123;<span class="string">&quot;AES-128&quot;</span>,<span class="string">&quot;0123456789abcdeffedcba9876543210&quot;</span>,<span class="string">&quot;0f1571c947d9e8590cb7add6af7f6798&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&quot;AES-128&quot;</span>,<span class="string">&quot;1b5e8b0f1bc78d238064826704830cdb&quot;</span>,<span class="string">&quot;3475bd76fa040b73f521ffcd9de93f24&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&quot;AES-128&quot;</span>,<span class="string">&quot;41b267bc5905f0a3cd691b3ddaee149d&quot;</span>,<span class="string">&quot;2b24424b9fed596659842a4d0b007c61&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&quot;AES-192&quot;</span>,<span class="string">&quot;123456789012345678901234567890ab&quot;</span>,<span class="string">&quot;1234567890123456789012345678901234567890abcdef01&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&quot;AES-256&quot;</span>,<span class="string">&quot;123456789012345678901234567890ab&quot;</span>,<span class="string">&quot;123456789012345678901234567890123456789012345678901234567890abcd&quot;</span>&#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;AES encrypt/decrypt test result\n&quot;</span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;--------------------------------\n&quot;</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">size_t</span> i=<span class="number">0</span>;i&lt;tests.<span class="built_in">size</span>();i++) &#123;</span><br><span class="line">        string ct=<span class="built_in">encryptBlock</span>(tests[i].pt, tests[i].key);</span><br><span class="line">        string dec=<span class="built_in">decryptBlock</span>(ct, tests[i].key);</span><br><span class="line">        cout &lt;&lt; tests[i].type &lt;&lt; <span class="string">&quot; group &quot;</span> &lt;&lt; (i<span class="number">+1</span>) &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;ciphertext : &quot;</span> &lt;&lt; ct &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;decrypted  : &quot;</span> &lt;&lt; dec &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;check      : &quot;</span> &lt;&lt; (dec==tests[i].pt ? <span class="string">&quot;OK&quot;</span> : <span class="string">&quot;FAIL&quot;</span>) &lt;&lt; <span class="string">&quot;\n\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    vector&lt;State&gt; rks;</span><br><span class="line">    <span class="built_in">encryptBlock</span>(tests[<span class="number">0</span>].pt, tests[<span class="number">0</span>].key, &amp;rks);</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;AES-128 group 1 round keys:\n&quot;</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">size_t</span> i=<span class="number">0</span>;i&lt;rks.<span class="built_in">size</span>();i++) cout &lt;&lt; <span class="built_in">setw</span>(<span class="number">2</span>) &lt;&lt; i &lt;&lt; <span class="string">&quot; : &quot;</span> &lt;&lt; <span class="built_in">stateHex</span>(rks[i]) &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 
+	</div>
+	<div class="meta split">
+		
+		<time class="post-date" datetime="2026-03-19T03:55:44.000Z" itemprop="datePublished">2026-03-19</time>
+	</div>
+</article>
 
+<!--评论-->
 
-
-
-</div>
-  </main>
-
-  <footer class="footer">
-    <div class="footer-inner">
-
-  <div class="copyright">
-    &copy; 
-    <span itemprop="copyrightYear">2026</span>
-    <span class="with-love">
-      <i class="fa fa-heart"></i>
-    </span>
-    <span class="author" itemprop="copyrightHolder">ksenr</span>
-  </div>
-<div class="busuanzi-count">
-    <span class="post-meta-item" id="busuanzi_container_site_uv">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-user"></i>
-      </span>
-      <span class="site-uv" title="总访客量">
-        <span id="busuanzi_value_site_uv"></span>
-      </span>
-    </span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-eye"></i>
-      </span>
-      <span class="site-pv" title="总访问量">
-        <span id="busuanzi_value_site_pv"></span>
-      </span>
-    </span>
-</div>
-  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
-  </div>
-
-    </div>
-  </footer>
 
   
-  <div class="toggle sidebar-toggle" role="button">
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-  </div>
-  <div class="sidebar-dimmer"></div>
-  <div class="back-to-top" role="button" aria-label="返回顶部">
-    <i class="fa fa-arrow-up fa-lg"></i>
-    <span>0%</span>
-  </div>
+</div>
 
-<noscript>
-  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
-</noscript>
 
-</body>
+  <svg id="bigTriangleColor" width="100%" height="40" viewBox="0 0 100 102" preserveAspectRatio="none">
+    <path d="M0 0 L50 100 L100 0 Z"></path>
+  </svg>
+
+  
+
+
+  <div class="wrapper"></div>
+
+
+
+
+
+<div class="fat-footer">
+	<div class="wrapper">
+		<div class="layout layout--center">
+			<div class="layout__item palm-mb">
+				<div class="media">
+					<img class="headimg" src='https://imgchr.github.la/steve.jpeg' alt='ksenr'>
+					<div class="media__body">
+						<h4>justpsvm</h4>
+						<p class='site-description'>Stay Hungry,Stay Foolish.</p>
+					</div>
+				</div>
+				<div class="author-contact">
+					<ul>
+						
+							
+							<li>
+				        		<a href="https://github.com/ksenrii" target="_blank">
+				        			
+				        		</a>
+				        	</li>
+						
+							
+							<li>
+				        		<a href="https://github.com/" target="_blank">
+				        			
+				        				<i class="iconfont icon-github"></i>
+				        			
+				        		</a>
+				        	</li>
+						
+							
+							<li>
+				        		<a href="https://www.zhihu.com/" target="_blank">
+				        			
+										<i class="iconfont icon-zhihu"></i>
+				        			
+				        		</a>
+				        	</li>
+						
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<footer class="footer" role="contentinfo">
+	<div class="wrapper wrapper--wide split split--responsive">
+		
+		<span>Theme by <a target="_blank" rel="noopener" href="http://github.com/justpsvm">justpsvm</a>. Powered by <a target="_blank" rel="noopener" href="http://hexo.io">Hexo</a></span>
+	</div>
+</footer>
+
+	<!-－这里导入了 lib.js 里面涵盖了 jQuery 等框架 所以注释掉-->
+	<!--
+<script src="http://lib.sinaapp.com/js/jquery/2.0/jquery.min.js"></script>
+-->
+	
+<script src="/js/lib.js"></script>
+
+	
+<script src="/js/module.js"></script>
+
+	
+<script src="/js/script.js"></script>
+
+	
+	<!-- hexo injector body_end start -->
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>
+(function () {
+  function getCodeText(block) {
+    var code = block.querySelector(".code pre") || block.querySelector("pre");
+    return code ? code.innerText.replace(/\n$/, "") : "";
+  }
+
+  document.querySelectorAll(".post-body figure.highlight").forEach(function (block) {
+    if (block.querySelector(".code-toolbar")) return;
+
+    var language = Array.from(block.classList).filter(function (name) {
+      return name !== "highlight";
+    })[0] || "code";
+
+    var toolbar = document.createElement("div");
+    toolbar.className = "code-toolbar";
+    toolbar.innerHTML = "<span>" + language.toUpperCase() + "</span><button class=\"code-copy-button\" type=\"button\">澶嶅埗</button>";
+    block.insertBefore(toolbar, block.firstChild);
+
+    toolbar.querySelector("button").addEventListener("click", function () {
+      var button = this;
+      var text = getCodeText(block);
+      var copied = function () {
+        button.textContent = "宸插鍒?;
+        setTimeout(function () {
+          button.textContent = "澶嶅埗";
+        }, 1500);
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(copied);
+      } else {
+        var textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+        copied();
+      }
+    });
+  });
+
+  var article = document.querySelector("article");
+  var body = article && article.querySelector(".post-body");
+  if (!article || !body || article.querySelector(".post-toc")) return;
+
+  var headings = Array.from(body.querySelectorAll("h2, h3, h4")).filter(function (heading) {
+    return heading.textContent.trim().length > 0;
+  });
+  if (headings.length < 2) return;
+
+  var nav = document.createElement("aside");
+  nav.className = "post-toc";
+  nav.innerHTML = '<div class="post-toc-title">鐩綍</div>';
+
+  headings.forEach(function (heading, index) {
+    if (!heading.id) {
+      heading.id = "toc-heading-" + index;
+    }
+    var link = document.createElement("a");
+    link.href = "#" + encodeURIComponent(heading.id);
+    link.className = "level-" + heading.tagName.slice(1);
+    link.textContent = heading.textContent.trim();
+    nav.appendChild(link);
+  });
+
+  article.insertBefore(nav, body);
+
+  var links = Array.from(nav.querySelectorAll("a"));
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      links.forEach(function (link) {
+        link.classList.toggle("is-active", decodeURIComponent(link.hash.slice(1)) === entry.target.id);
+      });
+    });
+  }, { rootMargin: "-20% 0px -70% 0px", threshold: 0 });
+
+  headings.forEach(function (heading) {
+    observer.observe(heading);
+  });
+})();
+</script><!-- hexo injector body_end end --></body>
 </html>
+
+

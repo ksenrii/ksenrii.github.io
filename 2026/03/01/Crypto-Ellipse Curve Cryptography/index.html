@@ -1,262 +1,304 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+<html>
+  <head>
+    <meta charset="utf-8">
+    
+    <title>Crypto-Ellipse Curve Cryptography | ksenr&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    
+      <link rel="icon" href="/favicon.png">
+    
 
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
-
-<script class="next-config" data-name="main" type="application/json">{"hostname":"ksenrii.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
-
-    <meta name="description" content="Ellipse Curve CryptographyECC 全称为椭圆曲线加密，EllipseCurve Cryptography，是一种基于椭圆曲线数学的公钥密码。与传统的基于大质数因子分解困难性的加密方法不同，ECC依赖于解决椭圆曲线离散对数问题的困难性。它的优势主要在于相对于其它方法，它可以在使用较短密钥长度的同时保持相同的密码强度。">
-<meta property="og:type" content="article">
-<meta property="og:title" content="Crypto-Ellipse Curve Cryptography">
-<meta property="og:url" content="https://ksenrii.github.io/2026/03/01/Crypto-Ellipse%20Curve%20Cryptography/index.html">
-<meta property="og:site_name" content="ksenr&#39;s blog">
-<meta property="og:description" content="Ellipse Curve CryptographyECC 全称为椭圆曲线加密，EllipseCurve Cryptography，是一种基于椭圆曲线数学的公钥密码。与传统的基于大质数因子分解困难性的加密方法不同，ECC依赖于解决椭圆曲线离散对数问题的困难性。它的优势主要在于相对于其它方法，它可以在使用较短密钥长度的同时保持相同的密码强度。">
-<meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://ksenrii.github.io/%5Cimages%5Cecc1.png">
-<meta property="og:image" content="https://ksenrii.github.io/%5Cimages%5Cecc2.png">
-<meta property="og:image" content="https://ksenrii.github.io/%5Cimages%5Cecc3.png">
-<meta property="article:published_time" content="2026-03-01T03:55:44.000Z">
-<meta property="article:modified_time" content="2026-04-04T08:05:29.984Z">
-<meta property="article:author" content="ksenr">
-<meta property="article:tag" content="密码学">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://ksenrii.github.io/%5Cimages%5Cecc1.png">
+    
+<link rel="stylesheet" href="/css/style.css">
 
 
-<link rel="canonical" href="https://ksenrii.github.io/2026/03/01/Crypto-Ellipse%20Curve%20Cryptography/">
+    
+<link rel="stylesheet" href="/js/google-code-prettify/tomorrow-night-eighties.min.css">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ksenrii.github.io/2026/03/01/Crypto-Ellipse%20Curve%20Cryptography/","path":"2026/03/01/Crypto-Ellipse Curve Cryptography/","title":"Crypto-Ellipse Curve Cryptography"}</script>
+  <!-- hexo injector head_end start -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [["\\(", "\\)"]],
+    displayMath: [["\\[", "\\]"]],
+    processEscapes: true,
+    processEnvironments: true,
+    tags: "ams"
+  },
+  options: {
+    skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"]
+  },
+  chtml: {
+    scale: 1,
+    matchFontHeight: false
+  }
+};
+</script>
+<style>
+.post-body .math-display {
+  margin: 1.25rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.post-body mjx-container {
+  max-width: 100%;
+}
+.post-body mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.35rem 0;
+}
+.post-body mjx-container svg {
+  max-width: none;
+}
 
-<script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Crypto-Ellipse Curve Cryptography | ksenr's blog</title>
-  
+.post-body figure.highlight {
+  position: relative;
+  margin: 1.6rem 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #1f2329;
+  box-shadow: 0 12px 34px rgba(17, 24, 39, 0.16);
+}
+.post-body figure.highlight table {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  overflow-x: auto;
+  border-collapse: collapse;
+  background: #282c34;
+}
+.post-body figure.highlight tbody,
+.post-body figure.highlight tr {
+  display: table;
+  width: 100%;
+}
+.post-body figure.highlight td {
+  border: 0;
+  padding: 0;
+  vertical-align: top;
+}
+.post-body figure.highlight .gutter {
+  width: 3.7rem;
+  min-width: 3.7rem;
+  user-select: none;
+  background: #21252b;
+  color: #6b7280;
+  text-align: right;
+}
+.post-body figure.highlight .code {
+  width: 100%;
+  background: #282c34;
+}
+.post-body figure.highlight pre {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  overflow: visible !important;
+  color: #abb2bf;
+  font-family: Consolas, Monaco, "Cascadia Code", "Fira Code", monospace;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.post-body figure.highlight .code pre {
+  min-width: max-content;
+}
+.post-body figure.highlight .line {
+  min-height: 1.65em;
+}
+.post-body figure.highlight .keyword,
+.post-body figure.highlight .type {
+  color: #c678dd;
+}
+.post-body figure.highlight .string {
+  color: #98c379;
+}
+.post-body figure.highlight .number,
+.post-body figure.highlight .literal {
+  color: #d19a66;
+}
+.post-body figure.highlight .comment {
+  color: #7f848e;
+}
+.post-body figure.highlight .meta,
+.post-body figure.highlight .built_in,
+.post-body figure.highlight .function .title {
+  color: #61afef;
+}
+.code-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 2.4rem;
+  padding: 0 0.75rem 0 1rem;
+  background: #1b1f27;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: #9ca3af;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.code-copy-button {
+  border: 0;
+  border-radius: 6px;
+  padding: 0.32rem 0.65rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: #d1d5db;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+.code-copy-button:hover {
+  background: #35bfab;
+  color: #111827;
+}
+
+article {
+  position: relative;
+}
+.post-toc {
+  position: fixed;
+  top: 128px;
+  right: max(24px, calc((100vw - 1180px) / 2));
+  width: 235px;
+  max-height: calc(100vh - 160px);
+  overflow: auto;
+  padding: 1rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 10px 34px rgba(17, 24, 39, 0.10);
+  backdrop-filter: blur(12px);
+  z-index: 1;
+}
+.post-toc-title {
+  margin-bottom: 0.7rem;
+  color: #334f52;
+  font-weight: 600;
+}
+.post-toc a {
+  display: block;
+  padding: 0.32rem 0.45rem;
+  border-left: 2px solid transparent;
+  border-radius: 4px;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.5;
+  text-decoration: none;
+}
+.post-toc a.level-3 {
+  padding-left: 1.05rem;
+}
+.post-toc a.level-4 {
+  padding-left: 1.65rem;
+}
+.post-toc a.is-active,
+.post-toc a:hover {
+  border-left-color: #35bfab;
+  background: rgba(53, 191, 171, 0.12);
+  color: #243b3d;
+}
+@media screen and (max-width: 1180px) {
+  .post-toc {
+    position: static;
+    width: auto;
+    max-height: none;
+    margin: 0 0 1.6rem;
+  }
+}
+</style><!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+
+<header>
+	
+		<i class="js-toggle-search iconfont icon-search"></i>
 
 
+<form class="js-search search-form search-form--modal" method="get" action="http://gushi.li" role="search">
+	<div class="search-form__inner">
+		<div>
+			<i class="iconfont icon-search"></i>
+			<input class="text-input" placeholder="Enter Key..." type="search">
+		</div>
+	</div>
+</form>
+	
 
+	
+		<a id="nav-toggle" href="#"><span></span></a>
 
-
-
-
-
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
-
-  
-
-
-
-
-
-
-  
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-
-
-
-  
-
-  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
-<script src="/js/third-party/math/mathjax.js" defer></script>
-
-
-
-  <noscript>
-    <link rel="stylesheet" href="/css/noscript.css">
-  </noscript>
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
-  <div class="headband"></div>
-
-  <main class="main">
-    <div class="column">
-      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏" role="button">
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <i class="logo-line"></i>
-      <p class="site-title">ksenr's blog</p>
-      <i class="logo-line"></i>
-    </a>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger" aria-label="搜索" role="button">
-    </div>
-  </div>
-</div>
-
-
-
-<nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
-  </ul>
+<nav>
+	<div class="menu-top-container">
+		<ul id="menu-top" class="menu">
+			
+				
+				<li class="current-menu-item">
+					<a href="/daily-pause/" target="_self">Daily Pause</a>
+				</li>
+			
+				
+				<li class="current-menu-item">
+					<a href="https://github.com/ksenrii" target="_blank">GitHub</a>
+				</li>
+			
+		</ul>
+	</div>
 </nav>
-
-
-
-
+	
 </header>
-        
-  
-  <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
-      <ul class="sidebar-nav">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <div class="sidebar-panel-container">
-        <!--noindex-->
-        <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Ellipse-Curve-Cryptography"><span class="nav-number">1.</span> <span class="nav-text">Ellipse Curve Cryptography</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-%E4%BB%80%E4%B9%88%E6%98%AFECC"><span class="nav-number">1.1.</span> <span class="nav-text">1.什么是ECC</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-%E6%9C%89%E9%99%90%E5%9F%9F%E4%B8%8A%E7%9A%84%E6%A4%AD%E5%9C%86%E6%9B%B2%E7%BA%BF"><span class="nav-number">1.2.</span> <span class="nav-text">2.有限域上的椭圆曲线</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-%E6%A4%AD%E5%9C%86%E6%9B%B2%E7%BA%BF%E7%BE%A4"><span class="nav-number">1.3.</span> <span class="nav-text">3.椭圆曲线群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1%E4%BB%80%E4%B9%88%E6%98%AF%E6%A4%AD%E5%9C%86%E6%9B%B2%E7%BA%BF%E4%B8%8A%E7%9A%84%E2%80%9C%E5%8A%A0%E6%B3%95%E2%80%9D"><span class="nav-number">1.3.1.</span> <span class="nav-text">3.1什么是椭圆曲线上的“加法”</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#4-%E6%A4%AD%E5%9C%86%E6%9B%B2%E7%BA%BF%E7%A6%BB%E6%95%A3%E5%AF%B9%E6%95%B0%E9%97%AE%E9%A2%98"><span class="nav-number">1.4.</span> <span class="nav-text">4.椭圆曲线离散对数问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#5-%E5%BA%94%E7%94%A8"><span class="nav-number">1.5.</span> <span class="nav-text">5.应用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#5-1ECDH"><span class="nav-number">1.5.1.</span> <span class="nav-text">5.1ECDH</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-2ECDSA"><span class="nav-number">1.5.2.</span> <span class="nav-text">5.2ECDSA</span></a></li></ol></li></ol></li></ol></div>
-        </div>
-        <!--/noindex-->
-
-        <div class="site-overview-wrap sidebar-panel">
-          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <img class="site-author-image" itemprop="image" alt="ksenr"
-      src="/images/EB423E68F516288F90CA5C2BF3E8F12D.jpg">
-  <p class="site-author-name" itemprop="name">ksenr</p>
-  <div class="site-description" itemprop="description"></div>
-</div>
-<div class="site-state-wrap animated">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-        <a href="/archives/">
-          <span class="site-state-item-count">10</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-        <span class="site-state-item-count">2</span>
-        <span class="site-state-item-name">分类</span>
-      </div>
-      <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">2</span>
-        <span class="site-state-item-name">标签</span>
-      </div>
-  </nav>
+<div class="m-header ">
+	<section id="hero1" class="hero">
+		<div class="inner">
+		</div>
+	</section>
+	
+		<figure class="top-image" style='background-image: url(/banner/4.jpg)' data-enable=false></figure>
+	
 </div>
 
-        </div>
-      </div>
-    </div>
 
-    
-  </aside>
-
-
-    </div>
-
-    <div class="main-inner post posts-expand">
-
-
+<!--文章列表-->
+<div class="wrapper">
+  
+    <!--文章-->
+<article>
+	
+  
+    <h1 class="post-title" itemprop="name">
+      Crypto-Ellipse Curve Cryptography
+    </h1>
   
 
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://ksenrii.github.io/2026/03/01/Crypto-Ellipse%20Curve%20Cryptography/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/EB423E68F516288F90CA5C2BF3E8F12D.jpg">
-      <meta itemprop="name" content="ksenr">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ksenr's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="Crypto-Ellipse Curve Cryptography | ksenr's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          Crypto-Ellipse Curve Cryptography
-        </h1>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2026-03-01 11:55:44" itemprop="dateCreated datePublished" datetime="2026-03-01T11:55:44+08:00">2026-03-01</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%AF%86%E7%A0%81%E5%AD%A6/" itemprop="url" rel="index"><span itemprop="name">密码学</span></a>
-        </span>
-    </span>
-
-  
-    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
-      <span class="post-meta-item-icon">
-        <i class="far fa-eye"></i>
-      </span>
-      <span class="post-meta-item-text">阅读次数：</span>
-      <span id="busuanzi_value_page_pv"></span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody"><h1 id="Ellipse-Curve-Cryptography"><a href="#Ellipse-Curve-Cryptography" class="headerlink" title="Ellipse Curve Cryptography"></a><strong>Ellipse Curve Cryptography</strong></h1><p><strong>ECC</strong> 全称为椭圆曲线加密，EllipseCurve Cryptography，是一种基于椭圆曲线数学的公钥密码。与传统的基于大质数因子分解困难性的加密方法不同，ECC依赖于解决椭圆曲线离散对数问题的困难性。它的优势主要在于相对于其它方法，它可以在使用较短密钥长度的同时保持相同的密码强度。</p>
+	<div class='post-body mb'>
+		<h1 id="Ellipse-Curve-Cryptography"><a href="#Ellipse-Curve-Cryptography" class="headerlink" title="Ellipse Curve Cryptography"></a><strong>Ellipse Curve Cryptography</strong></h1><p><strong>ECC</strong> 全称为椭圆曲线加密，EllipseCurve Cryptography，是一种基于椭圆曲线数学的公钥密码。与传统的基于大质数因子分解困难性的加密方法不同，ECC依赖于解决椭圆曲线离散对数问题的困难性。它的优势主要在于相对于其它方法，它可以在使用较短密钥长度的同时保持相同的密码强度。</p>
 <span id="more"></span>
 
 <h2 id="1-什么是ECC"><a href="#1-什么是ECC" class="headerlink" title="1.什么是ECC"></a>1.什么是ECC</h2><p>ECC 是基于<strong>椭圆曲线数学结构</strong>的一类公钥密码系统。</p>
 <p>这里的“椭圆曲线”并不是椭圆，而是满足如下方程的一类曲线：</p>
-<p>$$<br>y^2 &#x3D; x^3 + ax + b<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+y^2 = x^3 + ax + b
+\]</div>
+
+</div>
+
+
+
 <p>在密码学中，这个方程通常定义在<strong>有限域</strong>上，而不是实数域</p>
 <h2 id="2-有限域上的椭圆曲线"><a href="#2-有限域上的椭圆曲线" class="headerlink" title="2.有限域上的椭圆曲线"></a>2.有限域上的椭圆曲线</h2><p><strong>对于实数域上的椭圆虚线：</strong></p>
-<p>$$<br>y^2 &#x3D; x^3 + ax + b<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+y^2 = x^3 + ax + b
+\]</div>
+
+</div>
+
+
+
 <p>如果 x, y 是<strong>实数</strong>，那么：</p>
 <ul>
 <li>曲线是连续的</li>
@@ -267,10 +309,28 @@
 <p><img src="/%5Cimages%5Cecc1.png" alt="ecc1"></p>
 <p><strong>对于有限域上的椭圆曲线：</strong><br>例如模素数域</p>
 <p>记作：</p>
-<p>$$<br>\mathbb{F}_p<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\mathbb{F}_p
+\]</div>
+
+</div>
+
+
+
 <p>即所有计算都在<strong>modp</strong>下进行</p>
 <p>当p&#x3D;7时，那么域中的元素明显就是</p>
-<p>$$<br>{0,1,2,3,4,5,6}<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\{0,1,2,3,4,5,6\}
+\]</div>
+
+</div>
+
+
+
 <p>由于曲线定义在有限域上，变量 x 和 y 只能取集合 {0,1,2,3,4,5,6}中的值。因此，我们不再是在实数平面上画一条连续曲线，而是在有限个候选点中检查哪些点满足方程<br>因此，有限域上的椭圆曲线本质上不是一条连续图像，而是一个满足方程的<strong>离散点集</strong></p>
 <p><img src="/%5Cimages%5Cecc2.png" alt="ecc2"></p>
 <h2 id="3-椭圆曲线群"><a href="#3-椭圆曲线群" class="headerlink" title="3.椭圆曲线群"></a>3.椭圆曲线群</h2><p>在密码学中，我们关心的不仅仅是椭圆曲线的“形状”，更重要的是：</p>
@@ -278,12 +338,30 @@
 <p><strong>曲线上的点能否构成一个“群”</strong></p>
 </blockquote>
 <p>因为 ECC 的所有操作（密钥交换、签名）本质上都是在做：</p>
-<p>$$<br>Q &#x3D; kP<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+Q = kP
+\]</div>
+
+</div>
+
+
+
 <p>也就是在一个群里反复做“加法”。</p>
 <p>回顾近世代数</p>
 <p>若满足封闭性，结合律，单位元，逆元和交换律，称为交换群（阿贝尔群）</p>
 <h3 id="3-1什么是椭圆曲线上的“加法”"><a href="#3-1什么是椭圆曲线上的“加法”" class="headerlink" title="3.1什么是椭圆曲线上的“加法”"></a>3.1什么是椭圆曲线上的“加法”</h3><p>在实数域上，椭圆曲线：</p>
-<p>$$<br>y^2 &#x3D; x^3 + ax + b<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+y^2 = x^3 + ax + b
+\]</div>
+
+</div>
+
+
+
 <p>上，我们可以定义一种特殊的加法规则：</p>
 <ul>
 <li>连接 P 和 Q 作一条直线</li>
@@ -291,7 +369,16 @@
 <li>把 R’关于 x 轴对称，得到 R</li>
 </ul>
 <p>定义：</p>
-<p>$$<br>P + Q &#x3D; R<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+P + Q = R
+\]</div>
+
+</div>
+
+
+
 <p>记p（1,1），Q(0,-1)</p>
 <p><img src="/%5Cimages%5Cecc3.png" alt="ecc3"></p>
 <p><strong>特殊情况：</strong></p>
@@ -302,16 +389,43 @@
 <li>必须保证加法总是有结果</li>
 </ul>
 <p>数学上做了一个非常关键的补充：</p>
-<p>$$<br>引入一个无穷远点\mathcal{O}<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+引入一个无穷远点\mathcal{O}
+\]</div>
+
+</div>
+
+
+
 <p>并定义：</p>
-<p>$$<br>P + (-P) &#x3D; \mathcal{O}<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+P + (-P) = \mathcal{O}
+\]</div>
+
+</div>
+
+
+
 <blockquote>
 <p>记小写p为模数，-P 不是负数，而是P关于 x 轴对称的点（在有限域中就是 -y mod p）。</p>
 </blockquote>
 <h2 id="4-椭圆曲线离散对数问题"><a href="#4-椭圆曲线离散对数问题" class="headerlink" title="4.椭圆曲线离散对数问题"></a>4.椭圆曲线离散对数问题</h2><p>ECC 利用了椭圆曲线上的一种特殊运算规则：</p>
 <p>1.给定曲线上的两个点，可以定义“点加法”<br>2.可以进一步定义“点乘”（重复加法）</p>
 <p>例如：</p>
-<p>$$<br>Q &#x3D; kP<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+Q = kP
+\]</div>
+
+</div>
+
+
+
 <p>表示点 P 自加 k次得到点 Q</p>
 <p>对于逆向计算</p>
 <p>给定：</p>
@@ -320,7 +434,16 @@
 <li>Q &#x3D; kP</li>
 </ul>
 <p>求：</p>
-<p>$$<br>k &#x3D; ?<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+k = ?
+\]</div>
+
+</div>
+
+
+
 <p>这就是：椭圆曲线离散对数问题（ECDLP）</p>
 <h2 id="5-应用"><a href="#5-应用" class="headerlink" title="5.应用"></a>5.应用</h2><p>ECC 本身是一个数学结构，可以构建多种密码协议，常见包括</p>
 <h3 id="5-1ECDH"><a href="#5-1ECDH" class="headerlink" title="5.1ECDH"></a>5.1ECDH</h3><p><strong>椭圆曲线迪菲-赫尔曼密钥交换</strong>（Elliptic Curve Diffie–Hellman Key Exchange，ECDH）是基于椭圆曲线密码学的匿名密钥协商协议，由Neal Koblitz和Victor Miller于1985年分别独立提出椭圆曲线密码学基础 。该协议允许通信双方在不安全信道中通过交换公钥生成共享密钥，具体使用公共参数（大质数p与整数g）生成私钥a&#x2F;b及对应公钥（ga mod p与gb mod p），最终通过计算获得相同共享机密值用于派生对称加密密钥材料</p>
@@ -332,20 +455,74 @@
 </ul>
 <p><strong>Alice</strong></p>
 <p>选私钥：</p>
-<p>$$<br>a<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+a
+\]</div>
+
+</div>
+
+
+
 <p>计算公钥：</p>
-<p>$$<br>A &#x3D; aG<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+A = aG
+\]</div>
+
+</div>
+
+
+
 <hr>
 <p><strong>Bob</strong></p>
 <p>选私钥：</p>
-<p>$$<br>b<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+b
+\]</div>
+
+</div>
+
+
+
 <p>计算公钥：</p>
-<p>$$<br>B &#x3D; bG<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+B = bG
+\]</div>
+
+</div>
+
+
+
 <p><strong>交换后</strong></p>
 <p>Alice：</p>
-<p>$$<br>S &#x3D; aB &#x3D; a(bG) &#x3D; abG<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+S = aB = a(bG) = abG
+\]</div>
+
+</div>
+
+
+
 <p>Bob：</p>
-<p>$$<br>S &#x3D; bA &#x3D; b(aG) &#x3D; abG<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+S = bA = b(aG) = abG
+\]</div>
+
+</div>
+
+
+
 <h3 id="5-2ECDSA"><a href="#5-2ECDSA" class="headerlink" title="5.2ECDSA"></a>5.2ECDSA</h3><p><strong>ECDSA</strong>（Elliptic Curve Digital Signature Algorithm）是一种基于椭圆曲线的数字签名算法，用于验证消息的来源和完整性。ECDSA是ECC与DSA的结合，整个签名过程与DSA类似，所不一样的是签名中采取的算法为ECC，最后签名出来的值也是分为r,s</p>
 <p> <strong>签名流程</strong></p>
 <p>设：</p>
@@ -356,110 +533,259 @@
 <li>阶：n</li>
 </ul>
 <p>1.对消息做哈希</p>
-<p>$$<br>z &#x3D; H(M)<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+z = H(M)
+\]</div>
+
+</div>
+
+
+
 <p>2.选随机数 k</p>
-<p>$$<br>k \in [1, n-1]<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+k \in [1, n-1]
+\]</div>
+
+</div>
+
+
+
 <p>3.计算点</p>
-<p>$$<br>(kG) &#x3D; (x_1, y_1)<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+(kG) = (x_1, y_1)
+\]</div>
+
+</div>
+
+
+
 <blockquote>
 <p><strong>把点 G 在椭圆曲线上“加自己 k 次”，得到一个新的点，这个点的坐标是 (x₁, y₁)</strong></p>
 </blockquote>
 <p>4.计算r</p>
-<p>$$<br>r&#x3D;x_1modn<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+r=x_1modn
+\]</div>
+
+</div>
+
+
+
 <p>若r&#x3D;0，重新选k</p>
 <p>5.计算s</p>
-<p>$$<br>s&#x3D;k^{−1}(z+rd)modn<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+s=k^{−1}(z+rd)modn
+\]</div>
+
+</div>
+
+
+
 <p>若s&#x3D;0，重新选k</p>
 <p>6.输出签名</p>
-<p>$$<br>\text{Signature} &#x3D; (r, s)<br>$$</p>
+<div class="math-display">
 
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-          <div class="post-tags">
-              <a href="/tags/%E5%AF%86%E7%A0%81%E5%AD%A6/" rel="tag"># 密码学</a>
-          </div>
-
-        
-
-          <div class="post-nav">
-            <div class="post-nav-item">
-                <a href="/2026/02/24/Web-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/" rel="prev" title="Web">
-                  <i class="fa fa-angle-left"></i> Web
-                </a>
-            </div>
-            <div class="post-nav-item">
-                <a href="/2026/03/03/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/" rel="next" title="信息安全数学基础">
-                  信息安全数学基础 <i class="fa fa-angle-right"></i>
-                </a>
-            </div>
-          </div>
-    </footer>
-  </article>
-</div>
-
-
-
-
-
+<div class="math-display">\[
+\text{Signature} = (r, s)
+\]</div>
 
 </div>
-  </main>
 
-  <footer class="footer">
-    <div class="footer-inner">
 
-  <div class="copyright">
-    &copy; 
-    <span itemprop="copyrightYear">2026</span>
-    <span class="with-love">
-      <i class="fa fa-heart"></i>
-    </span>
-    <span class="author" itemprop="copyrightHolder">ksenr</span>
-  </div>
-<div class="busuanzi-count">
-    <span class="post-meta-item" id="busuanzi_container_site_uv">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-user"></i>
-      </span>
-      <span class="site-uv" title="总访客量">
-        <span id="busuanzi_value_site_uv"></span>
-      </span>
-    </span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-eye"></i>
-      </span>
-      <span class="site-pv" title="总访问量">
-        <span id="busuanzi_value_site_pv"></span>
-      </span>
-    </span>
-</div>
-  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
-  </div>
 
-    </div>
-  </footer>
+	</div>
+	<div class="meta split">
+		
+		<time class="post-date" datetime="2026-03-01T03:55:44.000Z" itemprop="datePublished">2026-03-01</time>
+	</div>
+</article>
+
+<!--评论-->
+
 
   
-  <div class="toggle sidebar-toggle" role="button">
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-  </div>
-  <div class="sidebar-dimmer"></div>
-  <div class="back-to-top" role="button" aria-label="返回顶部">
-    <i class="fa fa-arrow-up fa-lg"></i>
-    <span>0%</span>
-  </div>
+</div>
 
-<noscript>
-  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
-</noscript>
 
-</body>
+  <svg id="bigTriangleColor" width="100%" height="40" viewBox="0 0 100 102" preserveAspectRatio="none">
+    <path d="M0 0 L50 100 L100 0 Z"></path>
+  </svg>
+
+  
+
+
+  <div class="wrapper"></div>
+
+
+
+
+
+<div class="fat-footer">
+	<div class="wrapper">
+		<div class="layout layout--center">
+			<div class="layout__item palm-mb">
+				<div class="media">
+					<img class="headimg" src='https://imgchr.github.la/steve.jpeg' alt='ksenr'>
+					<div class="media__body">
+						<h4>justpsvm</h4>
+						<p class='site-description'>Stay Hungry,Stay Foolish.</p>
+					</div>
+				</div>
+				<div class="author-contact">
+					<ul>
+						
+							
+							<li>
+				        		<a href="https://github.com/ksenrii" target="_blank">
+				        			
+				        		</a>
+				        	</li>
+						
+							
+							<li>
+				        		<a href="https://github.com/" target="_blank">
+				        			
+				        				<i class="iconfont icon-github"></i>
+				        			
+				        		</a>
+				        	</li>
+						
+							
+							<li>
+				        		<a href="https://www.zhihu.com/" target="_blank">
+				        			
+										<i class="iconfont icon-zhihu"></i>
+				        			
+				        		</a>
+				        	</li>
+						
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<footer class="footer" role="contentinfo">
+	<div class="wrapper wrapper--wide split split--responsive">
+		
+		<span>Theme by <a target="_blank" rel="noopener" href="http://github.com/justpsvm">justpsvm</a>. Powered by <a target="_blank" rel="noopener" href="http://hexo.io">Hexo</a></span>
+	</div>
+</footer>
+
+	<!-－这里导入了 lib.js 里面涵盖了 jQuery 等框架 所以注释掉-->
+	<!--
+<script src="http://lib.sinaapp.com/js/jquery/2.0/jquery.min.js"></script>
+-->
+	
+<script src="/js/lib.js"></script>
+
+	
+<script src="/js/module.js"></script>
+
+	
+<script src="/js/script.js"></script>
+
+	
+	<!-- hexo injector body_end start -->
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>
+(function () {
+  function getCodeText(block) {
+    var code = block.querySelector(".code pre") || block.querySelector("pre");
+    return code ? code.innerText.replace(/\n$/, "") : "";
+  }
+
+  document.querySelectorAll(".post-body figure.highlight").forEach(function (block) {
+    if (block.querySelector(".code-toolbar")) return;
+
+    var language = Array.from(block.classList).filter(function (name) {
+      return name !== "highlight";
+    })[0] || "code";
+
+    var toolbar = document.createElement("div");
+    toolbar.className = "code-toolbar";
+    toolbar.innerHTML = "<span>" + language.toUpperCase() + "</span><button class=\"code-copy-button\" type=\"button\">澶嶅埗</button>";
+    block.insertBefore(toolbar, block.firstChild);
+
+    toolbar.querySelector("button").addEventListener("click", function () {
+      var button = this;
+      var text = getCodeText(block);
+      var copied = function () {
+        button.textContent = "宸插鍒?;
+        setTimeout(function () {
+          button.textContent = "澶嶅埗";
+        }, 1500);
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(copied);
+      } else {
+        var textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+        copied();
+      }
+    });
+  });
+
+  var article = document.querySelector("article");
+  var body = article && article.querySelector(".post-body");
+  if (!article || !body || article.querySelector(".post-toc")) return;
+
+  var headings = Array.from(body.querySelectorAll("h2, h3, h4")).filter(function (heading) {
+    return heading.textContent.trim().length > 0;
+  });
+  if (headings.length < 2) return;
+
+  var nav = document.createElement("aside");
+  nav.className = "post-toc";
+  nav.innerHTML = '<div class="post-toc-title">鐩綍</div>';
+
+  headings.forEach(function (heading, index) {
+    if (!heading.id) {
+      heading.id = "toc-heading-" + index;
+    }
+    var link = document.createElement("a");
+    link.href = "#" + encodeURIComponent(heading.id);
+    link.className = "level-" + heading.tagName.slice(1);
+    link.textContent = heading.textContent.trim();
+    nav.appendChild(link);
+  });
+
+  article.insertBefore(nav, body);
+
+  var links = Array.from(nav.querySelectorAll("a"));
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      links.forEach(function (link) {
+        link.classList.toggle("is-active", decodeURIComponent(link.hash.slice(1)) === entry.target.id);
+      });
+    });
+  }, { rootMargin: "-20% 0px -70% 0px", threshold: 0 });
+
+  headings.forEach(function (heading) {
+    observer.observe(heading);
+  });
+})();
+</script><!-- hexo injector body_end end --></body>
 </html>
+
+

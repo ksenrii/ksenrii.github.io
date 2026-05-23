@@ -1,292 +1,578 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-  <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#222" media="(prefers-color-scheme: dark)"><meta name="generator" content="Hexo 8.1.1">
+<html>
+  <head>
+    <meta charset="utf-8">
+    
+    <title>信息安全数学基础 | ksenr&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    
+      <link rel="icon" href="/favicon.png">
+    
 
-  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
-  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
-  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
-  <link rel="mask-icon" href="/images/logo.svg" color="#222">
-
-<link rel="stylesheet" href="/css/main.css">
-
-
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css" integrity="sha256-VHqXKFhhMxcpubYf9xiWdCiojEbY9NexQ4jh8AxbvcM=" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
-
-<script class="next-config" data-name="main" type="application/json">{"hostname":"ksenrii.github.io","root":"/","images":"/images","scheme":"Pisces","darkmode":true,"version":"8.27.0","exturl":false,"sidebar":{"position":"left","width_expanded":320,"width_dual_column":240,"display":"post","padding":18,"offset":12},"hljswrap":true,"codeblock":{"theme":{"light":"default","dark":"stackoverflow-dark"},"prism":{"light":"prism","dark":"prism-dark"},"copy_button":{"enable":false,"style":null},"fold":{"enable":false,"height":500},"language":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"duration":200,"transition":{"menu_item":"fadeInDown","post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js" defer></script>
-
-    <meta name="description" content="近世代数中群、环、域的定义都是基于集合的,通过对集合上运算的约束,将集合构造成具有不同特性的新对象">
-<meta property="og:type" content="article">
-<meta property="og:title" content="信息安全数学基础">
-<meta property="og:url" content="https://ksenrii.github.io/2026/03/03/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/index.html">
-<meta property="og:site_name" content="ksenr&#39;s blog">
-<meta property="og:description" content="近世代数中群、环、域的定义都是基于集合的,通过对集合上运算的约束,将集合构造成具有不同特性的新对象">
-<meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://ksenrii.github.io/images/image-20260307144656504.png">
-<meta property="article:published_time" content="2026-03-03T07:08:32.000Z">
-<meta property="article:modified_time" content="2026-03-31T04:33:14.446Z">
-<meta property="article:author" content="ksenr">
-<meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://ksenrii.github.io/images/image-20260307144656504.png">
+    
+<link rel="stylesheet" href="/css/style.css">
 
 
-<link rel="canonical" href="https://ksenrii.github.io/2026/03/03/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/">
+    
+<link rel="stylesheet" href="/js/google-code-prettify/tomorrow-night-eighties.min.css">
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://ksenrii.github.io/2026/03/03/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/","path":"2026/03/03/信息安全数学基础/","title":"信息安全数学基础"}</script>
+  <!-- hexo injector head_end start -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [["\\(", "\\)"]],
+    displayMath: [["\\[", "\\]"]],
+    processEscapes: true,
+    processEnvironments: true,
+    tags: "ams"
+  },
+  options: {
+    skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"]
+  },
+  chtml: {
+    scale: 1,
+    matchFontHeight: false
+  }
+};
+</script>
+<style>
+.post-body .math-display {
+  margin: 1.25rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.post-body mjx-container {
+  max-width: 100%;
+}
+.post-body mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.35rem 0;
+}
+.post-body mjx-container svg {
+  max-width: none;
+}
 
-<script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>信息安全数学基础 | ksenr's blog</title>
-  
+.post-body figure.highlight {
+  position: relative;
+  margin: 1.6rem 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #1f2329;
+  box-shadow: 0 12px 34px rgba(17, 24, 39, 0.16);
+}
+.post-body figure.highlight table {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  overflow-x: auto;
+  border-collapse: collapse;
+  background: #282c34;
+}
+.post-body figure.highlight tbody,
+.post-body figure.highlight tr {
+  display: table;
+  width: 100%;
+}
+.post-body figure.highlight td {
+  border: 0;
+  padding: 0;
+  vertical-align: top;
+}
+.post-body figure.highlight .gutter {
+  width: 3.7rem;
+  min-width: 3.7rem;
+  user-select: none;
+  background: #21252b;
+  color: #6b7280;
+  text-align: right;
+}
+.post-body figure.highlight .code {
+  width: 100%;
+  background: #282c34;
+}
+.post-body figure.highlight pre {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  overflow: visible !important;
+  color: #abb2bf;
+  font-family: Consolas, Monaco, "Cascadia Code", "Fira Code", monospace;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.post-body figure.highlight .code pre {
+  min-width: max-content;
+}
+.post-body figure.highlight .line {
+  min-height: 1.65em;
+}
+.post-body figure.highlight .keyword,
+.post-body figure.highlight .type {
+  color: #c678dd;
+}
+.post-body figure.highlight .string {
+  color: #98c379;
+}
+.post-body figure.highlight .number,
+.post-body figure.highlight .literal {
+  color: #d19a66;
+}
+.post-body figure.highlight .comment {
+  color: #7f848e;
+}
+.post-body figure.highlight .meta,
+.post-body figure.highlight .built_in,
+.post-body figure.highlight .function .title {
+  color: #61afef;
+}
+.code-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 2.4rem;
+  padding: 0 0.75rem 0 1rem;
+  background: #1b1f27;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: #9ca3af;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.code-copy-button {
+  border: 0;
+  border-radius: 6px;
+  padding: 0.32rem 0.65rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: #d1d5db;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+.code-copy-button:hover {
+  background: #35bfab;
+  color: #111827;
+}
+
+article {
+  position: relative;
+}
+.post-toc {
+  position: fixed;
+  top: 128px;
+  right: max(24px, calc((100vw - 1180px) / 2));
+  width: 235px;
+  max-height: calc(100vh - 160px);
+  overflow: auto;
+  padding: 1rem;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 10px 34px rgba(17, 24, 39, 0.10);
+  backdrop-filter: blur(12px);
+  z-index: 1;
+}
+.post-toc-title {
+  margin-bottom: 0.7rem;
+  color: #334f52;
+  font-weight: 600;
+}
+.post-toc a {
+  display: block;
+  padding: 0.32rem 0.45rem;
+  border-left: 2px solid transparent;
+  border-radius: 4px;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.5;
+  text-decoration: none;
+}
+.post-toc a.level-3 {
+  padding-left: 1.05rem;
+}
+.post-toc a.level-4 {
+  padding-left: 1.65rem;
+}
+.post-toc a.is-active,
+.post-toc a:hover {
+  border-left-color: #35bfab;
+  background: rgba(53, 191, 171, 0.12);
+  color: #243b3d;
+}
+@media screen and (max-width: 1180px) {
+  .post-toc {
+    position: static;
+    width: auto;
+    max-height: none;
+    margin: 0 0 1.6rem;
+  }
+}
+</style><!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+
+<header>
+	
+		<i class="js-toggle-search iconfont icon-search"></i>
 
 
+<form class="js-search search-form search-form--modal" method="get" action="http://gushi.li" role="search">
+	<div class="search-form__inner">
+		<div>
+			<i class="iconfont icon-search"></i>
+			<input class="text-input" placeholder="Enter Key..." type="search">
+		</div>
+	</div>
+</form>
+	
 
+	
+		<a id="nav-toggle" href="#"><span></span></a>
 
-
-
-
-
-  
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous" defer></script>
-<script src="/js/utils.js" defer></script><script src="/js/motion.js" defer></script><script src="/js/sidebar.js" defer></script><script src="/js/next-boot.js" defer></script>
-
-  
-
-
-
-
-
-
-  
-  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
-
-
-
-
-  
-
-  <script class="next-config" data-name="enableMath" type="application/json">true</script><script class="next-config" data-name="mathjax" type="application/json">{"enable":true,"tags":"none","js":{"url":"https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js","integrity":"sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI="}}</script>
-<script src="/js/third-party/math/mathjax.js" defer></script>
-
-
-
-  <noscript>
-    <link rel="stylesheet" href="/css/noscript.css">
-  </noscript>
-</head>
-
-<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
-  <div class="headband"></div>
-
-  <main class="main">
-    <div class="column">
-      <header class="header" itemscope itemtype="http://schema.org/WPHeader"><div class="site-brand-container">
-  <div class="site-nav-toggle">
-    <div class="toggle" aria-label="切换导航栏" role="button">
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-        <span class="toggle-line"></span>
-    </div>
-  </div>
-
-  <div class="site-meta">
-
-    <a href="/" class="brand" rel="start">
-      <i class="logo-line"></i>
-      <p class="site-title">ksenr's blog</p>
-      <i class="logo-line"></i>
-    </a>
-  </div>
-
-  <div class="site-nav-right">
-    <div class="toggle popup-trigger" aria-label="搜索" role="button">
-    </div>
-  </div>
-</div>
-
-
-
-<nav class="site-nav">
-  <ul class="main-menu menu"><li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li><li class="menu-item menu-item-archives"><a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li><li class="menu-item menu-item-tags"><a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li><li class="menu-item menu-item-categories"><a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li><li class="menu-item menu-item-about"><a href="/about/" rel="section"><i class="fa fa-user fa-fw"></i>关于</a></li>
-  </ul>
+<nav>
+	<div class="menu-top-container">
+		<ul id="menu-top" class="menu">
+			
+				
+				<li class="current-menu-item">
+					<a href="/daily-pause/" target="_self">Daily Pause</a>
+				</li>
+			
+				
+				<li class="current-menu-item">
+					<a href="https://github.com/ksenrii" target="_blank">GitHub</a>
+				</li>
+			
+		</ul>
+	</div>
 </nav>
-
-
-
-
+	
 </header>
-        
-  
-  <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
-      <ul class="sidebar-nav">
-        <li class="sidebar-nav-toc">
-          文章目录
-        </li>
-        <li class="sidebar-nav-overview">
-          站点概览
-        </li>
-      </ul>
-
-      <div class="sidebar-panel-container">
-        <!--noindex-->
-        <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BE%A4"><span class="nav-number">1.</span> <span class="nav-text">群</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#eg1"><span class="nav-number">1.1.</span> <span class="nav-text">eg1:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#eg2"><span class="nav-number">1.2.</span> <span class="nav-text">eg2:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#eg3"><span class="nav-number">1.3.</span> <span class="nav-text">eg3:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%90%E7%BE%A4"><span class="nav-number">1.4.</span> <span class="nav-text">子群</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%BE%AA%E7%8E%AF%E7%BE%A4"><span class="nav-number">1.5.</span> <span class="nav-text">循环群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%83%E7%B4%A0%E7%9A%84%E9%98%B6"><span class="nav-number">1.5.1.</span> <span class="nav-text">元素的阶</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BE%A4%E7%9A%84%E9%98%B6"><span class="nav-number">1.5.2.</span> <span class="nav-text">群的阶</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AF%B9%E7%A7%B0%E7%BE%A4"><span class="nav-number">1.6.</span> <span class="nav-text">对称群</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%AE%E6%8D%A2"><span class="nav-number">1.6.1.</span> <span class="nav-text">置换</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9A%E4%B9%89%EF%BC%88%E5%AF%B9%E7%A7%B0%E7%BE%A4%EF%BC%89"><span class="nav-number">1.6.2.</span> <span class="nav-text">定义（对称群）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BE%E4%BE%8B"><span class="nav-number">1.6.3.</span> <span class="nav-text">举例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%AE%E6%8D%A2%E5%AF%86%E7%A0%81"><span class="nav-number">1.6.4.</span> <span class="nav-text">置换密码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8E%9F%E7%90%86"><span class="nav-number">1.6.4.1.</span> <span class="nav-text">原理</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%A6%BB%E6%95%A3%E5%AF%B9%E6%95%B0%E9%97%AE%E9%A2%98"><span class="nav-number">1.7.</span> <span class="nav-text">离散对数问题</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Diffie-Hellman%E5%AF%86%E9%92%A5%E4%BA%A4%E6%8D%A2"><span class="nav-number">1.7.1.</span> <span class="nav-text">Diffie-Hellman密钥交换</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%8E%AF"><span class="nav-number">2.</span> <span class="nav-text">环</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%93"><span class="nav-number">2.1.</span> <span class="nav-text">体</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%9F"><span class="nav-number">2.2.</span> <span class="nav-text">域</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#eg1-1"><span class="nav-number">2.3.</span> <span class="nav-text">eg1:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#eg2-1"><span class="nav-number">2.4.</span> <span class="nav-text">eg2:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%B6%E5%9B%A0%E5%AD%90"><span class="nav-number">2.5.</span> <span class="nav-text">零因子</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E7%8E%AF"><span class="nav-number">2.6.</span> <span class="nav-text">整环</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%90%86%E6%83%B3"><span class="nav-number">2.7.</span> <span class="nav-text">理想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%BB%E7%90%86%E6%83%B3"><span class="nav-number">2.8.</span> <span class="nav-text">主理想</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%8E%AF%E4%B8%8A%E7%9A%84%E5%A4%9A%E9%A1%B9%E5%BC%8F"><span class="nav-number">2.9.</span> <span class="nav-text">环上的多项式</span></a></li></ol></li></ol></div>
-        </div>
-        <!--/noindex-->
-
-        <div class="site-overview-wrap sidebar-panel">
-          <div class="site-author animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
-    <img class="site-author-image" itemprop="image" alt="ksenr"
-      src="/images/EB423E68F516288F90CA5C2BF3E8F12D.jpg">
-  <p class="site-author-name" itemprop="name">ksenr</p>
-  <div class="site-description" itemprop="description"></div>
-</div>
-<div class="site-state-wrap animated">
-  <nav class="site-state">
-      <div class="site-state-item site-state-posts">
-        <a href="/archives/">
-          <span class="site-state-item-count">10</span>
-          <span class="site-state-item-name">日志</span>
-        </a>
-      </div>
-      <div class="site-state-item site-state-categories">
-        <span class="site-state-item-count">2</span>
-        <span class="site-state-item-name">分类</span>
-      </div>
-      <div class="site-state-item site-state-tags">
-        <span class="site-state-item-count">2</span>
-        <span class="site-state-item-name">标签</span>
-      </div>
-  </nav>
+<div class="m-header ">
+	<section id="hero1" class="hero">
+		<div class="inner">
+		</div>
+	</section>
+	
+		<figure class="top-image" style='background-image: url(/banner/4.jpg)' data-enable=false></figure>
+	
 </div>
 
-        </div>
-      </div>
-    </div>
 
-    
-  </aside>
-
-
-    </div>
-
-    <div class="main-inner post posts-expand">
-
-
+<!--文章列表-->
+<div class="wrapper">
+  
+    <!--文章-->
+<article>
+	
+  
+    <h1 class="post-title" itemprop="name">
+      信息安全数学基础
+    </h1>
   
 
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://ksenrii.github.io/2026/03/03/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/EB423E68F516288F90CA5C2BF3E8F12D.jpg">
-      <meta itemprop="name" content="ksenr">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="ksenr's blog">
-      <meta itemprop="description" content="">
-    </span>
-
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="信息安全数学基础 | ksenr's blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-          信息安全数学基础
-        </h1>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2026-03-03 15:08:32" itemprop="dateCreated datePublished" datetime="2026-03-03T15:08:32+08:00">2026-03-03</time>
-    </span>
-
-  
-    <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv">
-      <span class="post-meta-item-icon">
-        <i class="far fa-eye"></i>
-      </span>
-      <span class="post-meta-item-text">阅读次数：</span>
-      <span id="busuanzi_value_page_pv"></span>
-    </span>
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody"><p><strong>近世代数中群、环、域的定义都是基于集合的,通过对集合上运算的约束,将集合构造成具有不同特性的新对象</strong></p>
+	<div class='post-body mb'>
+		<p><strong>近世代数中群、环、域的定义都是基于集合的,通过对集合上运算的约束,将集合构造成具有不同特性的新对象</strong></p>
 <span id="more"></span>
 
 <p><strong>集合:</strong></p>
 <p>具有共同属性的事物的总体</p>
 <p><strong>定义(集上的二元运算):</strong></p>
 <p>设S为集合,映射</p>
-<p>$$<br>\eta:<br>\begin{cases}<br>S \times S &amp;\to S \<br>(x, y)     &amp;\mapsto z<br>\end{cases}<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\eta:
+\begin{cases}
+S \times S &amp;amp;\to S \\
+(x, y)     &amp;amp;\mapsto z
+\end{cases}
+\]</div>
+
+</div>
+
+
+
 <blockquote>
 <p>我们定义了一个叫 η 的二元运算，它以集合 S 中两个元素组成的有序对 (x,y) 作为输入，最终输出集合 S 里的一个元素 z。（封闭性）</p>
 </blockquote>
 <p>称为集合S上的二元运算</p>
-<h1 id="群"><a href="#群" class="headerlink" title="群"></a>群</h1><p>$$<br>设三元组 (G, \cdot, e) 中 G 为集合，\cdot 为集 G 上的二元运算，e为 G 中一个元。<br>$$</p>
-<p>若（G，⋅，e）满足：<br>$$<br>G1（乘法结合律）：a \cdot (b \cdot c) &#x3D; (a \cdot b) \cdot c,\ a, b, c \in G；<br>$$</p>
-<p>$$<br>G2（单位元）：e \cdot a &#x3D; a \cdot e &#x3D; a,\ a \in G；<br>$$</p>
-<p>$$<br>G3（逆元）：对 a \in G，有 a’ \in G 使得 a \cdot a’ &#x3D; a’ \cdot a &#x3D; e。<br>$$</p>
-<p>$$<br>则称 (G, \cdot, e) 为\textbf{群}，简称群 G，e 称为群 G 的\textbf{单位元}，a’ 称为 a 的\textbf{逆元}。<br>$$</p>
-<p>$$<br>若 (G, \cdot, e) 还满足 G4（交换律）：a \cdot b &#x3D; b \cdot a,\ a, b \in G，则称 G 为\textbf{交换群}。<br>$$</p>
-<p>$$<br>若 (G, \cdot, e) 仅满足 G1, G2，则称 G 为\textbf{有单位元的半群}。<br>$$</p>
-<p>$$<br>若 (G, \cdot, e) 满足 G1, G2, G4，则称 G 为\textbf{有单位元的交换半群}。<br>$$</p>
+<h1 id="群"><a href="#群" class="headerlink" title="群"></a>群</h1><div class="math-display">
+
+<div class="math-display">\[
+设三元组 (G, \cdot, e) 中 G 为集合，\cdot 为集 G 上的二元运算，e为 G 中一个元。
+\]</div>
+
+</div>
+
+
+
+<p>若（G，⋅，e）满足：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+G1（乘法结合律）：a \cdot (b \cdot c) = (a \cdot b) \cdot c,\ a, b, c \in G；
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+G2（单位元）：e \cdot a = a \cdot e = a,\ a \in G；
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+G3（逆元）：对 a \in G，有 a' \in G 使得 a \cdot a' = a' \cdot a = e。
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+则称 (G, \cdot, e) 为\textbf{群}，简称群 G，e 称为群 G 的\textbf{单位元}，a' 称为 a 的\textbf{逆元}。
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+若 (G, \cdot, e) 还满足 G4（交换律）：a \cdot b = b \cdot a,\ a, b \in G，则称 G 为\textbf{交换群}。
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+若 (G, \cdot, e) 仅满足 G1, G2，则称 G 为\textbf{有单位元的半群}。
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+若 (G, \cdot, e) 满足 G1, G2, G4，则称 G 为\textbf{有单位元的交换半群}。
+\]</div>
+
+</div>
+
+
+
 <p><strong>下面举例一些群,方便我们理解</strong></p>
-<h2 id="eg1"><a href="#eg1" class="headerlink" title="eg1:"></a><strong>eg1:</strong></h2><p>$$<br>设 (\mathbb{Z}, +, 0) 中 \mathbb{Z} 为整数集，+ 为整数的加法，0 为整数零，易验证：<br>$$</p>
-<p>$$<br>(\mathbb{Z}, +, 0) 中有 (a + b) + c &#x3D; a + (b + c)，故 G1 成立<br>$$</p>
-<p>$$<br>又有 a + 0 &#x3D; 0 + a &#x3D; a，故 G2 成立<br>$$</p>
-<p>$$<br>最后有 a + (-a) &#x3D; (-a) + a &#x3D; 0，这里 (-a) 表示与 a 对应的负整数，因而 G3 成立<br>$$</p>
-<p>$$<br>再 a + b &#x3D; b + a，故 G4 成立<br>$$</p>
-<p>$$<br>从而 (\mathbb{Z}, +, 0) 为交换<br>$$</p>
-<h2 id="eg2"><a href="#eg2" class="headerlink" title="eg2:"></a><strong>eg2:</strong></h2><p>$$<br>设 (Q*, ·, 1) 中 Q* 为零以外的所有有理数的集合，· 为有理数乘法，1 为整数 1，则 (Q*, ·, 1) 满足 G1, G2, G3 和 G4。故 (Q*, ·, 1) 为交换群。<br>$$</p>
-<h2 id="eg3"><a href="#eg3" class="headerlink" title="eg3:"></a><strong>eg3:</strong></h2><p>$$<br>设 GLₙ(R) 为 n 阶实数可逆方阵的集合，· 为两矩阵的乘法，I 为单位阵，则 (GLₙ(R), ·, I) 为群。GLₙ(R) 称为实数域 R 上 n 阶一般线性群。<br>$$<br><strong>对于实可逆矩阵:</strong></p>
+<h2 id="eg1"><a href="#eg1" class="headerlink" title="eg1:"></a><strong>eg1:</strong></h2><div class="math-display">
+
+<div class="math-display">\[
+设 (\mathbb{Z}, +, 0) 中 \mathbb{Z} 为整数集，+ 为整数的加法，0 为整数零，易验证：
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+(\mathbb{Z}, +, 0) 中有 (a + b) + c = a + (b + c)，故 G1 成立
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+又有 a + 0 = 0 + a = a，故 G2 成立
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+最后有 a + (-a) = (-a) + a = 0，这里 (-a) 表示与 a 对应的负整数，因而 G3 成立
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+再 a + b = b + a，故 G4 成立
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+从而 (\mathbb{Z}, +, 0) 为交换
+\]</div>
+
+</div>
+
+
+
+<h2 id="eg2"><a href="#eg2" class="headerlink" title="eg2:"></a><strong>eg2:</strong></h2><div class="math-display">
+
+<div class="math-display">\[
+设 (Q*, ·, 1) 中 Q* 为零以外的所有有理数的集合，· 为有理数乘法，1 为整数 1，则 (Q*, ·, 1) 满足 G1, G2, G3 和 G4。故 (Q*, ·, 1) 为交换群。
+\]</div>
+
+</div>
+
+
+
+<h2 id="eg3"><a href="#eg3" class="headerlink" title="eg3:"></a><strong>eg3:</strong></h2><div class="math-display">
+
+<div class="math-display">\[
+设 GLₙ(R) 为 n 阶实数可逆方阵的集合，· 为两矩阵的乘法，I 为单位阵，则 (GLₙ(R), ·, I) 为群。GLₙ(R) 称为实数域 R 上 n 阶一般线性群。
+\]</div>
+
+</div>
+
+
+<p><strong>对于实可逆矩阵:</strong></p>
 <p>G1,矩阵乘法满足结合律</p>
 <p>G2,单位矩阵 I 满足 I⋅A&#x3D;A⋅I&#x3D;A</p>
 <p>G3,GLn(R) 定义的就是 “可逆矩阵” 集合 ——可逆矩阵的核心定义就是 “存在逆矩阵”，所以满足</p>
 <p>所以说GLₙ(R) 是群</p>
 <p>但同时它并不是交换群,因为矩阵乘法不满足交换律</p>
-<h2 id="子群"><a href="#子群" class="headerlink" title="子群"></a>子群</h2><p>$$<br>设 (G, ·, 1) 为群，A 为 G 的子集合。若单位元 1 ∈ A 且 (A, ·, 1) 构成群，则称 A 为 G 的子群，并记为 A ≤ G。<br>$$</p>
+<h2 id="子群"><a href="#子群" class="headerlink" title="子群"></a>子群</h2><div class="math-display">
+
+<div class="math-display">\[
+设 (G, ·, 1) 为群，A 为 G 的子集合。若单位元 1 ∈ A 且 (A, ·, 1) 构成群，则称 A 为 G 的子群，并记为 A ≤ G。
+\]</div>
+
+</div>
+
+
+
 <p>例</p>
-<p>$$<br>证明 nℤ &#x3D; [{0, ±n, ±2n, …}] 为整数群 (ℤ, +, 0) 的子群<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+证明 nℤ = [{0, ±n, ±2n, …}] 为整数群 (ℤ, +, 0) 的子群
+\]</div>
+
+</div>
+
+
+
 <p>证</p>
-<p>$$<br>nℤ ⊆ ℤ；<br> 0 ∈ nℤ；<br> (nℤ, +, 0) 为群。<br>$$</p>
-<h2 id="循环群"><a href="#循环群" class="headerlink" title="循环群"></a>循环群</h2><p>$$<br>若群 G 的每一个元都能表成一个元素 a 的幂，则 G 称为由 a 生成的循环群，记作 G &#x3D; ⟨a⟩，a 称为循环群 G 的生成元。<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+nℤ ⊆ ℤ；
+ 0 ∈ nℤ；
+ (nℤ, +, 0) 为群。
+\]</div>
+
+</div>
+
+
+
+<h2 id="循环群"><a href="#循环群" class="headerlink" title="循环群"></a>循环群</h2><div class="math-display">
+
+<div class="math-display">\[
+若群 G 的每一个元都能表成一个元素 a 的幂，则 G 称为由 a 生成的循环群，记作 G = ⟨a⟩，a 称为循环群 G 的生成元。
+\]</div>
+
+</div>
+
+
+
 <p><strong>根据元素的阶的性质，循环群 G &#x3D; ⟨a⟩ 共有两种类型：</strong></p>
-<p>$$</p>
-<ol>
-<li>当生成元 a 是无限阶元素时，则 G 称为无限阶循环群。\<br>$$</li>
-</ol>
-<p>$$<br>2.  如果 a 的阶为 n，即 aⁿ &#x3D; 1，那么这时<br>    G &#x3D; ⟨a⟩ &#x3D; ⟨1, a, a², …, aⁿ⁻¹⟩\<br>    则 G 称为由 a 所生成的n 阶循环群。(注意此时 1, a, a², …, aⁿ⁻¹ 两两不同)<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+1.  当生成元 a 是无限阶元素时，则 G 称为无限阶循环群。\\
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+2.  如果 a 的阶为 n，即 aⁿ = 1，那么这时
+    G = ⟨a⟩ = ⟨1, a, a², …, aⁿ⁻¹⟩\\
+    则 G 称为由 a 所生成的n 阶循环群。(注意此时 1, a, a², …, aⁿ⁻¹ 两两不同)
+\]</div>
+
+</div>
+
+
+
+
+
 <h3 id="元素的阶"><a href="#元素的阶" class="headerlink" title="元素的阶"></a>元素的阶</h3><p>设 G 是一个群，a∈G，元素 a 的阶定义为：</p>
 <blockquote>
-<p>$$<br>若存在最小的正整数n，使得a^n&#x3D;e（e 是群的单位元），则称 a 的阶为 n，记作 ord(a)&#x3D;n\</p>
-<p>若不存在这样的正整数 n，则称 a 是无限阶元素，记作 ord(a)&#x3D;∞<br>$$</p>
 </blockquote>
+<div class="math-display">
+
+<div class="math-display">\[
+&amp;gt; 若存在最小的正整数n，使得a^n=e（e 是群的单位元），则称 a 的阶为 n，记作 ord(a)=n\\
+&amp;gt; 
+&amp;gt; 若不存在这样的正整数 n，则称 a 是无限阶元素，记作 ord(a)=∞
+&amp;gt;
+\]</div>
+
+</div>
+
+
+
 <p>简单理解就是：</p>
 <p>阶就是 “把这个元素自己乘自己多少次，能变回单位元” 的最小次数，而无限阶意味着无论乘多少次，都回不到单位元</p>
 <p><strong>在整数加法群 (Z,+,0) 中：</strong></p>
@@ -302,21 +588,130 @@
 <li>整数加法群 (Z,+,0) 是无限群，∣Z∣&#x3D;∞。</li>
 <li>模 n 加法群 Zn 是有限群，∣Zn∣&#x3D;n。</li>
 </ul>
-<h2 id="对称群"><a href="#对称群" class="headerlink" title="对称群"></a>对称群</h2><h3 id="置换"><a href="#置换" class="headerlink" title="置换"></a>置换</h3><p>$$<br>设 S &#x3D; {1, 2, …, n}，若映射 σ: S → S 是可逆的，则称 σ 为 S 上的置换<br>$$</p>
-<h3 id="定义（对称群）"><a href="#定义（对称群）" class="headerlink" title="定义（对称群）"></a>定义（对称群）</h3><p>全体 S 上的置换所成的集合记为 Sₙ，令 1 表示恒等置换（即对任意 i ∈ S，有 1(i) &#x3D; i）<br>$$<br>在 Sₙ 中以 σ(i) 表示 i 在置换 σ 下的像，定义 Sₙ 中两元素 σ 与 η 的乘积为：<br>$$</p>
-<p>$$<br><a href="i">σ · η</a> &#x3D; σ(η(i))<br>$$</p>
-<p>$$<br>则 (Sₙ, ·, 1) 成群，群 Sₙ 称为n 次对称群<br>$$</p>
+<h2 id="对称群"><a href="#对称群" class="headerlink" title="对称群"></a>对称群</h2><h3 id="置换"><a href="#置换" class="headerlink" title="置换"></a>置换</h3><div class="math-display">
+
+<div class="math-display">\[
+设 S = {1, 2, …, n}，若映射 σ: S → S 是可逆的，则称 σ 为 S 上的置换
+\]</div>
+
+</div>
+
+
+
+<h3 id="定义（对称群）"><a href="#定义（对称群）" class="headerlink" title="定义（对称群）"></a>定义（对称群）</h3><p>全体 S 上的置换所成的集合记为 Sₙ，令 1 表示恒等置换（即对任意 i ∈ S，有 1(i) &#x3D; i）</p>
+<div class="math-display">
+
+<div class="math-display">\[
+在 Sₙ 中以 σ(i) 表示 i 在置换 σ 下的像，定义 Sₙ 中两元素 σ 与 η 的乘积为：
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+[σ · η](i) = σ(η(i))
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+则 (Sₙ, ·, 1) 成群，群 Sₙ 称为n 次对称群
+\]</div>
+
+</div>
+
+
+
 <p><img src="/images/image-20260307144656504.png" alt="对称群"></p>
-<h3 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h3><p>取 n&#x3D;3，定义两个置换：<br>$$<br>\sigma &#x3D; \begin{pmatrix}1 &amp; 2 &amp; 3 \ 2 &amp; 3 &amp; 1\end{pmatrix}, \quad \eta &#x3D; \begin{pmatrix}1 &amp; 2 &amp; 3 \ 3 &amp; 1 &amp; 2\end{pmatrix}<br><br>$$<br>即 σ(1)&#x3D;2, σ(2)&#x3D;3, σ(3)&#x3D;1，η(1)&#x3D;3, η(2)&#x3D;1, η(3)&#x3D;2</p>
-<p>计算σ⋅η：<br>$$<br>\begin{align*}<br><a href="1">\sigma \cdot \eta</a> &amp;&#x3D; \sigma(\eta(1)) &#x3D; \sigma(3) &#x3D; 1; \<br><a href="2">\sigma \cdot \eta</a> &amp;&#x3D; \sigma(\eta(2)) &#x3D; \sigma(1) &#x3D; 2; \<br><a href="3">\sigma \cdot \eta</a> &amp;&#x3D; \sigma(\eta(3)) &#x3D; \sigma(2) &#x3D; 3.<br>\end{align*}<br>$$<br>所以 σ⋅η 就是恒等置换 1，这说明 σ 和 η 互为逆元</p>
+<h3 id="举例"><a href="#举例" class="headerlink" title="举例"></a>举例</h3><p>取 n&#x3D;3，定义两个置换：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\sigma = \begin{pmatrix}1 &amp;amp; 2 &amp;amp; 3 \\ 2 &amp;amp; 3 &amp;amp; 1\end{pmatrix}, \quad \eta = \begin{pmatrix}1 &amp;amp; 2 &amp;amp; 3 \\ 3 &amp;amp; 1 &amp;amp; 2\end{pmatrix}
+\
+\]</div>
+
+</div>
+
+
+<p>即 σ(1)&#x3D;2, σ(2)&#x3D;3, σ(3)&#x3D;1，η(1)&#x3D;3, η(2)&#x3D;1, η(3)&#x3D;2</p>
+<p>计算σ⋅η：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\begin{align*}
+[\sigma \cdot \eta](1) &amp;amp;= \sigma(\eta(1)) = \sigma(3) = 1; \\
+[\sigma \cdot \eta](2) &amp;amp;= \sigma(\eta(2)) = \sigma(1) = 2; \\
+[\sigma \cdot \eta](3) &amp;amp;= \sigma(\eta(3)) = \sigma(2) = 3.
+\end{align*}
+\]</div>
+
+</div>
+
+
+<p>所以 σ⋅η 就是恒等置换 1，这说明 σ 和 η 互为逆元</p>
 <h3 id="置换密码"><a href="#置换密码" class="headerlink" title="置换密码"></a>置换密码</h3><p>置换密码，也叫<strong>换位密码</strong>，是一种经典的加密技术。它的核心思想是：<strong>不改变明文中的字符本身，只改变它们的排列顺序</strong>，从而隐藏信息</p>
 <h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><p><strong>本质</strong>：加密过程就是对明文序列执行一个<strong>置换操作</strong> σ，解密则是执行其逆置换 </p>
 <p><strong>与对称群的关系</strong>：所有可能的置换操作构成了一个<strong>对称群</strong> Sn。密钥就是这个群中的一个特定元素（置换规则），解密则需要找到它的逆元</p>
 <h2 id="离散对数问题"><a href="#离散对数问题" class="headerlink" title="离散对数问题"></a>离散对数问题</h2><p>不同代数系统中都有各自的对数（离散对数）问题，有的可以找到快速算法，有的则尚未找到快速算法。尚未找到快速算法的离散对数问题，可以看作一个数学上的“难题”，能够用来构造密码学算法或协议。</p>
-<p>在群 G 里，我们先定义 “幂”：<br>$$<br>若群运算为乘法（如模乘群 Z_n^*，n 为素数）,那 a^m 就是把 a 自己乘 m 次<br>$$</p>
-<p>$$<br>  a^m &#x3D; \underbrace{a \otimes_n a \otimes_n \cdots \otimes_n a}_{m \text{ 个 } a} \quad (m \text{ 为整数})<br>$$</p>
-<p>$$<br>若群运算为加法：那 x⋅a 就是把 a 自己加 x 次<br>$$</p>
-<p>$$<br>  x \cdot a &#x3D; \underbrace{a + a + \cdots + a}_{x \text{ 个 } a} \quad (x \text{ 为整数})<br>$$</p>
+<p>在群 G 里，我们先定义 “幂”：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+若群运算为乘法（如模乘群 Z_n^*，n 为素数）,那 a^m 就是把 a 自己乘 m 次
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+a^m = \underbrace{a \otimes_n a \otimes_n \cdots \otimes_n a}_{m \text{ 个 } a} \quad (m \text{ 为整数})
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+若群运算为加法：那 x⋅a 就是把 a 自己加 x 次
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+x \cdot a = \underbrace{a + a + \cdots + a}_{x \text{ 个 } a} \quad (x \text{ 为整数})
+\]</div>
+
+</div>
+
+
+
 <p><strong>离散对数问题</strong>就是：</p>
 <p>已知 a 和 b，求整数 x，使得：</p>
 <ul>
@@ -324,37 +719,249 @@
 <li>加法群：x⋅a&#x3D;b</li>
 </ul>
 <h4 id="Diffie-Hellman密钥交换"><a href="#Diffie-Hellman密钥交换" class="headerlink" title="Diffie-Hellman密钥交换"></a>Diffie-Hellman密钥交换</h4><p>公开：大素数 p、生成元 g</p>
-<p>$$<br>Alice 选 a，发 A&#x3D;g^amodp<br>$$</p>
-<p>$$<br>Bob 选 b，发 B&#x3D;g^bmodp<br>$$</p>
-<p>$$<br>共享密钥：K&#x3D;B^a&#x3D;(g^b)^a&#x3D;g^{ab}&#x3D;A^b<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+Alice 选 a，发 A=g^amodp
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+Bob 选 b，发 B=g^bmodp
+\]</div>
+
+</div>
+
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+共享密钥：K=B^a=(g^b)^a=g^{ab}=A^b
+\]</div>
+
+</div>
+
+
+
+
 <p>攻击者只看到 g,A,B，要算 ab 就必须解离散对数，而这在大素数下几乎不可能</p>
-<h1 id="环"><a href="#环" class="headerlink" title="环"></a>环</h1><p>$$<br>设五元组 (R, +, ·, 0, 1) 中，R 为集合，+ 与 · 为集 R 上二元运算，0 与 1 为 R 中元。若 (R, +, ·, 0, 1) 满足：<br>$$</p>
-<p>$$<br>R1（加法交换群）：(R, +, 0) 是交换群；<br>$$</p>
-<p>$$<br>R2（乘法半群）：(R, ·, 1) 是有单位元的半群；<br>$$</p>
-<p>$$<br>R3（乘法对加法的分配律）：<br>  a · (b + c) &#x3D; a · b + a · c，(b + c) · a &#x3D; b · a + c · a，对任意 a,b,c ∈ R<br>$$</p>
-<p>$$<br>则称 (R, +, \cdot, 0, 1) 为环，简称环 R<br>$$</p>
-<p> <strong>若还满足</strong><br>$$<br>R4 (乘法半群交换)：(R,・, 1) 为交换半群。则称 R 为交换环<br>$$</p>
-<p>$$<br>+与·称为环R的加法与乘法<br>$$</p>
-<p>$$<br>0称为环的零元<br>$$</p>
-<p>$$<br>1称为环的单位元（环不一定有单位元,含幺环一定有单位元）<br>$$</p>
-<p>$$<br>若a’’ ∈ R使a’’ · a &#x3D; 1，则称a’’为a的逆元，写为a⁻¹<br>$$</p>
-<p>$$<br>若a’ ∈ R使a’ + a &#x3D; 0，则称a’为a的负元，写为-a；<br>$$</p>
-<p>$$<br>(R, +, 0)称为环R的加法群<br>$$</p>
-<p>$$<br>(R, ·, 1)称为环R的乘法半群<br>$$</p>
+<h1 id="环"><a href="#环" class="headerlink" title="环"></a>环</h1><div class="math-display">
+
+<div class="math-display">\[
+设五元组 (R, +, ·, 0, 1) 中，R 为集合，+ 与 · 为集 R 上二元运算，0 与 1 为 R 中元。若 (R, +, ·, 0, 1) 满足：
+\]</div>
+
+</div>
+
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+R1（加法交换群）：(R, +, 0) 是交换群；
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+R2（乘法半群）：(R, ·, 1) 是有单位元的半群；
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+R3（乘法对加法的分配律）：
+  a · (b + c) = a · b + a · c，(b + c) · a = b · a + c · a，对任意 a,b,c ∈ R
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+则称 (R, +, \cdot, 0, 1) 为环，简称环 R
+\]</div>
+
+</div>
+
+
+
+<p> <strong>若还满足</strong></p>
+<div class="math-display">
+
+<div class="math-display">\[
+R4 (乘法半群交换)：(R,・, 1) 为交换半群。则称 R 为交换环
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
++与·称为环R的加法与乘法
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+0称为环的零元
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+1称为环的单位元（环不一定有单位元,含幺环一定有单位元）
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+若a'' ∈ R使a'' · a = 1，则称a''为a的逆元，写为a⁻¹
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+若a' ∈ R使a' + a = 0，则称a'为a的负元，写为-a；
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+(R, +, 0)称为环R的加法群
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+(R, ·, 1)称为环R的乘法半群
+\]</div>
+
+</div>
+
+
+
 <h2 id="体"><a href="#体" class="headerlink" title="体"></a>体</h2><p>若环 (R, +,・, 0, 1) 满足</p>
-<p>$$<br>R5：(R^<em>,・, 1) 为群，这里 R^</em> &#x3D; R − {0}，则称 R 为体<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+R5：(R^*,・, 1) 为群，这里 R^* = R − {0}，则称 R 为体
+\]</div>
+
+</div>
+
+
+
 <h2 id="域"><a href="#域" class="headerlink" title="域"></a>域</h2><p>若环 (R, +,・, 0, 1) 满足</p>
-<p>$$<br>R6：(R^*,・, 1) 为交换群，则称 R 为域<br>$$</p>
+<div class="math-display">
+
+<div class="math-display">\[
+R6：(R^*,・, 1) 为交换群，则称 R 为域
+\]</div>
+
+</div>
+
+
+
+
 <p><strong>看起来环的定义好像很复杂,但我们简单记住环 &#x3D; 加法交换群 + 乘法半群 + 分配律即可</strong></p>
 <p><strong>下面举例一些环,方便我们理解</strong></p>
-<h2 id="eg1-1"><a href="#eg1-1" class="headerlink" title="eg1:"></a>eg1:</h2><p>$$<br>整数集 Z 在整数 + 与整数・下为交换环，称为整数环 (Z,+,・,0,1)，简记为环<br>$$</p>
+<h2 id="eg1-1"><a href="#eg1-1" class="headerlink" title="eg1:"></a>eg1:</h2><div class="math-display">
+
+<div class="math-display">\[
+整数集 Z 在整数 + 与整数・下为交换环，称为整数环 (Z,+,・,0,1)，简记为环
+\]</div>
+
+</div>
+
+
+
 <p>满足</p>
 <ul>
 <li>(Z,+,0) 是交换群</li>
 <li>(Z,・,1) 是有单位元的交换半群</li>
 <li>乘法对加法的分配律 :a・(b+c)&#x3D;a・b+a・c，(b+c)・a&#x3D;b・a+c・a</li>
 </ul>
-<h2 id="eg2-1"><a href="#eg2-1" class="headerlink" title="eg2:"></a>eg2:</h2><p>$$<br>有理数集 Q 在有理数加法 + 与有理数乘法・下为域，称为有理数域 (Q,+,・,0,1)，简记为域 Q<br>$$</p>
+<h2 id="eg2-1"><a href="#eg2-1" class="headerlink" title="eg2:"></a>eg2:</h2><div class="math-display">
+
+<div class="math-display">\[
+有理数集 Q 在有理数加法 + 与有理数乘法・下为域，称为有理数域 (Q,+,・,0,1)，简记为域 Q
+\]</div>
+
+</div>
+
+
+
 <p> 满足</p>
 <ul>
 <li><p>(Q,+,0) 是交换群</p>
@@ -362,47 +969,61 @@
 <li><p>(Q,・,1) 是有单位元的半群</p>
 </li>
 <li><p>乘法对加法的分配律：a・(b+c)&#x3D;a・b+a・c，(b+c)・a&#x3D;b・a+c・a</p>
-<p>这里已经能证明了是环了,但还满足<br>$$<br>(Q^*,・, 1) 为交换群<br>$$</p>
+<p>这里已经能证明了是环了,但还满足</p>
 </li>
 </ul>
+<div class="math-display">
+
+<div class="math-display">\[
+(Q^*,・, 1) 为交换群
+\]</div>
+
+</div>
+
+
+
+
+
 <p>所以称为有理数域 (Q,+,・,0,1)</p>
-<h2 id="零因子"><a href="#零因子" class="headerlink" title="零因子"></a>零因子</h2><p>$$<br>设 a,b ∈ R，且 a ≠ 0,b ≠ 0，若 a・b &#x3D; 0，则称 a 与 b 为环 R 中的零因子<br>$$</p>
-<p>$$<br>在环 Z₂₆中 13 和 2 是零因子<br>$$</p>
+<h2 id="零因子"><a href="#零因子" class="headerlink" title="零因子"></a>零因子</h2><div class="math-display">
+
+<div class="math-display">\[
+设 a,b ∈ R，且 a ≠ 0,b ≠ 0，若 a・b = 0，则称 a 与 b 为环 R 中的零因子
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+在环 Z₂₆中 13 和 2 是零因子
+\]</div>
+
+</div>
+
+
+
 <h2 id="整环"><a href="#整环" class="headerlink" title="整环"></a>整环</h2><p>环 R 若无零因子，则称 R 为无零因子环。交换的无零因子环称为整环</p>
-<h2 id="理想"><a href="#理想" class="headerlink" title="理想"></a>理想</h2><p>$$<br>若 I 为环 R 的加法群的子群，且对任 a ∈ I 和任 r ∈ R 有 ar ∈ I 和 ra ∈ I，则称 I 为环 R 的理想<br>$$</p>
-<h2 id="主理想"><a href="#主理想" class="headerlink" title="主理想"></a>主理想</h2><p>$$<br>若 I 为交换环 R 的理想。若 I &#x3D; {ra | r ∈ R}，则称 I 为环 R 的主理想，并记为 I &#x3D; (a)<br>$$</p>
-<p>$$<br>在整数环 (Z,+,・,0,1) 中，令 nZ &#x3D; {0, ±n, ±2n, …}，则 nZ 为环 Z 的理想，且 nZ 为环 Z 的主理想，此时 nZ &#x3D; (n)。<br>$$</p>
-<h2 id="环上的多项式"><a href="#环上的多项式" class="headerlink" title="环上的多项式"></a>环上的多项式</h2><p>$$<br>设 x 为文字，R 为交换环，x ∉ R。定义为 R 上多项式集<br>$$</p>
-<p>$$<br>R[x] &#x3D; \left{ f(x) &#x3D; \sum_{i&#x3D;0}^{n} a_i x^i \mid n \in \mathbb{Z},\ a_i \in R \right}<br>$$</p>
-<p>$$<br>1.f(x) &#x3D; \sum_{i&#x3D;0}^{n} a_i x^i 称为交换环 R 上关于文字 x 的多项式<br>$$</p>
-<p>$$<br>2. a_i x^i 称为 f(x) 的第 i 次项，a_i 为 f(x) 的第 i 次项系数；a_0 x^0 写为 a_0<br>$$</p>
-<p>$$<br>3.当 a_n \neq 0 时，a_n x^n 称为 f(x) 的首项，n 称为 f(x) 的次数，记为 \partial f(x) &#x3D; n；特别当 a_n &#x3D; 1 时，称 f(x) 为首1多项式<br>$$</p>
-<p>$$<br>4. 称 0 \in R 为 R[x] 中的零多项式，并约定 \partial(0) &#x3D; -\infty（负无穷大），任意非负整数 n，n + (-\infty) &#x3D; -\infty<br>$$</p>
+<h2 id="理想"><a href="#理想" class="headerlink" title="理想"></a>理想</h2><div class="math-display">
 
-    </div>
+<div class="math-display">\[
+若 I 为环 R 的加法群的子群，且对任 a ∈ I 和任 r ∈ R 有 ar ∈ I 和 ra ∈ I，则称 I 为环 R 的理想
+\]</div>
 
-    
-    
-    
+</div>
 
-    <footer class="post-footer">
 
-        
 
-          <div class="post-nav">
-            <div class="post-nav-item">
-                <a href="/2026/03/01/Crypto-Ellipse%20Curve%20Cryptography/" rel="prev" title="Crypto-Ellipse Curve Cryptography">
-                  <i class="fa fa-angle-left"></i> Crypto-Ellipse Curve Cryptography
-                </a>
-            </div>
-            <div class="post-nav-item">
-                <a href="/2026/03/16/Diffie-Hellman/" rel="next" title="Diffie-Hellman">
-                  Diffie-Hellman <i class="fa fa-angle-right"></i>
-                </a>
-            </div>
-          </div>
-    </footer>
-  </article>
+<h2 id="主理想"><a href="#主理想" class="headerlink" title="主理想"></a>主理想</h2><div class="math-display">
+
+<div class="math-display">\[
+若 I 为交换环 R 的理想。若 I = \{ra | r ∈ R\}，则称 I 为环 R 的主理想，并记为 I = (a)
+\]</div>
+
 </div>
 
 
@@ -410,59 +1031,273 @@
 
 
 
+<div class="math-display">
+
+<div class="math-display">\[
+在整数环 (Z,+,・,0,1) 中，令 nZ = {0, ±n, ±2n, …}，则 nZ 为环 Z 的理想，且 nZ 为环 Z 的主理想，此时 nZ = (n)。
+\]</div>
+
 </div>
-  </main>
 
-  <footer class="footer">
-    <div class="footer-inner">
 
-  <div class="copyright">
-    &copy; 
-    <span itemprop="copyrightYear">2026</span>
-    <span class="with-love">
-      <i class="fa fa-heart"></i>
-    </span>
-    <span class="author" itemprop="copyrightHolder">ksenr</span>
-  </div>
-<div class="busuanzi-count">
-    <span class="post-meta-item" id="busuanzi_container_site_uv">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-user"></i>
-      </span>
-      <span class="site-uv" title="总访客量">
-        <span id="busuanzi_value_site_uv"></span>
-      </span>
-    </span>
-    <span class="post-meta-item" id="busuanzi_container_site_pv">
-      <span class="post-meta-item-icon">
-        <i class="fa fa-eye"></i>
-      </span>
-      <span class="site-pv" title="总访问量">
-        <span id="busuanzi_value_site_pv"></span>
-      </span>
-    </span>
+
+<h2 id="环上的多项式"><a href="#环上的多项式" class="headerlink" title="环上的多项式"></a>环上的多项式</h2><div class="math-display">
+
+<div class="math-display">\[
+设 x 为文字，R 为交换环，x ∉ R。定义为 R 上多项式集
+\]</div>
+
 </div>
-  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
-  </div>
 
-    </div>
-  </footer>
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+R[x] = \left\{ f(x) = \sum_{i=0}^{n} a_i x^i \mid n \in \mathbb{Z},\ a_i \in R \right\}
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+1.f(x) = \sum_{i=0}^{n} a_i x^i 称为交换环 R 上关于文字 x 的多项式
+\]</div>
+
+</div>
+
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+2. a_i x^i 称为 f(x) 的第 i 次项，a_i 为 f(x) 的第 i 次项系数；a_0 x^0 写为 a_0
+\]</div>
+
+</div>
+
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+3.当 a_n \neq 0 时，a_n x^n 称为 f(x) 的首项，n 称为 f(x) 的次数，记为 \partial f(x) = n；特别当 a_n = 1 时，称 f(x) 为首1多项式
+\]</div>
+
+</div>
+
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+4. 称 0 \in R 为 R[x] 中的零多项式，并约定 \partial(0) = -\infty（负无穷大），任意非负整数 n，n + (-\infty) = -\infty
+\]</div>
+
+</div>
+
+
+
+
+	</div>
+	<div class="meta split">
+		
+		<time class="post-date" datetime="2026-03-03T07:08:32.000Z" itemprop="datePublished">2026-03-03</time>
+	</div>
+</article>
+
+<!--评论-->
+
 
   
-  <div class="toggle sidebar-toggle" role="button">
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-    <span class="toggle-line"></span>
-  </div>
-  <div class="sidebar-dimmer"></div>
-  <div class="back-to-top" role="button" aria-label="返回顶部">
-    <i class="fa fa-arrow-up fa-lg"></i>
-    <span>0%</span>
-  </div>
+</div>
 
-<noscript>
-  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
-</noscript>
 
-</body>
+  <svg id="bigTriangleColor" width="100%" height="40" viewBox="0 0 100 102" preserveAspectRatio="none">
+    <path d="M0 0 L50 100 L100 0 Z"></path>
+  </svg>
+
+  
+
+
+  <div class="wrapper"></div>
+
+
+
+
+
+<div class="fat-footer">
+	<div class="wrapper">
+		<div class="layout layout--center">
+			<div class="layout__item palm-mb">
+				<div class="media">
+					<img class="headimg" src='https://imgchr.github.la/steve.jpeg' alt='ksenr'>
+					<div class="media__body">
+						<h4>justpsvm</h4>
+						<p class='site-description'>Stay Hungry,Stay Foolish.</p>
+					</div>
+				</div>
+				<div class="author-contact">
+					<ul>
+						
+							
+							<li>
+				        		<a href="https://github.com/ksenrii" target="_blank">
+				        			
+				        		</a>
+				        	</li>
+						
+							
+							<li>
+				        		<a href="https://github.com/" target="_blank">
+				        			
+				        				<i class="iconfont icon-github"></i>
+				        			
+				        		</a>
+				        	</li>
+						
+							
+							<li>
+				        		<a href="https://www.zhihu.com/" target="_blank">
+				        			
+										<i class="iconfont icon-zhihu"></i>
+				        			
+				        		</a>
+				        	</li>
+						
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<footer class="footer" role="contentinfo">
+	<div class="wrapper wrapper--wide split split--responsive">
+		
+		<span>Theme by <a target="_blank" rel="noopener" href="http://github.com/justpsvm">justpsvm</a>. Powered by <a target="_blank" rel="noopener" href="http://hexo.io">Hexo</a></span>
+	</div>
+</footer>
+
+	<!-－这里导入了 lib.js 里面涵盖了 jQuery 等框架 所以注释掉-->
+	<!--
+<script src="http://lib.sinaapp.com/js/jquery/2.0/jquery.min.js"></script>
+-->
+	
+<script src="/js/lib.js"></script>
+
+	
+<script src="/js/module.js"></script>
+
+	
+<script src="/js/script.js"></script>
+
+	
+	<!-- hexo injector body_end start -->
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>
+(function () {
+  function getCodeText(block) {
+    var code = block.querySelector(".code pre") || block.querySelector("pre");
+    return code ? code.innerText.replace(/\n$/, "") : "";
+  }
+
+  document.querySelectorAll(".post-body figure.highlight").forEach(function (block) {
+    if (block.querySelector(".code-toolbar")) return;
+
+    var language = Array.from(block.classList).filter(function (name) {
+      return name !== "highlight";
+    })[0] || "code";
+
+    var toolbar = document.createElement("div");
+    toolbar.className = "code-toolbar";
+    toolbar.innerHTML = "<span>" + language.toUpperCase() + "</span><button class=\"code-copy-button\" type=\"button\">澶嶅埗</button>";
+    block.insertBefore(toolbar, block.firstChild);
+
+    toolbar.querySelector("button").addEventListener("click", function () {
+      var button = this;
+      var text = getCodeText(block);
+      var copied = function () {
+        button.textContent = "宸插鍒?;
+        setTimeout(function () {
+          button.textContent = "澶嶅埗";
+        }, 1500);
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(copied);
+      } else {
+        var textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+        copied();
+      }
+    });
+  });
+
+  var article = document.querySelector("article");
+  var body = article && article.querySelector(".post-body");
+  if (!article || !body || article.querySelector(".post-toc")) return;
+
+  var headings = Array.from(body.querySelectorAll("h2, h3, h4")).filter(function (heading) {
+    return heading.textContent.trim().length > 0;
+  });
+  if (headings.length < 2) return;
+
+  var nav = document.createElement("aside");
+  nav.className = "post-toc";
+  nav.innerHTML = '<div class="post-toc-title">鐩綍</div>';
+
+  headings.forEach(function (heading, index) {
+    if (!heading.id) {
+      heading.id = "toc-heading-" + index;
+    }
+    var link = document.createElement("a");
+    link.href = "#" + encodeURIComponent(heading.id);
+    link.className = "level-" + heading.tagName.slice(1);
+    link.textContent = heading.textContent.trim();
+    nav.appendChild(link);
+  });
+
+  article.insertBefore(nav, body);
+
+  var links = Array.from(nav.querySelectorAll("a"));
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (!entry.isIntersecting) return;
+      links.forEach(function (link) {
+        link.classList.toggle("is-active", decodeURIComponent(link.hash.slice(1)) === entry.target.id);
+      });
+    });
+  }, { rootMargin: "-20% 0px -70% 0px", threshold: 0 });
+
+  headings.forEach(function (heading) {
+    observer.observe(heading);
+  });
+})();
+</script><!-- hexo injector body_end end --></body>
 </html>
+
+
