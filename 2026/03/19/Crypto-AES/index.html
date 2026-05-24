@@ -38,6 +38,223 @@ window.MathJax = {
 };
 </script>
 <style>
+:root {
+  --ksenr-brand: #35bfab;
+  --ksenr-ink: #334f52;
+  --ksenr-muted: #66777d;
+  --ksenr-panel: rgba(255, 255, 255, 0.84);
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  color: var(--ksenr-ink);
+}
+::selection {
+  background: rgba(53, 191, 171, 0.26);
+  color: #1f3437;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: url("/banner/4.jpg") center / cover no-repeat;
+  opacity: 0.16;
+  filter: saturate(1.05) blur(1px);
+  pointer-events: none;
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.86)),
+    radial-gradient(circle at 20% 12%, rgba(53, 191, 171, 0.08), transparent 34%),
+    rgba(255, 255, 255, 0.78);
+  pointer-events: none;
+}
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 30;
+  width: 100%;
+  height: 3px;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: linear-gradient(90deg, var(--ksenr-brand), #7edbd1);
+}
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 68px;
+  padding: 0 42px;
+  background: rgba(255, 255, 255, 0.42);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(14px);
+  transition: background 180ms ease, box-shadow 180ms ease;
+}
+.site-header.scrolled {
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: 0 6px 24px rgba(20, 24, 30, 0.08);
+}
+.site-brand {
+  color: var(--ksenr-ink);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.site-nav {
+  display: flex !important;
+  align-items: center;
+  gap: 18px;
+}
+.site-nav a,
+.site-nav-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  border: 0;
+  padding: 0 0.1rem;
+  background: transparent;
+  color: var(--ksenr-muted);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.site-nav a::after,
+.site-nav-button::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 2px;
+  height: 2px;
+  transform: scaleX(0);
+  transform-origin: right;
+  border-radius: 999px;
+  background: var(--ksenr-brand);
+  transition: transform 0.18s ease;
+}
+.site-nav a:hover,
+.site-nav-button:hover {
+  color: var(--ksenr-brand);
+}
+.site-nav a:hover::after,
+.site-nav-button:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.search-form--modal .search-form__inner {
+  align-items: flex-start;
+  padding-top: 16vh;
+}
+.search-panel {
+  width: min(720px, calc(100vw - 44px));
+  padding: 24px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 24px 90px rgba(20, 24, 30, 0.22);
+}
+.search-label {
+  display: block;
+  margin-bottom: 12px;
+  color: #334f52;
+  font-weight: 700;
+}
+.search-panel .text-input {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid #d9e0db;
+  border-radius: 8px;
+  outline: none;
+}
+.search-results {
+  margin-top: 16px;
+  max-height: 50vh;
+  overflow: auto;
+}
+.search-result {
+  display: block;
+  padding: 12px 0;
+  border-top: 1px solid rgba(83, 97, 106, 0.14);
+}
+.search-result strong {
+  display: block;
+  color: #334f52;
+}
+.search-result span {
+  color: #889198;
+  font-size: 12px;
+}
+.search-empty {
+  color: #889198;
+}
+.wrapper:has(.post-article) {
+  width: min(1320px, calc(100vw - 72px)) !important;
+  max-width: none !important;
+}
+.post-article {
+  position: relative;
+  left: 50%;
+  display: grid;
+  grid-template-columns: minmax(0, 900px) 280px;
+  gap: 42px;
+  align-items: start;
+  width: min(1270px, calc(100vw - 84px));
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  transform: translateX(-50%);
+  background: transparent;
+  box-shadow: none;
+  isolation: isolate;
+}
+.post-main-panel {
+  position: relative;
+  grid-column: 1;
+  min-width: 0;
+  padding: 42px 50px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  background: var(--ksenr-panel);
+  box-shadow: 0 20px 72px rgba(34, 42, 48, 0.11);
+  backdrop-filter: blur(13px);
+}
+.post-main-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(53, 191, 171, 0.08), transparent 42%);
+  pointer-events: none;
+}
+.post-main-panel > .post-title,
+.post-main-panel > .post-body,
+.post-main-panel > .meta,
+.post-body,
+.post-body p,
+.post-body li {
+  max-width: none !important;
+}
+.post-body,
+.post-body table,
+.post-body figure {
+  min-width: 0;
+}
+.post-body p {
+  line-height: 1.9;
+}
 .post-body .math-display {
   margin: 1.25rem 0;
   overflow-x: auto;
@@ -54,7 +271,6 @@ window.MathJax = {
 .post-body mjx-container svg {
   max-width: none;
 }
-
 .post-body figure.highlight {
   position: relative;
   margin: 1.6rem 0;
@@ -153,52 +369,225 @@ window.MathJax = {
   background: #35bfab;
   color: #111827;
 }
-
 article {
   position: relative;
 }
 .post-toc {
-  position: fixed;
-  top: 128px;
-  right: max(24px, calc((100vw - 1180px) / 2));
-  width: 235px;
-  max-height: calc(100vh - 160px);
+  position: sticky;
+  top: 90px;
+  grid-column: 2;
+  grid-row: 1 / span 4;
+  align-self: start;
+  width: auto;
+  max-height: calc(100vh - 116px);
   overflow: auto;
   padding: 1rem;
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 10px 34px rgba(17, 24, 39, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: 0 14px 42px rgba(17, 24, 39, 0.12);
   backdrop-filter: blur(12px);
-  z-index: 1;
+  z-index: 2;
 }
 .post-toc-title {
   margin-bottom: 0.7rem;
-  color: #334f52;
-  font-weight: 600;
+  color: var(--ksenr-ink);
+  font-weight: 700;
 }
-.post-toc a {
+.toc-node {
+  margin: 2px 0;
+}
+.toc-node summary {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 0.34rem 0.45rem;
+  border-radius: 5px;
+  color: #59666d;
+  cursor: pointer;
+  list-style: none;
+}
+.toc-node summary::-webkit-details-marker {
+  display: none;
+}
+.toc-node summary::before {
+  content: "+";
+  grid-column: 2;
+  grid-row: 1;
+  color: var(--ksenr-brand);
+  font-weight: 700;
+}
+.toc-node[open] > summary::before {
+  content: "-";
+}
+.toc-node summary span {
+  grid-column: 1;
+  min-width: 0;
+}
+.toc-node summary a {
+  grid-column: 2;
+  grid-row: 1;
+  opacity: 0;
+  pointer-events: none;
+}
+.toc-children {
+  margin-left: 0.65rem;
+  padding-left: 0.7rem;
+  border-left: 1px solid rgba(83, 97, 106, 0.16);
+}
+.toc-link {
   display: block;
-  padding: 0.32rem 0.45rem;
-  border-left: 2px solid transparent;
-  border-radius: 4px;
+  padding: 0.34rem 0.45rem;
+  border-radius: 5px;
   color: #666;
   font-size: 13px;
   line-height: 1.5;
   text-decoration: none;
 }
-.post-toc a.level-3 {
-  padding-left: 1.05rem;
+.toc-link.level-3,
+.toc-node.level-3 summary {
+  font-size: 12px;
 }
-.post-toc a.level-4 {
-  padding-left: 1.65rem;
+.toc-link.level-4,
+.toc-node.level-4 summary {
+  font-size: 12px;
+  color: #7b858a;
 }
-.post-toc a.is-active,
-.post-toc a:hover {
-  border-left-color: #35bfab;
-  background: rgba(53, 191, 171, 0.12);
+.toc-link.is-active,
+.toc-node summary:hover,
+.toc-link:hover {
+  background: rgba(53, 191, 171, 0.14);
   color: #243b3d;
 }
+.click-ripple,
+.click-particle {
+  pointer-events: none;
+  position: fixed;
+}
+.click-ripple {
+  z-index: 9998;
+  left: 0;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(53, 191, 171, 0.72);
+  border-radius: 999px;
+  transform: translate(var(--x), var(--y)) translate(-50%, -50%) scale(1);
+  animation: ksenr-click-ripple 0.58s ease-out forwards;
+}
+.click-particle {
+  z-index: 9998;
+  left: 0;
+  top: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--particle-color);
+  transform: translate(var(--x), var(--y)) translate(-50%, -50%) scale(1);
+  animation: ksenr-click-particle 0.68s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+@keyframes ksenr-click-ripple {
+  to {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) translate(-50%, -50%) scale(7);
+  }
+}
+@keyframes ksenr-click-particle {
+  to {
+    opacity: 0;
+    transform: translate(calc(var(--x) + var(--dx)), calc(var(--y) + var(--dy))) translate(-50%, -50%) scale(0.25);
+  }
+}
+.timeline-page {
+  padding-top: 42px;
+  padding-bottom: 80px;
+}
+.timeline-page h1 {
+  margin-bottom: 42px;
+  text-align: center;
+  color: #334f52;
+}
+.timeline-tree {
+  position: relative;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 16px 0;
+}
+.timeline-tree::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  background: linear-gradient(180deg, transparent, #35bfab 12%, #35bfab 88%, transparent);
+}
+.timeline-item {
+  position: relative;
+  display: block;
+  width: calc(50% - 34px);
+  margin: 0 0 24px;
+  padding: 16px 18px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+  color: #334f52;
+}
+.timeline-item.left {
+  margin-right: auto;
+  text-align: right;
+}
+.timeline-item.right {
+  margin-left: auto;
+}
+.timeline-dot {
+  position: absolute;
+  top: 22px;
+  width: 12px;
+  height: 12px;
+  border: 3px solid #35bfab;
+  border-radius: 999px;
+  background: #fff;
+}
+.timeline-item.left .timeline-dot {
+  right: -41px;
+}
+.timeline-item.right .timeline-dot {
+  left: -39px;
+}
+.timeline-item strong {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+.timeline-item time {
+  color: #7b858a;
+  font-size: 13px;
+}
+.footer {
+  padding: 24px 0;
+  background: rgba(246, 247, 247, 0.9);
+}
+.footer-inner {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 9vw;
+  color: #9aa3a8;
+  font-size: 14px;
+}
 @media screen and (max-width: 1180px) {
+  .post-article {
+    display: block;
+    left: auto;
+    width: auto;
+    max-width: min(860px, calc(100vw - 32px));
+    margin: 0 auto;
+    transform: none;
+  }
+  .post-main-panel {
+    padding: 32px;
+  }
   .post-toc {
     position: static;
     width: auto;
@@ -206,41 +595,59 @@ article {
     margin: 0 0 1.6rem;
   }
 }
+@media screen and (max-width: 719px) {
+  .site-header {
+    height: auto;
+    padding: 14px 18px;
+    align-items: flex-start;
+  }
+  .site-nav {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px 14px;
+  }
+  .post-main-panel {
+    padding: 22px 18px;
+  }
+  .timeline-tree::before {
+    left: 8px;
+  }
+  .timeline-item,
+  .timeline-item.left,
+  .timeline-item.right {
+    width: auto;
+    margin-left: 34px;
+    margin-right: 0;
+    text-align: left;
+  }
+  .timeline-item.left .timeline-dot,
+  .timeline-item.right .timeline-dot {
+    left: -32px;
+    right: auto;
+  }
+}
 </style><!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.1.1"></head>
 
   <body>
 
-<header>
-	
-		<i class="js-toggle-search iconfont icon-search"></i>
-
-
-<form class="js-search search-form search-form--modal" method="get" action="http://gushi.li" role="search">
+<header class="site-header">
+	<a class="site-brand" href="/" aria-label="Home">ksenr</a>
+	<nav class="site-nav" aria-label="Main navigation">
+		<a href="/">Home</a>
+		<button class="site-nav-button js-toggle-search" type="button">Search</button>
+		<a href="/timeline/">Archive</a>
+		<a href="/daily-pause/">Daily Pause</a>
+	</nav>
+	<form class="js-search search-form search-form--modal" role="search">
 	<div class="search-form__inner">
-		<div>
-			<i class="iconfont icon-search"></i>
-			<input class="text-input" placeholder="Search..." type="search">
+		<div class="search-panel">
+			<label class="search-label" for="site-search-input">Search</label>
+			<input id="site-search-input" class="text-input" placeholder="Search posts..." type="search" autocomplete="off">
+			<div class="search-results" aria-live="polite"></div>
 		</div>
 	</div>
 </form>
-	
 
-	
-		<a id="nav-toggle" href="#"><span></span></a>
-
-<nav>
-	<div class="menu-top-container">
-		<ul id="menu-top" class="menu">
-			
-				
-				<li class="current-menu-item">
-					<a href="/daily-pause/" target="_self">Daily Pause</a>
-				</li>
-			
-		</ul>
-	</div>
-</nav>
-	
 </header>
 
 <div class="m-header ">
@@ -258,53 +665,18 @@ article {
 <div class="wrapper">
   
     <!-- article -->
-<article>
+<article class="post-article">
 	
+	<div class="post-main-panel">
+		
   
     <h1 class="post-title" itemprop="name">
       Crypto-AES
     </h1>
   
 
-	
-	
-		<aside class="post-toc">
-			<div class="post-toc-title">&#30446;&#24405;</div>
-			
-				<a class="level-1" href="#AES">AES</a>
-			
-				<a class="level-2" href="#概述">概述</a>
-			
-				<a class="level-2" href="#整体架构">整体架构</a>
-			
-				<a class="level-2" href="#明文处理">明文处理</a>
-			
-				<a class="level-2" href="#密钥处理">密钥处理</a>
-			
-				<a class="level-2" href="#初始轮密钥加">初始轮密钥加</a>
-			
-				<a class="level-2" href="#字节代换（SubBytes）">字节代换（SubBytes）</a>
-			
-				<a class="level-2" href="#行移位（ShiftRows）">行移位（ShiftRows）</a>
-			
-				<a class="level-2" href="#列混淆（MixColumns）">列混淆（MixColumns）</a>
-			
-				<a class="level-2" href="#轮密钥加（AddRoundKey）">轮密钥加（AddRoundKey）</a>
-			
-				<a class="level-2" href="#总结">总结</a>
-			
-				<a class="level-2" href="#AES工作模式">AES工作模式</a>
-			
-				<a class="level-2" href="#ECB">ECB</a>
-			
-				<a class="level-2" href="#CBC">CBC</a>
-			
-				<a class="level-2" href="#CTR">CTR</a>
-			
-		</aside>
-	
-	<div class='post-body mb'>
-		<h1 id="AES"><a href="#AES" class="headerlink" title="AES"></a>AES</h1><p>高级加密标准（AES），又称Rijndael加密法，是美国联邦政府采用的一种区块加密标准。这个标准用来替代原先的DES，已经被多方分析且广为全世界所使用。经过五年的甄选流程，高级加密标准由美国国家标准与技术研究院（NIST）于2001年11月26日发布于FIPS PUB 197，并在2002年5月26日成为有效的标准。现在，高级加密标准已然成为对称密钥加密中最流行的算法之一。</p>
+		<div class='post-body mb'>
+			<h1 id="AES"><a href="#AES" class="headerlink" title="AES"></a>AES</h1><p>高级加密标准（AES），又称Rijndael加密法，是美国联邦政府采用的一种区块加密标准。这个标准用来替代原先的DES，已经被多方分析且广为全世界所使用。经过五年的甄选流程，高级加密标准由美国国家标准与技术研究院（NIST）于2001年11月26日发布于FIPS PUB 197，并在2002年5月26日成为有效的标准。现在，高级加密标准已然成为对称密钥加密中最流行的算法之一。</p>
 <span id="more"></span>
 
 <h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p><strong>AES</strong>（Advanced Encryption Standard，高级加密标准）是目前最广泛使用的对称分组加密算法之一。所谓“对称加密”，指加密和解密使用同一把密钥；所谓“分组加密”，指算法不是一次处理任意长度的数据流，而是把明文切成固定大小的块逐块处理。</p>
@@ -951,10 +1323,17 @@ C_i = P_i \oplus E_K(\mathrm{CTR}_i)
 <figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;bits/stdc++.h&gt;</span></span></span><br><span class="line"><span class="keyword">using</span> <span class="keyword">namespace</span> std;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="type">uint8_t</span> SBOX[<span class="number">256</span>] = &#123;</span><br><span class="line"><span class="number">0x63</span>,<span class="number">0x7c</span>,<span class="number">0x77</span>,<span class="number">0x7b</span>,<span class="number">0xf2</span>,<span class="number">0x6b</span>,<span class="number">0x6f</span>,<span class="number">0xc5</span>,<span class="number">0x30</span>,<span class="number">0x01</span>,<span class="number">0x67</span>,<span class="number">0x2b</span>,<span class="number">0xfe</span>,<span class="number">0xd7</span>,<span class="number">0xab</span>,<span class="number">0x76</span>,</span><br><span class="line"><span class="number">0xca</span>,<span class="number">0x82</span>,<span class="number">0xc9</span>,<span class="number">0x7d</span>,<span class="number">0xfa</span>,<span class="number">0x59</span>,<span class="number">0x47</span>,<span class="number">0xf0</span>,<span class="number">0xad</span>,<span class="number">0xd4</span>,<span class="number">0xa2</span>,<span class="number">0xaf</span>,<span class="number">0x9c</span>,<span class="number">0xa4</span>,<span class="number">0x72</span>,<span class="number">0xc0</span>,</span><br><span class="line"><span class="number">0xb7</span>,<span class="number">0xfd</span>,<span class="number">0x93</span>,<span class="number">0x26</span>,<span class="number">0x36</span>,<span class="number">0x3f</span>,<span class="number">0xf7</span>,<span class="number">0xcc</span>,<span class="number">0x34</span>,<span class="number">0xa5</span>,<span class="number">0xe5</span>,<span class="number">0xf1</span>,<span class="number">0x71</span>,<span class="number">0xd8</span>,<span class="number">0x31</span>,<span class="number">0x15</span>,</span><br><span class="line"><span class="number">0x04</span>,<span class="number">0xc7</span>,<span class="number">0x23</span>,<span class="number">0xc3</span>,<span class="number">0x18</span>,<span class="number">0x96</span>,<span class="number">0x05</span>,<span class="number">0x9a</span>,<span class="number">0x07</span>,<span class="number">0x12</span>,<span class="number">0x80</span>,<span class="number">0xe2</span>,<span class="number">0xeb</span>,<span class="number">0x27</span>,<span class="number">0xb2</span>,<span class="number">0x75</span>,</span><br><span class="line"><span class="number">0x09</span>,<span class="number">0x83</span>,<span class="number">0x2c</span>,<span class="number">0x1a</span>,<span class="number">0x1b</span>,<span class="number">0x6e</span>,<span class="number">0x5a</span>,<span class="number">0xa0</span>,<span class="number">0x52</span>,<span class="number">0x3b</span>,<span class="number">0xd6</span>,<span class="number">0xb3</span>,<span class="number">0x29</span>,<span class="number">0xe3</span>,<span class="number">0x2f</span>,<span class="number">0x84</span>,</span><br><span class="line"><span class="number">0x53</span>,<span class="number">0xd1</span>,<span class="number">0x00</span>,<span class="number">0xed</span>,<span class="number">0x20</span>,<span class="number">0xfc</span>,<span class="number">0xb1</span>,<span class="number">0x5b</span>,<span class="number">0x6a</span>,<span class="number">0xcb</span>,<span class="number">0xbe</span>,<span class="number">0x39</span>,<span class="number">0x4a</span>,<span class="number">0x4c</span>,<span class="number">0x58</span>,<span class="number">0xcf</span>,</span><br><span class="line"><span class="number">0xd0</span>,<span class="number">0xef</span>,<span class="number">0xaa</span>,<span class="number">0xfb</span>,<span class="number">0x43</span>,<span class="number">0x4d</span>,<span class="number">0x33</span>,<span class="number">0x85</span>,<span class="number">0x45</span>,<span class="number">0xf9</span>,<span class="number">0x02</span>,<span class="number">0x7f</span>,<span class="number">0x50</span>,<span class="number">0x3c</span>,<span class="number">0x9f</span>,<span class="number">0xa8</span>,</span><br><span class="line"><span class="number">0x51</span>,<span class="number">0xa3</span>,<span class="number">0x40</span>,<span class="number">0x8f</span>,<span class="number">0x92</span>,<span class="number">0x9d</span>,<span class="number">0x38</span>,<span class="number">0xf5</span>,<span class="number">0xbc</span>,<span class="number">0xb6</span>,<span class="number">0xda</span>,<span class="number">0x21</span>,<span class="number">0x10</span>,<span class="number">0xff</span>,<span class="number">0xf3</span>,<span class="number">0xd2</span>,</span><br><span class="line"><span class="number">0xcd</span>,<span class="number">0x0c</span>,<span class="number">0x13</span>,<span class="number">0xec</span>,<span class="number">0x5f</span>,<span class="number">0x97</span>,<span class="number">0x44</span>,<span class="number">0x17</span>,<span class="number">0xc4</span>,<span class="number">0xa7</span>,<span class="number">0x7e</span>,<span class="number">0x3d</span>,<span class="number">0x64</span>,<span class="number">0x5d</span>,<span class="number">0x19</span>,<span class="number">0x73</span>,</span><br><span class="line"><span class="number">0x60</span>,<span class="number">0x81</span>,<span class="number">0x4f</span>,<span class="number">0xdc</span>,<span class="number">0x22</span>,<span class="number">0x2a</span>,<span class="number">0x90</span>,<span class="number">0x88</span>,<span class="number">0x46</span>,<span class="number">0xee</span>,<span class="number">0xb8</span>,<span class="number">0x14</span>,<span class="number">0xde</span>,<span class="number">0x5e</span>,<span class="number">0x0b</span>,<span class="number">0xdb</span>,</span><br><span class="line"><span class="number">0xe0</span>,<span class="number">0x32</span>,<span class="number">0x3a</span>,<span class="number">0x0a</span>,<span class="number">0x49</span>,<span class="number">0x06</span>,<span class="number">0x24</span>,<span class="number">0x5c</span>,<span class="number">0xc2</span>,<span class="number">0xd3</span>,<span class="number">0xac</span>,<span class="number">0x62</span>,<span class="number">0x91</span>,<span class="number">0x95</span>,<span class="number">0xe4</span>,<span class="number">0x79</span>,</span><br><span class="line"><span class="number">0xe7</span>,<span class="number">0xc8</span>,<span class="number">0x37</span>,<span class="number">0x6d</span>,<span class="number">0x8d</span>,<span class="number">0xd5</span>,<span class="number">0x4e</span>,<span class="number">0xa9</span>,<span class="number">0x6c</span>,<span class="number">0x56</span>,<span class="number">0xf4</span>,<span class="number">0xea</span>,<span class="number">0x65</span>,<span class="number">0x7a</span>,<span class="number">0xae</span>,<span class="number">0x08</span>,</span><br><span class="line"><span class="number">0xba</span>,<span class="number">0x78</span>,<span class="number">0x25</span>,<span class="number">0x2e</span>,<span class="number">0x1c</span>,<span class="number">0xa6</span>,<span class="number">0xb4</span>,<span class="number">0xc6</span>,<span class="number">0xe8</span>,<span class="number">0xdd</span>,<span class="number">0x74</span>,<span class="number">0x1f</span>,<span class="number">0x4b</span>,<span class="number">0xbd</span>,<span class="number">0x8b</span>,<span class="number">0x8a</span>,</span><br><span class="line"><span class="number">0x70</span>,<span class="number">0x3e</span>,<span class="number">0xb5</span>,<span class="number">0x66</span>,<span class="number">0x48</span>,<span class="number">0x03</span>,<span class="number">0xf6</span>,<span class="number">0x0e</span>,<span class="number">0x61</span>,<span class="number">0x35</span>,<span class="number">0x57</span>,<span class="number">0xb9</span>,<span class="number">0x86</span>,<span class="number">0xc1</span>,<span class="number">0x1d</span>,<span class="number">0x9e</span>,</span><br><span class="line"><span class="number">0xe1</span>,<span class="number">0xf8</span>,<span class="number">0x98</span>,<span class="number">0x11</span>,<span class="number">0x69</span>,<span class="number">0xd9</span>,<span class="number">0x8e</span>,<span class="number">0x94</span>,<span class="number">0x9b</span>,<span class="number">0x1e</span>,<span class="number">0x87</span>,<span class="number">0xe9</span>,<span class="number">0xce</span>,<span class="number">0x55</span>,<span class="number">0x28</span>,<span class="number">0xdf</span>,</span><br><span class="line"><span class="number">0x8c</span>,<span class="number">0xa1</span>,<span class="number">0x89</span>,<span class="number">0x0d</span>,<span class="number">0xbf</span>,<span class="number">0xe6</span>,<span class="number">0x42</span>,<span class="number">0x68</span>,<span class="number">0x41</span>,<span class="number">0x99</span>,<span class="number">0x2d</span>,<span class="number">0x0f</span>,<span class="number">0xb0</span>,<span class="number">0x54</span>,<span class="number">0xbb</span>,<span class="number">0x16</span></span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="type">uint8_t</span> INV_SBOX[<span class="number">256</span>] = &#123;</span><br><span class="line"><span class="number">0x52</span>,<span class="number">0x09</span>,<span class="number">0x6a</span>,<span class="number">0xd5</span>,<span class="number">0x30</span>,<span class="number">0x36</span>,<span class="number">0xa5</span>,<span class="number">0x38</span>,<span class="number">0xbf</span>,<span class="number">0x40</span>,<span class="number">0xa3</span>,<span class="number">0x9e</span>,<span class="number">0x81</span>,<span class="number">0xf3</span>,<span class="number">0xd7</span>,<span class="number">0xfb</span>,</span><br><span class="line"><span class="number">0x7c</span>,<span class="number">0xe3</span>,<span class="number">0x39</span>,<span class="number">0x82</span>,<span class="number">0x9b</span>,<span class="number">0x2f</span>,<span class="number">0xff</span>,<span class="number">0x87</span>,<span class="number">0x34</span>,<span class="number">0x8e</span>,<span class="number">0x43</span>,<span class="number">0x44</span>,<span class="number">0xc4</span>,<span class="number">0xde</span>,<span class="number">0xe9</span>,<span class="number">0xcb</span>,</span><br><span class="line"><span class="number">0x54</span>,<span class="number">0x7b</span>,<span class="number">0x94</span>,<span class="number">0x32</span>,<span class="number">0xa6</span>,<span class="number">0xc2</span>,<span class="number">0x23</span>,<span class="number">0x3d</span>,<span class="number">0xee</span>,<span class="number">0x4c</span>,<span class="number">0x95</span>,<span class="number">0x0b</span>,<span class="number">0x42</span>,<span class="number">0xfa</span>,<span class="number">0xc3</span>,<span class="number">0x4e</span>,</span><br><span class="line"><span class="number">0x08</span>,<span class="number">0x2e</span>,<span class="number">0xa1</span>,<span class="number">0x66</span>,<span class="number">0x28</span>,<span class="number">0xd9</span>,<span class="number">0x24</span>,<span class="number">0xb2</span>,<span class="number">0x76</span>,<span class="number">0x5b</span>,<span class="number">0xa2</span>,<span class="number">0x49</span>,<span class="number">0x6d</span>,<span class="number">0x8b</span>,<span class="number">0xd1</span>,<span class="number">0x25</span>,</span><br><span class="line"><span class="number">0x72</span>,<span class="number">0xf8</span>,<span class="number">0xf6</span>,<span class="number">0x64</span>,<span class="number">0x86</span>,<span class="number">0x68</span>,<span class="number">0x98</span>,<span class="number">0x16</span>,<span class="number">0xd4</span>,<span class="number">0xa4</span>,<span class="number">0x5c</span>,<span class="number">0xcc</span>,<span class="number">0x5d</span>,<span class="number">0x65</span>,<span class="number">0xb6</span>,<span class="number">0x92</span>,</span><br><span class="line"><span class="number">0x6c</span>,<span class="number">0x70</span>,<span class="number">0x48</span>,<span class="number">0x50</span>,<span class="number">0xfd</span>,<span class="number">0xed</span>,<span class="number">0xb9</span>,<span class="number">0xda</span>,<span class="number">0x5e</span>,<span class="number">0x15</span>,<span class="number">0x46</span>,<span class="number">0x57</span>,<span class="number">0xa7</span>,<span class="number">0x8d</span>,<span class="number">0x9d</span>,<span class="number">0x84</span>,</span><br><span class="line"><span class="number">0x90</span>,<span class="number">0xd8</span>,<span class="number">0xab</span>,<span class="number">0x00</span>,<span class="number">0x8c</span>,<span class="number">0xbc</span>,<span class="number">0xd3</span>,<span class="number">0x0a</span>,<span class="number">0xf7</span>,<span class="number">0xe4</span>,<span class="number">0x58</span>,<span class="number">0x05</span>,<span class="number">0xb8</span>,<span class="number">0xb3</span>,<span class="number">0x45</span>,<span class="number">0x06</span>,</span><br><span class="line"><span class="number">0xd0</span>,<span class="number">0x2c</span>,<span class="number">0x1e</span>,<span class="number">0x8f</span>,<span class="number">0xca</span>,<span class="number">0x3f</span>,<span class="number">0x0f</span>,<span class="number">0x02</span>,<span class="number">0xc1</span>,<span class="number">0xaf</span>,<span class="number">0xbd</span>,<span class="number">0x03</span>,<span class="number">0x01</span>,<span class="number">0x13</span>,<span class="number">0x8a</span>,<span class="number">0x6b</span>,</span><br><span class="line"><span class="number">0x3a</span>,<span class="number">0x91</span>,<span class="number">0x11</span>,<span class="number">0x41</span>,<span class="number">0x4f</span>,<span class="number">0x67</span>,<span class="number">0xdc</span>,<span class="number">0xea</span>,<span class="number">0x97</span>,<span class="number">0xf2</span>,<span class="number">0xcf</span>,<span class="number">0xce</span>,<span class="number">0xf0</span>,<span class="number">0xb4</span>,<span class="number">0xe6</span>,<span class="number">0x73</span>,</span><br><span class="line"><span class="number">0x96</span>,<span class="number">0xac</span>,<span class="number">0x74</span>,<span class="number">0x22</span>,<span class="number">0xe7</span>,<span class="number">0xad</span>,<span class="number">0x35</span>,<span class="number">0x85</span>,<span class="number">0xe2</span>,<span class="number">0xf9</span>,<span class="number">0x37</span>,<span class="number">0xe8</span>,<span class="number">0x1c</span>,<span class="number">0x75</span>,<span class="number">0xdf</span>,<span class="number">0x6e</span>,</span><br><span class="line"><span class="number">0x47</span>,<span class="number">0xf1</span>,<span class="number">0x1a</span>,<span class="number">0x71</span>,<span class="number">0x1d</span>,<span class="number">0x29</span>,<span class="number">0xc5</span>,<span class="number">0x89</span>,<span class="number">0x6f</span>,<span class="number">0xb7</span>,<span class="number">0x62</span>,<span class="number">0x0e</span>,<span class="number">0xaa</span>,<span class="number">0x18</span>,<span class="number">0xbe</span>,<span class="number">0x1b</span>,</span><br><span class="line"><span class="number">0xfc</span>,<span class="number">0x56</span>,<span class="number">0x3e</span>,<span class="number">0x4b</span>,<span class="number">0xc6</span>,<span class="number">0xd2</span>,<span class="number">0x79</span>,<span class="number">0x20</span>,<span class="number">0x9a</span>,<span class="number">0xdb</span>,<span class="number">0xc0</span>,<span class="number">0xfe</span>,<span class="number">0x78</span>,<span class="number">0xcd</span>,<span class="number">0x5a</span>,<span class="number">0xf4</span>,</span><br><span class="line"><span class="number">0x1f</span>,<span class="number">0xdd</span>,<span class="number">0xa8</span>,<span class="number">0x33</span>,<span class="number">0x88</span>,<span class="number">0x07</span>,<span class="number">0xc7</span>,<span class="number">0x31</span>,<span class="number">0xb1</span>,<span class="number">0x12</span>,<span class="number">0x10</span>,<span class="number">0x59</span>,<span class="number">0x27</span>,<span class="number">0x80</span>,<span class="number">0xec</span>,<span class="number">0x5f</span>,</span><br><span class="line"><span class="number">0x60</span>,<span class="number">0x51</span>,<span class="number">0x7f</span>,<span class="number">0xa9</span>,<span class="number">0x19</span>,<span class="number">0xb5</span>,<span class="number">0x4a</span>,<span class="number">0x0d</span>,<span class="number">0x2d</span>,<span class="number">0xe5</span>,<span class="number">0x7a</span>,<span class="number">0x9f</span>,<span class="number">0x93</span>,<span class="number">0xc9</span>,<span class="number">0x9c</span>,<span class="number">0xef</span>,</span><br><span class="line"><span class="number">0xa0</span>,<span class="number">0xe0</span>,<span class="number">0x3b</span>,<span class="number">0x4d</span>,<span class="number">0xae</span>,<span class="number">0x2a</span>,<span class="number">0xf5</span>,<span class="number">0xb0</span>,<span class="number">0xc8</span>,<span class="number">0xeb</span>,<span class="number">0xbb</span>,<span class="number">0x3c</span>,<span class="number">0x83</span>,<span class="number">0x53</span>,<span class="number">0x99</span>,<span class="number">0x61</span>,</span><br><span class="line"><span class="number">0x17</span>,<span class="number">0x2b</span>,<span class="number">0x04</span>,<span class="number">0x7e</span>,<span class="number">0xba</span>,<span class="number">0x77</span>,<span class="number">0xd6</span>,<span class="number">0x26</span>,<span class="number">0xe1</span>,<span class="number">0x69</span>,<span class="number">0x14</span>,<span class="number">0x63</span>,<span class="number">0x55</span>,<span class="number">0x21</span>,<span class="number">0x0c</span>,<span class="number">0x7d</span></span><br><span class="line">&#125;;</span><br><span class="line"><span class="type">static</span> <span class="type">const</span> <span class="type">uint8_t</span> RCON[<span class="number">16</span>] = &#123;<span class="number">0x00</span>,<span class="number">0x01</span>,<span class="number">0x02</span>,<span class="number">0x04</span>,<span class="number">0x08</span>,<span class="number">0x10</span>,<span class="number">0x20</span>,<span class="number">0x40</span>,<span class="number">0x80</span>,<span class="number">0x1b</span>,<span class="number">0x36</span>,<span class="number">0x6c</span>,<span class="number">0xd8</span>,<span class="number">0xab</span>,<span class="number">0x4d</span>,<span class="number">0x9a</span>&#125;;</span><br><span class="line"></span><br><span class="line"><span class="keyword">using</span> State = array&lt;array&lt;<span class="type">uint8_t</span>,<span class="number">4</span>&gt;,<span class="number">4</span>&gt;;</span><br><span class="line"></span><br><span class="line"><span class="function">vector&lt;<span class="type">uint8_t</span>&gt; <span class="title">hexToBytes</span><span class="params">(<span class="type">const</span> string &amp;s)</span> </span>&#123;</span><br><span class="line">    vector&lt;<span class="type">uint8_t</span>&gt; out;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">size_t</span> i=<span class="number">0</span>; i&lt;s.<span class="built_in">size</span>(); i+=<span class="number">2</span>) out.<span class="built_in">push_back</span>((<span class="type">uint8_t</span>)<span class="built_in">stoi</span>(s.<span class="built_in">substr</span>(i,<span class="number">2</span>), <span class="literal">nullptr</span>, <span class="number">16</span>));</span><br><span class="line">    <span class="keyword">return</span> out;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">string <span class="title">bytesToHex</span><span class="params">(<span class="type">const</span> vector&lt;<span class="type">uint8_t</span>&gt; &amp;v)</span> </span>&#123;</span><br><span class="line">    stringstream ss; ss &lt;&lt; hex &lt;&lt; <span class="built_in">setfill</span>(<span class="string">&#x27;0&#x27;</span>) &lt;&lt; nouppercase;</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">auto</span> b: v) ss &lt;&lt; <span class="built_in">setw</span>(<span class="number">2</span>) &lt;&lt; (<span class="type">int</span>)b;</span><br><span class="line">    <span class="keyword">return</span> ss.<span class="built_in">str</span>();</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">State <span class="title">bytesToState</span><span class="params">(<span class="type">const</span> vector&lt;<span class="type">uint8_t</span>&gt; &amp;b)</span> </span>&#123;</span><br><span class="line">    State s&#123;&#125;;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) <span class="keyword">for</span> (<span class="type">int</span> r=<span class="number">0</span>;r&lt;<span class="number">4</span>;r++) s[r][c]=b[<span class="number">4</span>*c+r];</span><br><span class="line">    <span class="keyword">return</span> s;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">vector&lt;<span class="type">uint8_t</span>&gt; <span class="title">stateToBytes</span><span class="params">(<span class="type">const</span> State &amp;s)</span> </span>&#123;</span><br><span class="line">    vector&lt;<span class="type">uint8_t</span>&gt; b;</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) <span class="keyword">for</span> (<span class="type">int</span> r=<span class="number">0</span>;r&lt;<span class="number">4</span>;r++) b.<span class="built_in">push_back</span>(s[r][c]);</span><br><span class="line">    <span class="keyword">return</span> b;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">string <span class="title">stateHex</span><span class="params">(<span class="type">const</span> State &amp;s)</span> </span>&#123; <span class="keyword">return</span> <span class="built_in">bytesToHex</span>(<span class="built_in">stateToBytes</span>(s)); &#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">uint8_t</span> <span class="title">gmul</span><span class="params">(<span class="type">uint8_t</span> a, <span class="type">uint8_t</span> b)</span> </span>&#123;</span><br><span class="line">    <span class="type">uint8_t</span> p=<span class="number">0</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;<span class="number">8</span>;i++) &#123;</span><br><span class="line">        <span class="keyword">if</span>(b&amp;<span class="number">1</span>) p^=a;</span><br><span class="line">        <span class="type">bool</span> hi=a&amp;<span class="number">0x80</span>;</span><br><span class="line">        a &lt;&lt;= <span class="number">1</span>;</span><br><span class="line">        <span class="keyword">if</span>(hi) a ^= <span class="number">0x1b</span>;</span><br><span class="line">        b &gt;&gt;= <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> p;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">State <span class="title">addRoundKey</span><span class="params">(<span class="type">const</span> State &amp;a, <span class="type">const</span> State &amp;k)</span> </span>&#123;</span><br><span class="line">    State o&#123;&#125;; <span class="keyword">for</span>(<span class="type">int</span> r=<span class="number">0</span>;r&lt;<span class="number">4</span>;r++) <span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) o[r][c]=a[r][c]^k[r][c]; <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">State <span class="title">subBytes</span><span class="params">(<span class="type">const</span> State &amp;s)</span> </span>&#123;</span><br><span class="line">    State o&#123;&#125;; <span class="keyword">for</span>(<span class="type">int</span> r=<span class="number">0</span>;r&lt;<span class="number">4</span>;r++) <span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) o[r][c]=SBOX[s[r][c]]; <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">State <span class="title">invSubBytes</span><span class="params">(<span class="type">const</span> State &amp;s)</span> </span>&#123;</span><br><span class="line">    State o&#123;&#125;; <span class="keyword">for</span>(<span class="type">int</span> r=<span class="number">0</span>;r&lt;<span class="number">4</span>;r++) <span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) o[r][c]=INV_SBOX[s[r][c]]; <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">State <span class="title">shiftRows</span><span class="params">(<span class="type">const</span> State &amp;s)</span> </span>&#123;</span><br><span class="line">    State o&#123;&#125;;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> r=<span class="number">0</span>;r&lt;<span class="number">4</span>;r++) <span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) o[r][c]=s[r][(c+r)%<span class="number">4</span>];</span><br><span class="line">    <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">State <span class="title">invShiftRows</span><span class="params">(<span class="type">const</span> State &amp;s)</span> </span>&#123;</span><br><span class="line">    State o&#123;&#125;;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> r=<span class="number">0</span>;r&lt;<span class="number">4</span>;r++) <span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) o[r][(c+r)%<span class="number">4</span>]=s[r][c];</span><br><span class="line">    <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">State <span class="title">mixColumns</span><span class="params">(<span class="type">const</span> State &amp;s)</span> </span>&#123;</span><br><span class="line">    State o&#123;&#125;;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) &#123;</span><br><span class="line">        <span class="type">uint8_t</span> a0=s[<span class="number">0</span>][c], a1=s[<span class="number">1</span>][c], a2=s[<span class="number">2</span>][c], a3=s[<span class="number">3</span>][c];</span><br><span class="line">        o[<span class="number">0</span>][c]=<span class="built_in">gmul</span>(a0,<span class="number">2</span>)^<span class="built_in">gmul</span>(a1,<span class="number">3</span>)^a2^a3;</span><br><span class="line">        o[<span class="number">1</span>][c]=a0^<span class="built_in">gmul</span>(a1,<span class="number">2</span>)^<span class="built_in">gmul</span>(a2,<span class="number">3</span>)^a3;</span><br><span class="line">        o[<span class="number">2</span>][c]=a0^a1^<span class="built_in">gmul</span>(a2,<span class="number">2</span>)^<span class="built_in">gmul</span>(a3,<span class="number">3</span>);</span><br><span class="line">        o[<span class="number">3</span>][c]=<span class="built_in">gmul</span>(a0,<span class="number">3</span>)^a1^a2^<span class="built_in">gmul</span>(a3,<span class="number">2</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br><span class="line"><span class="function">State <span class="title">invMixColumns</span><span class="params">(<span class="type">const</span> State &amp;s)</span> </span>&#123;</span><br><span class="line">    State o&#123;&#125;;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> c=<span class="number">0</span>;c&lt;<span class="number">4</span>;c++) &#123;</span><br><span class="line">        <span class="type">uint8_t</span> a0=s[<span class="number">0</span>][c], a1=s[<span class="number">1</span>][c], a2=s[<span class="number">2</span>][c], a3=s[<span class="number">3</span>][c];</span><br><span class="line">        o[<span class="number">0</span>][c]=<span class="built_in">gmul</span>(a0,<span class="number">14</span>)^<span class="built_in">gmul</span>(a1,<span class="number">11</span>)^<span class="built_in">gmul</span>(a2,<span class="number">13</span>)^<span class="built_in">gmul</span>(a3,<span class="number">9</span>);</span><br><span class="line">        o[<span class="number">1</span>][c]=<span class="built_in">gmul</span>(a0,<span class="number">9</span>)^<span class="built_in">gmul</span>(a1,<span class="number">14</span>)^<span class="built_in">gmul</span>(a2,<span class="number">11</span>)^<span class="built_in">gmul</span>(a3,<span class="number">13</span>);</span><br><span class="line">        o[<span class="number">2</span>][c]=<span class="built_in">gmul</span>(a0,<span class="number">13</span>)^<span class="built_in">gmul</span>(a1,<span class="number">9</span>)^<span class="built_in">gmul</span>(a2,<span class="number">14</span>)^<span class="built_in">gmul</span>(a3,<span class="number">11</span>);</span><br><span class="line">        o[<span class="number">3</span>][c]=<span class="built_in">gmul</span>(a0,<span class="number">11</span>)^<span class="built_in">gmul</span>(a1,<span class="number">13</span>)^<span class="built_in">gmul</span>(a2,<span class="number">9</span>)^<span class="built_in">gmul</span>(a3,<span class="number">14</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> o;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">vector&lt;State&gt; <span class="title">keyExpansion</span><span class="params">(<span class="type">const</span> vector&lt;<span class="type">uint8_t</span>&gt; &amp;key)</span> </span>&#123;</span><br><span class="line">    <span class="type">int</span> Nk = (<span class="type">int</span>)key.<span class="built_in">size</span>()/<span class="number">4</span>;</span><br><span class="line">    <span class="type">int</span> Nr = Nk + <span class="number">6</span>;</span><br><span class="line">    vector&lt;array&lt;<span class="type">uint8_t</span>,4&gt;&gt; w;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">0</span>;i&lt;Nk;i++) w.<span class="built_in">push_back</span>(&#123;key[<span class="number">4</span>*i],key[<span class="number">4</span>*i<span class="number">+1</span>],key[<span class="number">4</span>*i<span class="number">+2</span>],key[<span class="number">4</span>*i<span class="number">+3</span>]&#125;);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> i=Nk;i&lt;<span class="number">4</span>*(Nr<span class="number">+1</span>);i++) &#123;</span><br><span class="line">        <span class="keyword">auto</span> temp = w[i<span class="number">-1</span>];</span><br><span class="line">        <span class="keyword">if</span>(i%Nk==<span class="number">0</span>) &#123;</span><br><span class="line">            temp = &#123;temp[<span class="number">1</span>],temp[<span class="number">2</span>],temp[<span class="number">3</span>],temp[<span class="number">0</span>]&#125;;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">auto</span> &amp;x:temp) x=SBOX[x];</span><br><span class="line">            temp[<span class="number">0</span>] ^= RCON[i/Nk];</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span>(Nk&gt;<span class="number">6</span> &amp;&amp; i%Nk==<span class="number">4</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span>(<span class="keyword">auto</span> &amp;x:temp) x=SBOX[x];</span><br><span class="line">        &#125;</span><br><span class="line">        array&lt;<span class="type">uint8_t</span>,4&gt; nw&#123;&#125;;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;<span class="number">4</span>;j++) nw[j]=w[i-Nk][j]^temp[j];</span><br><span class="line">        w.<span class="built_in">push_back</span>(nw);</span><br><span class="line">    &#125;</span><br><span class="line">    vector&lt;State&gt; rks;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> r=<span class="number">0</span>;r&lt;=Nr;r++) &#123;</span><br><span class="line">        vector&lt;<span class="type">uint8_t</span>&gt; rb;</span><br><span class="line">        <span class="keyword">for</span>(<span class="type">int</span> i=<span class="number">4</span>*r;i&lt;<span class="number">4</span>*r<span class="number">+4</span>;i++) <span class="keyword">for</span>(<span class="type">int</span> j=<span class="number">0</span>;j&lt;<span class="number">4</span>;j++) rb.<span class="built_in">push_back</span>(w[i][j]);</span><br><span class="line">        rks.<span class="built_in">push_back</span>(<span class="built_in">bytesToState</span>(rb));</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> rks;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">string <span class="title">encryptBlock</span><span class="params">(<span class="type">const</span> string &amp;ptHex, <span class="type">const</span> string &amp;keyHex, vector&lt;State&gt;* savedKeys=<span class="literal">nullptr</span>)</span> </span>&#123;</span><br><span class="line">    vector&lt;<span class="type">uint8_t</span>&gt; pt=<span class="built_in">hexToBytes</span>(ptHex), key=<span class="built_in">hexToBytes</span>(keyHex);</span><br><span class="line">    <span class="type">int</span> Nr=(<span class="type">int</span>)key.<span class="built_in">size</span>()/<span class="number">4</span><span class="number">+6</span>;</span><br><span class="line">    <span class="keyword">auto</span> rks=<span class="built_in">keyExpansion</span>(key);</span><br><span class="line">    <span class="keyword">if</span>(savedKeys) *savedKeys = rks;</span><br><span class="line">    State s=<span class="built_in">bytesToState</span>(pt);</span><br><span class="line">    s=<span class="built_in">addRoundKey</span>(s,rks[<span class="number">0</span>]);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> r=<span class="number">1</span>;r&lt;Nr;r++) s=<span class="built_in">addRoundKey</span>(<span class="built_in">mixColumns</span>(<span class="built_in">shiftRows</span>(<span class="built_in">subBytes</span>(s))),rks[r]);</span><br><span class="line">    s=<span class="built_in">addRoundKey</span>(<span class="built_in">shiftRows</span>(<span class="built_in">subBytes</span>(s)),rks[Nr]);</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">stateHex</span>(s);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">string <span class="title">decryptBlock</span><span class="params">(<span class="type">const</span> string &amp;ctHex, <span class="type">const</span> string &amp;keyHex)</span> </span>&#123;</span><br><span class="line">    vector&lt;<span class="type">uint8_t</span>&gt; ct=<span class="built_in">hexToBytes</span>(ctHex), key=<span class="built_in">hexToBytes</span>(keyHex);</span><br><span class="line">    <span class="type">int</span> Nr=(<span class="type">int</span>)key.<span class="built_in">size</span>()/<span class="number">4</span><span class="number">+6</span>;</span><br><span class="line">    <span class="keyword">auto</span> rks=<span class="built_in">keyExpansion</span>(key);</span><br><span class="line">    State s=<span class="built_in">bytesToState</span>(ct);</span><br><span class="line">    s=<span class="built_in">addRoundKey</span>(s,rks[Nr]);</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">int</span> r=Nr<span class="number">-1</span>;r&gt;=<span class="number">1</span>;r--) s=<span class="built_in">invMixColumns</span>(<span class="built_in">addRoundKey</span>(<span class="built_in">invSubBytes</span>(<span class="built_in">invShiftRows</span>(s)),rks[r]));</span><br><span class="line">    s=<span class="built_in">addRoundKey</span>(<span class="built_in">invSubBytes</span>(<span class="built_in">invShiftRows</span>(s)),rks[<span class="number">0</span>]);</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">stateHex</span>(s);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">Test</span> &#123; string type, pt, key; &#125;;</span><br><span class="line">    vector&lt;Test&gt; tests = &#123;</span><br><span class="line">        &#123;<span class="string">&quot;AES-128&quot;</span>,<span class="string">&quot;0123456789abcdeffedcba9876543210&quot;</span>,<span class="string">&quot;0f1571c947d9e8590cb7add6af7f6798&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&quot;AES-128&quot;</span>,<span class="string">&quot;1b5e8b0f1bc78d238064826704830cdb&quot;</span>,<span class="string">&quot;3475bd76fa040b73f521ffcd9de93f24&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&quot;AES-128&quot;</span>,<span class="string">&quot;41b267bc5905f0a3cd691b3ddaee149d&quot;</span>,<span class="string">&quot;2b24424b9fed596659842a4d0b007c61&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&quot;AES-192&quot;</span>,<span class="string">&quot;123456789012345678901234567890ab&quot;</span>,<span class="string">&quot;1234567890123456789012345678901234567890abcdef01&quot;</span>&#125;,</span><br><span class="line">        &#123;<span class="string">&quot;AES-256&quot;</span>,<span class="string">&quot;123456789012345678901234567890ab&quot;</span>,<span class="string">&quot;123456789012345678901234567890123456789012345678901234567890abcd&quot;</span>&#125;</span><br><span class="line">    &#125;;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;AES encrypt/decrypt test result\n&quot;</span>;</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;--------------------------------\n&quot;</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">size_t</span> i=<span class="number">0</span>;i&lt;tests.<span class="built_in">size</span>();i++) &#123;</span><br><span class="line">        string ct=<span class="built_in">encryptBlock</span>(tests[i].pt, tests[i].key);</span><br><span class="line">        string dec=<span class="built_in">decryptBlock</span>(ct, tests[i].key);</span><br><span class="line">        cout &lt;&lt; tests[i].type &lt;&lt; <span class="string">&quot; group &quot;</span> &lt;&lt; (i<span class="number">+1</span>) &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;ciphertext : &quot;</span> &lt;&lt; ct &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;decrypted  : &quot;</span> &lt;&lt; dec &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">        cout &lt;&lt; <span class="string">&quot;check      : &quot;</span> &lt;&lt; (dec==tests[i].pt ? <span class="string">&quot;OK&quot;</span> : <span class="string">&quot;FAIL&quot;</span>) &lt;&lt; <span class="string">&quot;\n\n&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    vector&lt;State&gt; rks;</span><br><span class="line">    <span class="built_in">encryptBlock</span>(tests[<span class="number">0</span>].pt, tests[<span class="number">0</span>].key, &amp;rks);</span><br><span class="line">    cout &lt;&lt; <span class="string">&quot;AES-128 group 1 round keys:\n&quot;</span>;</span><br><span class="line">    <span class="keyword">for</span>(<span class="type">size_t</span> i=<span class="number">0</span>;i&lt;rks.<span class="built_in">size</span>();i++) cout &lt;&lt; <span class="built_in">setw</span>(<span class="number">2</span>) &lt;&lt; i &lt;&lt; <span class="string">&quot; : &quot;</span> &lt;&lt; <span class="built_in">stateHex</span>(rks[i]) &lt;&lt; <span class="string">&quot;\n&quot;</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 
+		</div>
+		<div class="meta split">
+			<time class="post-date" datetime="2026-03-19T03:55:44.000Z" itemprop="datePublished">2026-03-19</time>
+		</div>
 	</div>
-	<div class="meta split">
-		<time class="post-date" datetime="2026-03-19T03:55:44.000Z" itemprop="datePublished">2026-03-19</time>
-	</div>
+	
+		<aside class="post-toc">
+			<div class="post-toc-title">&#30446;&#24405;</div>
+			<details class="toc-node level-1"><summary><span>AES</span><a href="#AES" aria-label="Jump to AES">#</a></summary><div class="toc-children"><a class="toc-link level-2" href="#概述">概述</a><a class="toc-link level-2" href="#整体架构">整体架构</a><a class="toc-link level-2" href="#明文处理">明文处理</a><a class="toc-link level-2" href="#密钥处理">密钥处理</a><a class="toc-link level-2" href="#初始轮密钥加">初始轮密钥加</a><a class="toc-link level-2" href="#字节代换（SubBytes）">字节代换（SubBytes）</a><a class="toc-link level-2" href="#行移位（ShiftRows）">行移位（ShiftRows）</a><a class="toc-link level-2" href="#列混淆（MixColumns）">列混淆（MixColumns）</a><a class="toc-link level-2" href="#轮密钥加（AddRoundKey）">轮密钥加（AddRoundKey）</a><a class="toc-link level-2" href="#总结">总结</a><a class="toc-link level-2" href="#AES工作模式">AES工作模式</a><a class="toc-link level-2" href="#ECB">ECB</a><a class="toc-link level-2" href="#CBC">CBC</a><a class="toc-link level-2" href="#CTR">CTR</a></div></details>
+		</aside>
+	
 </article>
 
 <!-- comments -->
@@ -977,28 +1356,10 @@ C_i = P_i \oplus E_K(\mathrm{CTR}_i)
 
 
 
-<div class="fat-footer">
-	<div class="wrapper">
-		<div class="layout layout--center">
-			<div class="layout__item palm-mb">
-				<div class="media">
-					<img class="headimg" src='/images/avatar.gif' alt='ksenr'>
-					<div class="media__body">
-						<h4>ksenrii</h4>
-						<p class='site-description'>淇℃伅瀹夊叏瀛︿範绗旇</p>
-					</div>
-				</div>
-				<div class="author-contact">
-					<ul>
-						
-					</ul>
-				</div>
-			</div>
-		</div>
-	</div>
-</div>
+
+
 <footer class="footer" role="contentinfo">
-	<div class="wrapper wrapper--wide split split--responsive">
+	<div class="footer-inner">
 		<span>&copy; 2026 ksenr</span>
 	</div>
 </footer>
@@ -1016,6 +1377,54 @@ C_i = P_i \oplus E_K(\mathrm{CTR}_i)
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script>
 (function () {
+  var progress = document.createElement("div");
+  progress.className = "reading-progress";
+  document.body.appendChild(progress);
+
+  function updateProgress() {
+    var doc = document.documentElement;
+    var max = doc.scrollHeight - window.innerHeight;
+    var value = max > 0 ? window.scrollY / max : 0;
+    progress.style.transform = "scaleX(" + Math.max(0, Math.min(1, value)) + ")";
+  }
+
+  window.addEventListener("scroll", updateProgress, { passive: true });
+  window.addEventListener("resize", updateProgress);
+  updateProgress();
+
+  function createClickEffect(x, y) {
+    var colors = ["#35bfab", "#1fc9e7", "#f3b95f", "#ff7b9c"];
+    var ripple = document.createElement("span");
+    ripple.className = "click-ripple";
+    ripple.style.setProperty("--x", x + "px");
+    ripple.style.setProperty("--y", y + "px");
+    document.body.appendChild(ripple);
+    setTimeout(function () {
+      ripple.remove();
+    }, 620);
+
+    for (var i = 0; i < 10; i += 1) {
+      var particle = document.createElement("span");
+      var angle = (Math.PI * 2 * i) / 10;
+      var distance = 24 + Math.random() * 28;
+      particle.className = "click-particle";
+      particle.style.setProperty("--x", x + "px");
+      particle.style.setProperty("--y", y + "px");
+      particle.style.setProperty("--dx", Math.cos(angle) * distance + "px");
+      particle.style.setProperty("--dy", Math.sin(angle) * distance + "px");
+      particle.style.setProperty("--particle-color", colors[i % colors.length]);
+      document.body.appendChild(particle);
+      setTimeout(function (node) {
+        node.remove();
+      }, 720, particle);
+    }
+  }
+
+  document.addEventListener("pointerdown", function (event) {
+    if (event.button !== 0 && event.pointerType === "mouse") return;
+    createClickEffect(event.clientX, event.clientY);
+  });
+
   function getCodeText(block) {
     var code = block.querySelector(".code pre") || block.querySelector("pre");
     return code ? code.innerText.replace(/\n$/, "") : "";
@@ -1030,16 +1439,16 @@ C_i = P_i \oplus E_K(\mathrm{CTR}_i)
 
     var toolbar = document.createElement("div");
     toolbar.className = "code-toolbar";
-    toolbar.innerHTML = "<span>" + language.toUpperCase() + "</span><button class=\"code-copy-button\" type=\"button\">澶嶅埗</button>";
+    toolbar.innerHTML = "<span>" + language.toUpperCase() + "</span><button class=\"code-copy-button\" type=\"button\">Copy</button>";
     block.insertBefore(toolbar, block.firstChild);
 
     toolbar.querySelector("button").addEventListener("click", function () {
       var button = this;
       var text = getCodeText(block);
       var copied = function () {
-        button.textContent = "宸插鍒?;
+        button.textContent = "Copied";
         setTimeout(function () {
-          button.textContent = "澶嶅埗";
+          button.textContent = "Copy";
         }, 1500);
       };
 
@@ -1060,45 +1469,89 @@ C_i = P_i \oplus E_K(\mathrm{CTR}_i)
     });
   });
 
-  var article = document.querySelector("article");
-  var body = article && article.querySelector(".post-body");
-  if (!article || !body || article.querySelector(".post-toc")) return;
+  var searchForm = document.querySelector(".js-search");
+  var searchInput = searchForm && searchForm.querySelector(".text-input");
+  var searchResults = searchForm && searchForm.querySelector(".search-results");
+  var searchIndex = [];
 
-  var headings = Array.from(body.querySelectorAll("h2, h3, h4")).filter(function (heading) {
-    return heading.textContent.trim().length > 0;
-  });
-  if (headings.length < 2) return;
-
-  var nav = document.createElement("aside");
-  nav.className = "post-toc";
-  nav.innerHTML = '<div class="post-toc-title">鐩綍</div>';
-
-  headings.forEach(function (heading, index) {
-    if (!heading.id) {
-      heading.id = "toc-heading-" + index;
+  function renderSearch(query) {
+    if (!searchResults) return;
+    var q = query.trim().toLowerCase();
+    if (!q) {
+      searchResults.innerHTML = '<p class="search-empty">Type to search posts.</p>';
+      return;
     }
-    var link = document.createElement("a");
-    link.href = "#" + encodeURIComponent(heading.id);
-    link.className = "level-" + heading.tagName.slice(1);
-    link.textContent = heading.textContent.trim();
-    nav.appendChild(link);
-  });
 
-  article.insertBefore(nav, body);
+    var results = searchIndex.filter(function (item) {
+      return (item.title + " " + item.text).toLowerCase().indexOf(q) !== -1;
+    }).slice(0, 12);
 
-  var links = Array.from(nav.querySelectorAll("a"));
-  var observer = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry) {
-      if (!entry.isIntersecting) return;
-      links.forEach(function (link) {
-        link.classList.toggle("is-active", decodeURIComponent(link.hash.slice(1)) === entry.target.id);
+    if (!results.length) {
+      searchResults.innerHTML = '<p class="search-empty">No matching posts.</p>';
+      return;
+    }
+
+    searchResults.innerHTML = results.map(function (item) {
+      return '<a class="search-result" href="' + item.path + '"><strong>' + item.title + '</strong><span>' + item.date + '</span></a>';
+    }).join("");
+  }
+
+  if (searchForm && searchInput) {
+    fetch("/search.json")
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        searchIndex = Array.isArray(data) ? data : [];
+        renderSearch(searchInput.value || "");
+      })
+      .catch(function () {
+        if (searchResults) searchResults.innerHTML = '<p class="search-empty">Search index is not ready.</p>';
       });
-    });
-  }, { rootMargin: "-20% 0px -70% 0px", threshold: 0 });
 
-  headings.forEach(function (heading) {
-    observer.observe(heading);
-  });
+    searchForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      renderSearch(searchInput.value || "");
+    });
+
+    searchInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        event.stopPropagation();
+        renderSearch(searchInput.value || "");
+      }
+    }, true);
+
+    searchInput.addEventListener("input", function () {
+      renderSearch(searchInput.value || "");
+    });
+  }
+
+  var links = Array.from(document.querySelectorAll(".post-toc a[href^='#']"));
+  if (links.length) {
+    var headings = links.map(function (link) {
+      return document.getElementById(decodeURIComponent(link.getAttribute("href").slice(1)));
+    }).filter(Boolean);
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        links.forEach(function (link) {
+          var active = decodeURIComponent(link.getAttribute("href").slice(1)) === entry.target.id;
+          link.classList.toggle("is-active", active);
+          if (active) {
+            var parent = link.closest("details");
+            while (parent) {
+              parent.open = true;
+              parent = parent.parentElement && parent.parentElement.closest("details");
+            }
+          }
+        });
+      });
+    }, { rootMargin: "-20% 0px -70% 0px", threshold: 0 });
+
+    headings.forEach(function (heading) {
+      observer.observe(heading);
+    });
+  }
 })();
 </script><!-- hexo injector body_end end --></body>
 </html>
