@@ -19,7 +19,11 @@
 }
 
 /* 2. 给页面主体配置背景图（新增！这是显示背景的关键） */
-body {
+body.page-home {
+  background-image: none !important;
+  background-color: #e4ecef !important;
+}
+body:not(.page-home) {
   /* 本地图片路径写法（推荐，优先用这个测试） */
   background-image: url('/images/2126e25907dfdf69707bae26ba6294c.png') !important;
   /* 若用生成的URL，替换上面这行：

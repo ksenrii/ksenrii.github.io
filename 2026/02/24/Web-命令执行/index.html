@@ -114,6 +114,50 @@ body::after {
   background: rgba(255, 255, 255, 0.76);
   box-shadow: 0 6px 24px rgba(20, 24, 30, 0.08);
 }
+body.page-home::before,
+body.page-home::after {
+  display: none !important;
+}
+html.page-home {
+  background: #e4ecef !important;
+}
+body.page-home header.site-header {
+  position: absolute !important;
+  left: auto !important;
+  right: 0 !important;
+  width: auto !important;
+  max-width: 48% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 18px 28px !important;
+  justify-content: flex-end !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+body.page-home .site-brand {
+  display: none !important;
+}
+body.page-home header.site-header.scrolled {
+  position: fixed !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.52) !important;
+  box-shadow: 0 6px 24px rgba(20, 24, 30, 0.08) !important;
+}
+body.page-home .site-brand,
+body.page-home .site-nav a {
+  color: rgba(255, 255, 255, 0.96) !important;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.38);
+}
+body.page-home header.site-header.scrolled .site-brand,
+body.page-home header.site-header.scrolled .site-nav a {
+  color: var(--ksenr-muted) !important;
+  text-shadow: none;
+}
 .site-brand {
   color: var(--ksenr-ink);
   font-weight: 700;
@@ -764,6 +808,7 @@ article {
 	</div>
 </footer>
 
+	
 	
 <script src="/js/lib.js"></script>
 

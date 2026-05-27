@@ -18,11 +18,12 @@
   ];
 
   if (cfg.count) {
-    var total = cfg.count;
-    var per = Math.max(1, Math.floor(total / LAYERS.length));
-    LAYERS.forEach(function (layer) {
-      layer.count = per;
-    });
+    var n = Math.max(1, cfg.count);
+    var c0 = Math.round(n * 0.45);
+    var c1 = Math.round(n * 0.35);
+    LAYERS[0].count = c0;
+    LAYERS[1].count = c1;
+    LAYERS[2].count = Math.max(0, n - c0 - c1);
   }
 
   // 亮背景上加深饱和度，避免花瓣「看不见」

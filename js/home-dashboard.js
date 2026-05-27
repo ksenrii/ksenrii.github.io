@@ -1,19 +1,13 @@
+/**
+ * 首页：热力图 tooltip + 可选 API 刷新昨日数据（热力图由 Hexo 服务端预渲染）
+ */
 (function () {
-  var CONFIG = window.HOME_CONFIG || {
-    displayStart: '2026-01-01',
-    statsSource: 'posts',
-    apiUrl: ''
-  };
-
+  var CONFIG = window.HOME_CONFIG || {};
   var tooltip = document.getElementById('home-tooltip');
+  var heatmap = document.getElementById('home-heatmap-grid');
 
-  function $(id) {
+  function byId(id) {
     return document.getElementById(id);
-  }
-
-  function parseDate(str) {
-    var parts = str.split('-').map(Number);
-    return new Date(parts[0], parts[1] - 1, parts[2]);
   }
 
   function formatDate(d) {
@@ -31,10 +25,8 @@
     return d;
   }
 
-  function getYesterday() {
-    var t = new Date();
-    t.setHours(0, 0, 0, 0);
-    return addDays(t, -1);
+  function getPostRecords() {
+    return Array.isArray(window.HOME_POST_STATS) ? window.HOME_POST_STATS : [];
   }
 
   function buildMap(records) {
@@ -48,69 +40,27 @@
     return map;
   }
 
-  /** 从 Hexo 构建时注入的 _posts 统计 */
-  function getPostRecords() {
-    return Array.isArray(window.HOME_POST_STATS) ? window.HOME_POST_STATS : [];
-  }
+  function updateYesterday(map) {
+    var elCount = byId('home-yesterday-count');
+    var elWords = byId('home-yesterday-words');
+    var elDate = byId('home-yesterday-date');
+    if (!elCount || !elWords || !elDate) return;
 
-  function fetchRecords() {
-    if (CONFIG.statsSource === 'posts') {
-      return Promise.resolve(getPostRecords());
-    }
-    if (!CONFIG.apiUrl) {
-      return Promise.resolve(getPostRecords());
-    }
-    return fetch(CONFIG.apiUrl)
-      .then(function (res) {
-        if (!res.ok) throw new Error(res.statusText);
-        return res.json();
-      })
-      .then(function (data) {
-        var list = Array.isArray(data) ? data : (data.data || data.records || []);
-        return list.length ? list : getPostRecords();
-      })
-      .catch(function () {
-        return getPostRecords();
-      });
-  }
-
-  function wordLevel(count, thresholds) {
-    if (!count || count <= 0) return 0;
-    for (var i = thresholds.length - 1; i >= 0; i--) {
-      if (count >= thresholds[i]) return i + 1;
-    }
-    return 1;
-  }
-
-  function computeThresholds(map) {
-    var values = [];
-    map.forEach(function (row) {
-      if (row.dailyNoteWordCount > 0) {
-        values.push(row.dailyNoteWordCount);
-      }
-    });
-    if (!values.length) return [1, 1, 1, 1];
-    values.sort(function (a, b) { return a - b; });
-    var q = function (p) {
-      return values[Math.min(Math.floor(values.length * p), values.length - 1)];
-    };
-    return [q(0.25), q(0.5), q(0.75), q(1)].map(function (v) {
-      return Math.max(1, v);
-    });
-  }
-
-  function renderYesterday(map) {
-    var yesterday = getYesterday();
+    var t = new Date();
+    t.setHours(0, 0, 0, 0);
+    var yesterday = addDays(t, -1);
     var key = formatDate(yesterday);
     var row = map.get(key);
-    $('yesterday-count').textContent = row ? row.dailyNoteCount : 0;
-    $('yesterday-words').textContent = row
+
+    elCount.textContent = row ? row.dailyNoteCount : 0;
+    elWords.textContent = row
       ? row.dailyNoteWordCount.toLocaleString()
-      : 0;
-    $('yesterday-date').textContent = '统计日期：' + key;
+      : '0';
+    elDate.textContent = '统计日期：' + key;
   }
 
   function showTooltip(e) {
+    if (!tooltip) return;
     var el = e.target;
     var count = Number(el.dataset.count);
     if (!count) {
@@ -124,65 +74,41 @@
   }
 
   function moveTooltip(e) {
+    if (!tooltip) return;
     tooltip.style.left = e.clientX + 'px';
     tooltip.style.top = (e.clientY - 12) + 'px';
   }
 
   function hideTooltip() {
-    tooltip.classList.remove('visible');
+    if (tooltip) tooltip.classList.remove('visible');
   }
 
-  function renderHeatmap(map) {
-    var container = $('heatmap');
-    if (!container) return;
-    container.innerHTML = '';
+  function bindHeatmapTooltips() {
+    if (!heatmap) return;
+    heatmap.querySelectorAll('.home-heatmap__cell:not(.is-future)').forEach(function (cell) {
+      cell.addEventListener('mouseenter', showTooltip);
+      cell.addEventListener('mousemove', moveTooltip);
+      cell.addEventListener('mouseleave', hideTooltip);
+    });
+  }
 
-    var displayStart = parseDate(CONFIG.displayStart);
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);
-    var thresholds = computeThresholds(map);
-
-    var startPad = displayStart.getDay();
-    var gridStart = addDays(displayStart, -startPad);
-    var endPad = 6 - today.getDay();
-    var gridEnd = addDays(today, endPad);
-    var fragment = document.createDocumentFragment();
-
-    for (var d = new Date(gridStart.getTime()); d <= gridEnd; d = addDays(d, 1)) {
-      var key = formatDate(d);
-      var inRange = d >= displayStart && d <= today;
-      var isFuture = d > today;
-      var row = map.get(key);
-      var words = row ? row.dailyNoteWordCount : 0;
-      var count = row ? row.dailyNoteCount : 0;
-      var level = inRange && count > 0 ? wordLevel(words, thresholds) : 0;
-
-      var cell = document.createElement('span');
-      cell.className = 'home-heatmap__cell';
-      if (isFuture) cell.classList.add('is-future');
-      cell.dataset.level = String(level);
-      cell.dataset.date = key;
-      cell.dataset.words = String(words);
-      cell.dataset.count = String(count);
-
-      if (inRange && !isFuture) {
-        cell.addEventListener('mouseenter', showTooltip);
-        cell.addEventListener('mousemove', moveTooltip);
-        cell.addEventListener('mouseleave', hideTooltip);
-      }
-
-      fragment.appendChild(cell);
-    }
-
-    container.appendChild(fragment);
+  function maybeRefreshFromApi() {
+    if (CONFIG.statsSource === 'posts' || !CONFIG.apiUrl) return;
+    fetch(CONFIG.apiUrl)
+      .then(function (res) {
+        if (!res.ok) throw new Error(res.statusText);
+        return res.json();
+      })
+      .then(function (data) {
+        var list = Array.isArray(data) ? data : (data.data || data.records || []);
+        if (list.length) updateYesterday(buildMap(list));
+      })
+      .catch(function () { /* 保留服务端渲染结果 */ });
   }
 
   function init() {
-    fetchRecords().then(function (records) {
-      var map = buildMap(records);
-      renderYesterday(map);
-      renderHeatmap(map);
-    });
+    bindHeatmapTooltips();
+    maybeRefreshFromApi();
   }
 
   if (document.readyState === 'loading') {

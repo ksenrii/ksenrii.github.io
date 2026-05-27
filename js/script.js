@@ -79,7 +79,7 @@
             });
         }
 
-        var bannerNode = .top-image;
+        var bannerNode = $('.top-image');
 
         if (bannerNode.data('enable') && !bannerNode.attr('style')) {
 
