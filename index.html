@@ -15,6 +15,12 @@
 
 
     
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+
+    
 <link rel="stylesheet" href="/js/google-code-prettify/tomorrow-night-eighties.min.css">
 
 
@@ -634,192 +640,131 @@ article {
 }
 </style><!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.1.1"></head>
 
-  <body>
+  <body class="page-home">
 
 <header class="site-header">
 	<a class="site-brand" href="/" aria-label="Home">ksenr</a>
 	<nav class="site-nav" aria-label="Main navigation">
 		<a href="/">Home</a>
-		<button class="site-nav-button js-toggle-search" type="button">Search</button>
 		<a href="/timeline/">Archive</a>
 		<a href="/daily-pause/">Daily Pause</a>
 	</nav>
-	<form class="js-search search-form search-form--modal" role="search">
-	<div class="search-form__inner">
-		<div class="search-panel">
-			<label class="search-label" for="site-search-input">Search</label>
-			<input id="site-search-input" class="text-input" placeholder="Search posts..." type="search" autocomplete="off">
-			<div class="search-results" aria-live="polite"></div>
-		</div>
-	</div>
-</form>
-
 </header>
 
-<div class="m-header ">
-	<section id="hero1" class="hero">
-		<div class="inner">
-		</div>
-	</section>
-	
-		<figure class="top-image" style='background-image: url(/banner/4.jpg)' data-enable=false></figure>
-	
-</div>
 
 
-<!--文章列表-->
-<div class="wrapper">
-  
-    <ul class="posts-list mb+ js-posts">
+
+<script>
+  window.HOME_CONFIG = {
+    displayStart: '2026-01-01',
+    statsSource: 'posts',
+    apiUrl: '/api/nodeCount/list'
+  };
+  window.HOME_POST_STATS = [{"todayTime":"2026-02-05","dailyNoteCount":1,"dailyNoteWordCount":39160},{"todayTime":"2026-02-06","dailyNoteCount":1,"dailyNoteWordCount":494},{"todayTime":"2026-02-17","dailyNoteCount":1,"dailyNoteWordCount":3869},{"todayTime":"2026-02-24","dailyNoteCount":1,"dailyNoteWordCount":1553},{"todayTime":"2026-03-01","dailyNoteCount":1,"dailyNoteWordCount":1839},{"todayTime":"2026-03-03","dailyNoteCount":1,"dailyNoteWordCount":4409},{"todayTime":"2026-03-16","dailyNoteCount":1,"dailyNoteWordCount":2320},{"todayTime":"2026-03-19","dailyNoteCount":2,"dailyNoteWordCount":18874},{"todayTime":"2026-03-23","dailyNoteCount":1,"dailyNoteWordCount":4521}];
+</script>
+
+<section class="home-hero" style="--home-hero-image: url('/images/hero-bg.png')">
+  <div class="home-hero__bg" aria-hidden="true"></div>
+  <div class="home-hero__overlay" aria-hidden="true"></div>
+  <div class="home-hero__fade" aria-hidden="true"></div>
+</section>
+
+<div class="home-shell">
+  <section class="home-panel glass-card" aria-label="笔记统计">
+    <div class="home-stats">
+      <p class="home-stats__label">YESTERDAY'S GROWTH</p>
+      <div class="home-stats__block">
+        <div class="home-stats__value" id="yesterday-count">—</div>
+        <div class="home-stats__unit">新增笔记（篇）</div>
+      </div>
+      <div class="home-stats__block">
+        <div class="home-stats__value" id="yesterday-words">—</div>
+        <div class="home-stats__unit">新增字数</div>
+      </div>
+      <p class="home-stats__date" id="yesterday-date"></p>
+    </div>
+
+    <div class="home-heatmap-wrap">
+      <div class="home-heatmap" id="heatmap" role="img" aria-label="笔记活跃度"></div>
+    </div>
+  </section>
+
+  <section class="home-articles glass-card" aria-label="最近文章">
+    <h2 class="home-articles__title">最近文章</h2>
+    <ul class="home-articles__list">
       
-                <!--<div class="type">
-          <div class="mask">
-            <i class="iconfont"></i>
-          </div>
-          </div>-->
-        <li class="post">
-          
-            <i class="post-status iconfont icon-icon"></i>  
-          
-          <h2 class="no-background"  >
-            <span><a href="/2026/05/01/%E4%BC%A0%E8%BE%93%E6%8E%A7%E5%88%B6%E5%8D%8F%E8%AE%AE/"></a></span>
-            <time class="post-time" datetime="2026-05-01T13:37:52.596Z" itemprop="datePublished">2026-05-01</time>
-          </h2>
+        
+        <li class="home-articles__item">
+          <a class="home-articles__link" href="/2026/03/23/SM4/">
+            <span class="home-articles__name">SM4</span>
+            <time class="home-articles__time" datetime="2026-03-23">
+              2026-03-23
+            </time>
+          </a>
         </li>
       
-                <!--<div class="type">
-          <div class="mask">
-            <i class="iconfont"></i>
-          </div>
-          </div>-->
-        <li class="post">
-          
-          <h2 class="no-background"  >
-            <span><a href="/2026/03/23/SM4/">SM4</a></span>
-            <time class="post-time" datetime="2026-03-23T03:55:44.000Z" itemprop="datePublished">2026-03-23</time>
-          </h2>
+        
+        <li class="home-articles__item">
+          <a class="home-articles__link" href="/2026/03/19/Crypto-AES/">
+            <span class="home-articles__name">Crypto-AES</span>
+            <time class="home-articles__time" datetime="2026-03-19">
+              2026-03-19
+            </time>
+          </a>
         </li>
       
-                <!--<div class="type">
-          <div class="mask">
-            <i class="iconfont"></i>
-          </div>
-          </div>-->
-        <li class="post">
-          
-          <h2 class="no-background"  >
-            <span><a href="/2026/03/19/Crypto-AES/">Crypto-AES</a></span>
-            <time class="post-time" datetime="2026-03-19T03:55:44.000Z" itemprop="datePublished">2026-03-19</time>
-          </h2>
+        
+        <li class="home-articles__item">
+          <a class="home-articles__link" href="/2026/03/19/%E5%93%88%E5%B8%8C%E5%87%BD%E6%95%B0/">
+            <span class="home-articles__name">Hash</span>
+            <time class="home-articles__time" datetime="2026-03-19">
+              2026-03-19
+            </time>
+          </a>
         </li>
       
-                <!--<div class="type">
-          <div class="mask">
-            <i class="iconfont"></i>
-          </div>
-          </div>-->
-        <li class="post">
-          
-          <h2 class="no-background"  >
-            <span><a href="/2026/03/19/%E5%93%88%E5%B8%8C%E5%87%BD%E6%95%B0/">Hash</a></span>
-            <time class="post-time" datetime="2026-03-19T03:55:44.000Z" itemprop="datePublished">2026-03-19</time>
-          </h2>
+        
+        <li class="home-articles__item">
+          <a class="home-articles__link" href="/2026/03/16/Diffie-Hellman/">
+            <span class="home-articles__name">Diffie-Hellman</span>
+            <time class="home-articles__time" datetime="2026-03-16">
+              2026-03-16
+            </time>
+          </a>
         </li>
       
-                <!--<div class="type">
-          <div class="mask">
-            <i class="iconfont"></i>
-          </div>
-          </div>-->
-        <li class="post">
-          
-          <h2 class="no-background"  >
-            <span><a href="/2026/03/16/Diffie-Hellman/">Diffie-Hellman</a></span>
-            <time class="post-time" datetime="2026-03-16T03:55:44.000Z" itemprop="datePublished">2026-03-16</time>
-          </h2>
+        
+        <li class="home-articles__item">
+          <a class="home-articles__link" href="/2026/03/03/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/">
+            <span class="home-articles__name">信息安全数学基础</span>
+            <time class="home-articles__time" datetime="2026-03-03">
+              2026-03-03
+            </time>
+          </a>
         </li>
       
-                <!--<div class="type">
-          <div class="mask">
-            <i class="iconfont"></i>
-          </div>
-          </div>-->
-        <li class="post">
-          
-          <h2 class="no-background"  >
-            <span><a href="/2026/03/03/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/">信息安全数学基础</a></span>
-            <time class="post-time" datetime="2026-03-03T07:08:32.000Z" itemprop="datePublished">2026-03-03</time>
-          </h2>
+        
+        <li class="home-articles__item">
+          <a class="home-articles__link" href="/2026/03/01/Crypto-Ellipse%20Curve%20Cryptography/">
+            <span class="home-articles__name">Crypto-Ellipse Curve Cryptography</span>
+            <time class="home-articles__time" datetime="2026-03-01">
+              2026-03-01
+            </time>
+          </a>
         </li>
       
-                <!--<div class="type">
-          <div class="mask">
-            <i class="iconfont"></i>
-          </div>
-          </div>-->
-        <li class="post">
-          
-          <h2 class="no-background"  >
-            <span><a href="/2026/03/01/Crypto-Ellipse%20Curve%20Cryptography/">Crypto-Ellipse Curve Cryptography</a></span>
-            <time class="post-time" datetime="2026-03-01T03:55:44.000Z" itemprop="datePublished">2026-03-01</time>
-          </h2>
-        </li>
-      
-                <!--<div class="type">
-          <div class="mask">
-            <i class="iconfont"></i>
-          </div>
-          </div>-->
-        <li class="post">
-          
-          <h2 class="no-background"  >
-            <span><a href="/2026/02/24/Web-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/">Web</a></span>
-            <time class="post-time" datetime="2026-02-24T03:55:44.000Z" itemprop="datePublished">2026-02-24</time>
-          </h2>
-        </li>
-      
-                <!--<div class="type">
-          <div class="mask">
-            <i class="iconfont"></i>
-          </div>
-          </div>-->
-        <li class="post">
-          
-          <h2 class="no-background"  >
-            <span><a href="/2026/02/17/Crypto-Elgamal/">Crypto-Elgamal</a></span>
-            <time class="post-time" datetime="2026-02-17T03:55:44.000Z" itemprop="datePublished">2026-02-17</time>
-          </h2>
-        </li>
-      
-                <!--<div class="type">
-          <div class="mask">
-            <i class="iconfont"></i>
-          </div>
-          </div>-->
-        <li class="post">
-          
-          <h2 class="no-background"  >
-            <span><a href="/2026/02/06/Crypto-Knapsack%20Problem/">Crypto-Knapsack Problem</a></span>
-            <time class="post-time" datetime="2026-02-06T07:08:32.000Z" itemprop="datePublished">2026-02-06</time>
-          </h2>
-        </li>
-      
+        
+        
+        
+        
     </ul>
     
-      <div class="pagination mb+ js-pagination">
-        <div class="js-next pagination__load">
-            <a href="/page/2/"><i class="iconfont icon-next"></i></a></div>
-        </div>
-    </div>
+      <a class="home-articles__more" href="/timeline/">查看全部 →</a>
     
-
-  
+  </section>
 </div>
 
-
-
-
-
+<div class="home-tooltip" id="home-tooltip" role="tooltip"></div>
 
 
 <footer class="footer" role="contentinfo">
@@ -837,6 +782,23 @@ article {
 	
 <script src="/js/script.js"></script>
 
+	
+	
+	
+	<script>
+	  window.SAKURA_CONFIG = {
+	    count: 48,
+	    zIndex: 35
+	  };
+	</script>
+	
+<script src="/js/sakura.js"></script>
+
+	
+	
+<script src="/js/home-dashboard.js"></script>
+
+	
 	<!-- hexo injector body_end start -->
 <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 <script>
