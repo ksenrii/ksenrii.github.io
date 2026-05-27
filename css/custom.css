@@ -20,7 +20,6 @@
 
 /* 2. 给页面主体配置背景图（新增！这是显示背景的关键） */
 body.page-home {
-  background-image: none !important;
   background-color: #e4ecef !important;
 }
 body:not(.page-home) {
