@@ -1,5 +1,5 @@
 /**
- * 首页：热力图由 JS 渲染（HTML 仅保留空容器，避免数千行静态 DOM）
+ * 首页：热力图由 JS 渲染 + 悬停/点击显示 tooltip
  */
 (function () {
   var CONFIG = window.HOME_CONFIG || {
@@ -11,6 +11,7 @@
 
   var tooltip = document.getElementById('home-tooltip');
   var heatmap = document.getElementById('home-heatmap-grid');
+  var pinnedCell = null;
 
   function byId(id) {
     return document.getElementById(id);
@@ -119,8 +120,17 @@
     elDate.textContent = '统计日期：' + key;
   }
 
+  function resolveCell(target) {
+    if (!target || !target.closest) return null;
+    var cell = target.closest('.home-heatmap__cell');
+    if (!cell || !heatmap || !heatmap.contains(cell)) return null;
+    if (cell.classList.contains('is-future')) return null;
+    return cell;
+  }
+
   function showTooltip(cell, clientX, clientY) {
     if (!tooltip || !cell) return;
+
     var count = Number(cell.dataset.count);
     if (!count) {
       tooltip.textContent = cell.dataset.date + '：无发文';
@@ -128,28 +138,96 @@
       tooltip.textContent = cell.dataset.date + '：' + count + ' 篇 · ' +
         Number(cell.dataset.words).toLocaleString() + ' 字';
     }
+
+    var x = clientX;
+    var y = clientY;
+    if (typeof x !== 'number' || typeof y !== 'number') {
+      var rect = cell.getBoundingClientRect();
+      x = rect.left + rect.width / 2;
+      y = rect.top;
+    }
+
+    tooltip.style.left = x + 'px';
+    tooltip.style.top = y + 'px';
     tooltip.classList.add('visible');
-    tooltip.style.left = clientX + 'px';
-    tooltip.style.top = (clientY - 12) + 'px';
+    tooltip.setAttribute('aria-hidden', 'false');
   }
 
   function hideTooltip() {
-    if (tooltip) tooltip.classList.remove('visible');
+    if (!tooltip) return;
+    tooltip.classList.remove('visible');
+    tooltip.setAttribute('aria-hidden', 'true');
+    pinnedCell = null;
   }
 
   function bindHeatmapEvents() {
     if (!heatmap) return;
+
     heatmap.addEventListener('mouseover', function (e) {
-      var cell = e.target.closest('.home-heatmap__cell:not(.is-future)');
-      if (!cell || !heatmap.contains(cell)) return;
+      var cell = resolveCell(e.target);
+      if (!cell || pinnedCell) return;
       showTooltip(cell, e.clientX, e.clientY);
     });
+
     heatmap.addEventListener('mousemove', function (e) {
-      var cell = e.target.closest('.home-heatmap__cell:not(.is-future)');
-      if (!cell || !heatmap.contains(cell)) return;
+      var cell = resolveCell(e.target);
+      if (!cell || pinnedCell) return;
       showTooltip(cell, e.clientX, e.clientY);
     });
-    heatmap.addEventListener('mouseleave', hideTooltip);
+
+    heatmap.addEventListener('mouseout', function (e) {
+      if (pinnedCell) return;
+      var fromCell = resolveCell(e.target);
+      if (!fromCell) return;
+      var toCell = resolveCell(e.relatedTarget);
+      if (!toCell) hideTooltip();
+    });
+
+    heatmap.addEventListener('click', function (e) {
+      var cell = resolveCell(e.target);
+      if (!cell) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (pinnedCell === cell) {
+        hideTooltip();
+        return;
+      }
+      pinnedCell = cell;
+      showTooltip(cell, e.clientX, e.clientY);
+    });
+
+    heatmap.addEventListener('focusin', function (e) {
+      var cell = resolveCell(e.target);
+      if (!cell) return;
+      showTooltip(cell);
+    });
+
+    heatmap.addEventListener('focusout', function (e) {
+      if (pinnedCell) return;
+      var fromCell = resolveCell(e.target);
+      if (!fromCell) return;
+      var toCell = resolveCell(e.relatedTarget);
+      if (!toCell) hideTooltip();
+    });
+
+    heatmap.addEventListener('touchstart', function (e) {
+      var touch = e.changedTouches[0];
+      if (!touch) return;
+      var cell = resolveCell(document.elementFromPoint(touch.clientX, touch.clientY));
+      if (!cell) return;
+      pinnedCell = cell;
+      showTooltip(cell, touch.clientX, touch.clientY);
+    }, { passive: true });
+
+    document.addEventListener('click', function (e) {
+      if (!pinnedCell) return;
+      if (heatmap.contains(e.target)) return;
+      hideTooltip();
+    });
+
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') hideTooltip();
+    });
   }
 
   function renderHeatmap(map) {
@@ -182,6 +260,9 @@
       cell.dataset.date = key;
       cell.dataset.words = String(words);
       cell.dataset.count = String(count);
+      cell.setAttribute('title', '');
+      cell.setAttribute('tabindex', inRange && !isFuture ? '0' : '-1');
+      cell.setAttribute('role', 'gridcell');
       fragment.appendChild(cell);
     }
 
