@@ -24,7 +24,7 @@
 
   <meta name="generator" content="Hexo 8.1.1"></head>
 
-  <body>
+  <body class="page-timeline">
 
 <header class="site-header">
 	<a class="site-brand" href="/" aria-label="Home">ksenr</a>
@@ -34,17 +34,6 @@
 		<a href="/daily-pause/">Daily Pause</a>
 	</nav>
 </header>
-
-
-<div class="m-header ">
-	<section id="hero1" class="hero">
-		<div class="inner">
-		</div>
-	</section>
-	
-		<figure class="top-image" style='background-image: url(/banner/4.jpg)' data-enable=false></figure>
-	
-</div>
 
 
 <main class="timeline-page wrapper wrapper--wide">
@@ -122,15 +111,15 @@
 </footer>
 
 	
-	
-<script src="/js/lib.js"></script>
-
-	
-<script src="/js/module.js"></script>
-
-	
-<script src="/js/script.js"></script>
-
+	<script>
+	(function () {
+	  var header = document.querySelector('header.site-header');
+	  if (!header) return;
+	  function onScroll() { header.classList.toggle('scrolled', window.scrollY > 8); }
+	  onScroll();
+	  window.addEventListener('scroll', onScroll, { passive: true });
+	})();
+	</script>
 	
 	</body>
 </html>
