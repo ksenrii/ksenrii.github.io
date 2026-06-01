@@ -722,42 +722,381 @@ article {
   
 
 		<div class='post-body mb'>
-			<h1 id="背包密码体制"><a href="#背包密码体制" class="headerlink" title="背包密码体制"></a>背包密码体制</h1><p><strong>背包问题  :</strong></p>
-<p>首先，我们先来介绍一下背包问题，假定一个背包可以称重 W，现在有 n 个物品，其重量分别为 a1,a2,…,an 我们想问一下装哪些物品可以恰好使得背包装满，并且每个物品只能被装一次。这其实就是在解这样的一个问题</p>
+			<h1 id="背包密码体制"><a href="#背包密码体制" class="headerlink" title="背包密码体制"></a>背包密码体制</h1><p>背包密码体制（Knapsack Cryptosystem）是一类基于背包问题构造的公钥密码方案。它的基本思想是：将明文比特串映射为一个整数，再通过一组权重的线性组合生成密文。</p>
+<h2 id="1-背包问题"><a href="#1-背包问题" class="headerlink" title="1. 背包问题"></a>1. 背包问题</h2><p>经典背包问题可以表述为：给定一组正整数</p>
 <div class="math-display">
 
 <div class="math-display">\[
-x1a1+x2a2+....+xnan=W
+a_1, a_2, \dots, a_n
 \]</div>
 
 </div>
 
 
-<p>其中所有的 xi 只能为 0 和 1。显然我们必须枚举所有的 n 个物品的组合才能解决这个问题，而复杂度也就是 2n，这也就是背包加密的妙处所在。</p>
-<span id="more"></span>
 
-<p>在加密时，如果我们想要加密的明文为 x，那么我们可以将其表示为 n 位二进制数，然后分别乘上 ai 即可得到加密结果。</p>
-<p>但是解密的时候，该怎么办呢？我们确实让其他人难以解密密文，但是我们自己也确实没有办法解密密文。</p>
-<p>但是当 ai 是超递增的话，我们就有办法解了，所谓超递增是指序列满足如下条件 :</p>
+<p>以及一个目标值 <span class="math-inline">(W)</span>，判断是否存在一组二进制变量 <span class="math-inline">(x_i \in 0,1)</span>，使得</p>
 <div class="math-display">
 
 <div class="math-display">\[
-a_i&amp;gt;\sum_{k=1}^{i-1}a_k
+\sum_{i=1}^{n} x_i a_i = W
 \]</div>
 
 </div>
 
 
-<p>即第 i 个数大于前面所有数的和。</p>
-<p>例如[1,3,6,11,23,45]就是一个超递增序列</p>
-<p>为什么满足这样的条件就可以解密了呢？这是因为如果加密后的结果大于 an 的话，其前面的系数为必须 1 的。反之，无论如何也无法使得等式成立。因此，我们可以立马得到对应的明文。</p>
-<p><strong>背包密码 :</strong></p>
+
+<p>如果允许穷举所有 <span class="math-inline">(2^n)</span> 种组合，那么该问题可以直接求解；但当 <span class="math-inline">(n)</span> 较大时，穷举代价会迅速增长，因此背包问题具有较高的计算复杂度。</p>
+<p>背包密码体制正是利用了这一点：对外公开一个看似难以求解的背包实例，使攻击者难以从密文恢复明文。</p>
+<h2 id="2-基本加密思想"><a href="#2-基本加密思想" class="headerlink" title="2. 基本加密思想"></a>2. 基本加密思想</h2><p>设明文是一个 <span class="math-inline">(n)</span> 位二进制串</p>
+<div class="math-display">
+
+<div class="math-display">\[
+x = (x_1, x_2, \dots, x_n), \quad x_i \in 0,1
+\]</div>
+
+</div>
+
+
+
+<p>给定一组公开权重</p>
+<div class="math-display">
+
+<div class="math-display">\[
+a_1, a_2, \dots, a_n
+\]</div>
+
+</div>
+
+
+
+<p>则可以把密文构造为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+C = \sum_{i=1}^{n} x_i a_i
+\]</div>
+
+</div>
+
+
+
+<p>从形式上看，这就是把明文比特作为系数，去选择性地累加某些权重。</p>
+<p>如果这些权重没有额外结构，那么从 <span class="math-inline">(C)</span> 反推出 <span class="math-inline">(x)</span> 一般是困难的，这正是背包密码的设计基础。</p>
+<h2 id="3-超递增序列"><a href="#3-超递增序列" class="headerlink" title="3. 超递增序列"></a>3. 超递增序列</h2><p>为了便于解密，可以构造一类特殊的序列，称为<strong>超递增序列</strong>（superincreasing sequence）。它满足：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+a_i &amp;gt; \sum_{k=1}^{i-1} a_k, \quad i=2,3,\dots,n
+\]</div>
+
+</div>
+
+
+
+<p>也就是说，每一项都大于前面所有项之和。</p>
+<p>例如：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+1,\ 3,\ 6,\ 11,\ 23,\ 45
+\]</div>
+
+</div>
+
+
+
+<p>就是一个超递增序列，因为它满足：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+3 &amp;gt; 1,
+\quad 6 &amp;gt; 1+3,
+\quad 11 &amp;gt; 1+3+6,
+\]</div>
+
+</div>
+
+
+
+<p>依次类推。</p>
+<h3 id="3-1-为什么它容易解密"><a href="#3-1-为什么它容易解密" class="headerlink" title="3.1 为什么它容易解密"></a>3.1 为什么它容易解密</h3><p>如果使用超递增序列加密，那么解密可以从后向前进行：</p>
+<ul>
+<li>如果当前密文 <span class="math-inline">(C)</span> 大于某一项 <span class="math-inline">(a_i)</span>，则说明对应的 <span class="math-inline">(x_i &#x3D; 1)</span></li>
+<li>否则，说明 <span class="math-inline">(x_i &#x3D; 0)</span></li>
+</ul>
+<p>确定 <span class="math-inline">(x_i)</span> 后，再令</p>
+<div class="math-display">
+
+<div class="math-display">\[
+C \leftarrow C - x_i a_i
+\]</div>
+
+</div>
+
+
+
+<p>继续判断下一项即可。</p>
+<p>由于每一项都大于前面所有项之和，所以这种贪心判断是正确的。</p>
+<h2 id="4-简单超递增背包体制"><a href="#4-简单超递增背包体制" class="headerlink" title="4. 简单超递增背包体制"></a>4. 简单超递增背包体制</h2><p>设私钥为一个超递增序列：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+w_1, w_2, \dots, w_n
+\]</div>
+
+</div>
+
+
+
+<p>给定明文比特串 <span class="math-inline">(x_1, x_2, \dots, x_n)</span>，加密为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+C = \sum_{i=1}^{n} x_i w_i
+\]</div>
+
+</div>
+
+
+
+<p>解密时，按从后向前的顺序恢复：</p>
+<ol>
+<li>判断 <span class="math-inline">(C)</span> 是否大于 <span class="math-inline">(w_n)</span></li>
+<li>若是，则 <span class="math-inline">(x_n &#x3D; 1)</span>，并令 <span class="math-inline">(C \leftarrow C - w_n)</span></li>
+<li>否则 <span class="math-inline">(x_n &#x3D; 0)</span></li>
+<li>对 <span class="math-inline">(w_{n-1}, w_{n-2}, \dots, w_1)</span> 重复上述过程</li>
+</ol>
+<p>这种方案的缺点也很明显：如果直接公开超递增序列，那么攻击者同样可以用贪心算法轻松解密，因此它不能直接作为公钥方案使用。</p>
+<h2 id="5-由私钥到公钥"><a href="#5-由私钥到公钥" class="headerlink" title="5. 由私钥到公钥"></a>5. 由私钥到公钥</h2><p>为了让系统具备公钥密码体制的特点，通常会对超递增序列进行变换。</p>
+<p>一种经典做法是：</p>
+<ul>
+<li>选取超递增序列 <span class="math-inline">(w_1, w_2, \dots, w_n)</span></li>
+<li>选取模数 <span class="math-inline">(m)</span>，满足</li>
+</ul>
+<div class="math-display">
+
+<div class="math-display">\[
+m &amp;gt; \sum_{i=1}^{n} w_i
+\]</div>
+
+</div>
+
+
+
+<ul>
+<li>再选取整数 <span class="math-inline">(r)</span>，使得</li>
+</ul>
+<div class="math-display">
+
+<div class="math-display">\[
+\gcd(r,m)=1
+\]</div>
+
+</div>
+
+
+
+<p>然后构造公开序列：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+a_i \equiv r w_i \pmod m
+\]</div>
+
+</div>
+
+
+
+<p>此时：</p>
+<ul>
+<li><span class="math-inline">(w_i)</span> 是私钥中的结构化序列</li>
+<li><span class="math-inline">(a_i)</span> 是公开发布的背包序列</li>
+</ul>
+<h3 id="5-1-加密"><a href="#5-1-加密" class="headerlink" title="5.1 加密"></a>5.1 加密</h3><p>对明文比特串 <span class="math-inline">(x_1,\dots,x_n)</span>，密文为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+C = \sum_{i=1}^{n} x_i a_i
+\]</div>
+
+</div>
+
+
+
+<h3 id="5-2-解密"><a href="#5-2-解密" class="headerlink" title="5.2 解密"></a>5.2 解密</h3><p>解密时，先利用 <span class="math-inline">(r)</span> 的模逆：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+r^{-1} \pmod m
+\]</div>
+
+</div>
+
+
+
+<p>将密文恢复到私钥背包对应的形式：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+C' \equiv C \cdot r^{-1} \pmod m
+\]</div>
+
+</div>
+
+
+
+<p>然后对超递增序列 <span class="math-inline">(w_i)</span> 使用贪心算法恢复明文。</p>
+<h2 id="6-Merkle-Hellman-背包密码体制"><a href="#6-Merkle-Hellman-背包密码体制" class="headerlink" title="6. Merkle-Hellman 背包密码体制"></a>6. Merkle-Hellman 背包密码体制</h2><p>最著名的背包公钥密码体制是 <strong>Merkle-Hellman Knapsack Cryptosystem</strong>。其核心思路就是：</p>
+<ol>
+<li>选一个超递增序列作为私钥</li>
+<li>通过模乘变换生成看似随机的公开序列</li>
+<li>用公开序列加密</li>
+<li>用私钥结构高效解密</li>
+</ol>
+<p>这种设计在早期被认为很有希望，因为公开背包看起来像一个一般的 NP 难问题实例。</p>
+<h2 id="7-一个简单例子"><a href="#7-一个简单例子" class="headerlink" title="7. 一个简单例子"></a>7. 一个简单例子</h2><p>假设私钥超递增序列为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+W = (2,3,7,14,30)
+\]</div>
+
+</div>
+
+
+
+<p>选择模数和乘数：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+m = 61, \quad r = 17
+\]</div>
+
+</div>
+
+
+
+<p>则公开序列为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+A_i \equiv 17W_i \pmod{61}
+\]</div>
+
+</div>
+
+
+
+<p>即：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+A = (34, 51, 58, 55, 22)
+\]</div>
+
+</div>
+
+
+
+<p>若明文比特串为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+X = (1,0,1,0,1)
+\]</div>
+
+</div>
+
+
+
+<p>则密文为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+C = 34 + 58 + 22 = 114
+\]</div>
+
+</div>
+
+
+
+<p>解密时，先计算：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+r^{-1} \pmod{61} = 18
+\]</div>
+
+</div>
+
+
+
+<p>然后：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+C' \equiv 114 \cdot 18 \pmod{61} \equiv 39
+\]</div>
+
+</div>
+
+
+
+<p>注意到：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+39 = 2 + 7 + 30
+\]</div>
+
+</div>
+
+
+
+<p>因此对应的明文比特串正是 <span class="math-inline">(X &#x3D; (1,0,1,0,1))</span>。</p>
+<p>再用超递增序列 <span class="math-inline">(W)</span> 做贪心分解：</p>
+<ul>
+<li><span class="math-inline">(39 \ge 30)</span>，第 5 位为 1，剩余 <span class="math-inline">(9)</span></li>
+<li><span class="math-inline">(9 &lt; 14)</span>，第 4 位为 0</li>
+<li><span class="math-inline">(9 \ge 7)</span>，第 3 位为 1，剩余 <span class="math-inline">(2)</span></li>
+<li><span class="math-inline">(2 &lt; 3)</span>，第 2 位为 0</li>
+<li><span class="math-inline">(2 \ge 2)</span>，第 1 位为 1，剩余 <span class="math-inline">(0)</span></li>
+</ul>
+<p>由此恢复出原始比特串。</p>
+<p>这个例子中，公开序列和私钥序列之间的对应关系是严格一致的，因此加密和解密过程可以完整闭合。</p>
+<h2 id="8-安全性问题"><a href="#8-安全性问题" class="headerlink" title="8. 安全性问题"></a>8. 安全性问题</h2><p>背包密码体制曾经受到过较多研究，但后来发现许多早期方案存在明显缺陷，尤其是 Merkle-Hellman 方案。其主要问题包括：</p>
+<ul>
+<li>公开背包与私钥结构之间关系过于简单</li>
+<li>公开序列可能被格基方法分析</li>
+<li>某些参数选择下容易被还原出私钥结构</li>
+</ul>
+<p>因此，经典背包密码体制并没有像 RSA 那样长期成为主流公钥算法。</p>
+<h2 id="9-背包密码与格攻击"><a href="#9-背包密码与格攻击" class="headerlink" title="9. 背包密码与格攻击"></a>9. 背包密码与格攻击</h2><p>公开背包问题虽然表面上看像 NP 难问题，但如果参数设计不当，往往会暴露额外结构。例如：</p>
+<ul>
+<li>序列具有近似超递增特征</li>
+<li>模数和乘数选择不理想</li>
+<li>公开向量之间存在可利用关系</li>
+</ul>
+<p>这类结构可以被格方法利用，从而恢复原始私钥或明文。</p>
+<h2 id="10-总结"><a href="#10-总结" class="headerlink" title="10. 总结"></a>10. 总结</h2><p>背包密码体制的核心思路是将明文编码为若干二进制系数，再通过权重求和形成密文。它的关键点在于：</p>
+<ul>
+<li>一般背包问题求解困难</li>
+<li>超递增序列可以高效解密</li>
+<li>公钥方案需要对私钥结构进行隐藏</li>
+<li>经典方案存在较明显的安全缺陷</li>
+</ul>
+<p>因此，背包密码体制更适合作为密码学发展史中的重要实例来理解，而不是现代主流加密方案。</p>
 
 		</div>
 		<div class="meta split">
 			<time class="post-date" datetime="2026-02-06T07:08:32.000Z" itemprop="datePublished">2026-02-06</time>
 		</div>
 	</div>
+	
+		<aside class="post-toc">
+			<div class="post-toc-title">&#30446;&#24405;</div>
+			<details class="toc-node level-1"><summary><span>背包密码体制</span><a href="#背包密码体制" aria-label="Jump to 背包密码体制">#</a></summary><div class="toc-children"><a class="toc-link level-2" href="#1-背包问题">1. 背包问题</a><a class="toc-link level-2" href="#2-基本加密思想">2. 基本加密思想</a><details class="toc-node level-2"><summary><span>3. 超递增序列</span><a href="#3-超递增序列" aria-label="Jump to 3. 超递增序列">#</a></summary><div class="toc-children"><a class="toc-link level-3" href="#3-1-为什么它容易解密">3.1 为什么它容易解密</a></div></details><a class="toc-link level-2" href="#4-简单超递增背包体制">4. 简单超递增背包体制</a><details class="toc-node level-2"><summary><span>5. 由私钥到公钥</span><a href="#5-由私钥到公钥" aria-label="Jump to 5. 由私钥到公钥">#</a></summary><div class="toc-children"><a class="toc-link level-3" href="#5-1-加密">5.1 加密</a><a class="toc-link level-3" href="#5-2-解密">5.2 解密</a></div></details><a class="toc-link level-2" href="#6-Merkle-Hellman-背包密码体制">6. Merkle-Hellman 背包密码体制</a><a class="toc-link level-2" href="#7-一个简单例子">7. 一个简单例子</a><a class="toc-link level-2" href="#8-安全性问题">8. 安全性问题</a><a class="toc-link level-2" href="#9-背包密码与格攻击">9. 背包密码与格攻击</a><a class="toc-link level-2" href="#10-总结">10. 总结</a></div></details>
+		</aside>
 	
 </article>
 

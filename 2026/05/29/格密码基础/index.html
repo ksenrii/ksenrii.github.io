@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     
-    <title>archive_a: 2026 | ksenr&#39;s blog</title>
+    <title>格密码基础 | ksenr&#39;s blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
     
@@ -707,133 +707,426 @@ article {
 
 
 
+<!--文章列表-->
+<div class="wrapper">
+  
+    <!-- article -->
+<article class="post-article">
+	
+	<div class="post-main-panel">
+		
+  
+    <h1 class="post-title" itemprop="name">
+      格密码基础
+    </h1>
+  
 
-<style>
-  body.page-home {
-    --home-safe-left: 55.00000000000001%;
-    --home-bg-url: url('/images/liz.png');
-    background-image: var(--home-bg-url) !important;
-    background-repeat: no-repeat !important;
-    background-size: cover !important;
-    background-position: left center !important;
-    background-attachment: fixed !important;
-  }
-</style>
+		<div class='post-body mb'>
+			<h1 id="格的定义与几何直观"><a href="#格的定义与几何直观" class="headerlink" title="格的定义与几何直观"></a>格的定义与几何直观</h1><p>格密码的很多概念都建立在一个非常基础的对象之上：<strong>格</strong>。如果先把这个对象的定义、基、格向量以及几何图像理解清楚，后面的 LLL、短向量问题、Coppersmith 小根方法就会自然很多。</p>
+<span id="more"></span>
 
-<script>
-  window.HOME_CONFIG = {
-    displayStart: '',
-    heatmapWeeks: 26,
-    statsSource: 'posts',
-    apiUrl: '/api/nodeCount/list'
-  };
-  window.HOME_POST_STATS = [["2026-02-05",1,39160],["2026-02-06",1,2358],["2026-02-17",1,3869],["2026-02-24",1,1553],["2026-03-01",1,1839],["2026-03-03",1,4409],["2026-03-16",1,2320],["2026-03-19",2,20411],["2026-03-23",1,4521],["2026-05-29",1,4045]];
-</script>
+<h2 id="1-什么是格"><a href="#1-什么是格" class="headerlink" title="1. 什么是格"></a>1. 什么是格</h2><p>在欧几里得空间中，给定若干个线性无关的向量 <span class="math-inline">(b_1,b_2,\dots,b_n)</span>，它们生成的所有整数线性组合所构成的集合，称为一个<strong>格</strong>（lattice）。</p>
+<p>形式化地说，若</p>
+<div class="math-display">
 
-<div class="home-bg" aria-hidden="true">
-  <img class="home-bg__photo" src="/images/liz.png" alt="" decoding="async">
-  <div class="home-bg__overlay"></div>
+<div class="math-display">\[
+L = \left\{\sum_{i=1}^{n} z_i b_i \;\middle|\; z_i \in \mathbb{Z}\right\}
+\]</div>
+
 </div>
 
-<div class="home-shell">
-  <section class="home-panel glass-card" aria-label="笔记统计">
-    <div class="home-stats">
-      <p class="home-stats__label">YESTERDAY'S GROWTH</p>
-      <div class="home-stats__block">
-        <div class="home-stats__value" id="home-yesterday-count">0</div>
-        <div class="home-stats__unit">新增笔记（篇）</div>
-      </div>
-      <div class="home-stats__block">
-        <div class="home-stats__value" id="home-yesterday-words">0</div>
-        <div class="home-stats__unit">新增字数</div>
-      </div>
-      <p class="home-stats__date" id="home-yesterday-date">统计日期：2026-05-31</p>
-    </div>
 
-    <div class="home-heatmap-wrap">
-      <div class="home-heatmap" id="home-heatmap-grid" role="img" aria-label="笔记活跃度"></div>
-    </div>
-  </section>
 
-  <section class="home-articles glass-card" aria-label="最近文章">
-    <h2 class="home-articles__title">最近文章</h2>
-    <ul class="home-articles__list">
-      
-        
-        <li class="home-articles__item">
-          <a class="home-articles__link" href="/2026/05/29/%E6%A0%BC%E5%AF%86%E7%A0%81%E5%9F%BA%E7%A1%80/">
-            <span class="home-articles__name">格密码基础</span>
-            <time class="home-articles__time" datetime="2026-05-29">
-              2026-05-29
-            </time>
-          </a>
-        </li>
-      
-        
-        <li class="home-articles__item">
-          <a class="home-articles__link" href="/2026/03/23/SM4/">
-            <span class="home-articles__name">SM4</span>
-            <time class="home-articles__time" datetime="2026-03-23">
-              2026-03-23
-            </time>
-          </a>
-        </li>
-      
-        
-        <li class="home-articles__item">
-          <a class="home-articles__link" href="/2026/03/19/Crypto-AES/">
-            <span class="home-articles__name">Crypto-AES</span>
-            <time class="home-articles__time" datetime="2026-03-19">
-              2026-03-19
-            </time>
-          </a>
-        </li>
-      
-        
-        <li class="home-articles__item">
-          <a class="home-articles__link" href="/2026/03/19/%E5%93%88%E5%B8%8C%E5%87%BD%E6%95%B0/">
-            <span class="home-articles__name">Hash</span>
-            <time class="home-articles__time" datetime="2026-03-19">
-              2026-03-19
-            </time>
-          </a>
-        </li>
-      
-        
-        <li class="home-articles__item">
-          <a class="home-articles__link" href="/2026/03/16/Diffie-Hellman/">
-            <span class="home-articles__name">Diffie-Hellman</span>
-            <time class="home-articles__time" datetime="2026-03-16">
-              2026-03-16
-            </time>
-          </a>
-        </li>
-      
-        
-        <li class="home-articles__item">
-          <a class="home-articles__link" href="/2026/03/03/%E4%BF%A1%E6%81%AF%E5%AE%89%E5%85%A8%E6%95%B0%E5%AD%A6%E5%9F%BA%E7%A1%80/">
-            <span class="home-articles__name">信息安全数学基础</span>
-            <time class="home-articles__time" datetime="2026-03-03">
-              2026-03-03
-            </time>
-          </a>
-        </li>
-      
-        
-        
-        
-        
-    </ul>
-    
-      <a class="home-articles__more" href="/timeline/">查看全部 →</a>
-    
-  </section>
+<p>则称 <span class="math-inline">(L)</span> 为由向量组 <span class="math-inline">(b_1,b_2,\dots,b_n)</span> 生成的格。</p>
+<p>这里要特别注意两点：</p>
+<ul>
+<li>系数必须是整数，不是实数</li>
+<li>这些向量需要线性无关，否则不能作为一组有效的生成向量</li>
+</ul>
+<p>因此，格不是一般意义上的“点集”，而是由整数线性组合严格生成的离散结构。</p>
+<h2 id="2-什么是基"><a href="#2-什么是基" class="headerlink" title="2. 什么是基"></a>2. 什么是基</h2><p>生成同一个格的一组向量，称为这个格的一组<strong>基</strong>（basis）。</p>
+<p>如果 <span class="math-inline">(B&#x3D;(b_1,b_2,\dots,b_n))</span> 生成格 <span class="math-inline">(L)</span>，那么 <span class="math-inline">(B)</span> 就是 <span class="math-inline">(L)</span> 的一组基。</p>
+<p>需要强调的是：</p>
+<ul>
+<li>同一个格可以有很多组不同的基</li>
+<li>基不一定唯一</li>
+<li>但只要它们生成的是同一个格，那么它们描述的是同一个离散结构</li>
+</ul>
+<p>这意味着“基”更像是描述格的一种坐标系统，而不是格本身。</p>
+<h2 id="3-什么是格向量"><a href="#3-什么是格向量" class="headerlink" title="3. 什么是格向量"></a>3. 什么是格向量</h2><p>格中的任意元素都称为一个<strong>格向量</strong>。</p>
+<p>如果 <span class="math-inline">(v \in L)</span>，则 <span class="math-inline">(v)</span> 可以写成</p>
+<div class="math-display">
+
+<div class="math-display">\[
+v = z_1 b_1 + z_2 b_2 + \cdots + z_n b_n, \quad z_i \in \mathbb{Z}
+\]</div>
+
 </div>
 
-<div class="home-tooltip" id="home-tooltip" role="tooltip"></div>
 
 
-<script src="/js/home-dashboard.js"></script>
+<p>也就是说，格向量就是基向量的整数线性组合。</p>
+<p>在密码学里，我们通常关心的不只是“有没有某个格向量”，而是：</p>
+<ul>
+<li>是否存在特别短的格向量</li>
+<li>能否从一组不太好的基恢复出较短的向量</li>
+<li>能否利用格的代数结构来求解某些隐藏变量</li>
+</ul>
+<h2 id="4-二维格的几何直观"><a href="#4-二维格的几何直观" class="headerlink" title="4. 二维格的几何直观"></a>4. 二维格的几何直观</h2><p>先看二维情况。</p>
+<p>设有两个线性无关向量 <span class="math-inline">(b_1,b_2)</span>，它们生成一个二维格。所有格点都可以写成</p>
+<div class="math-display">
+
+<div class="math-display">\[
+L = \{z_1 b_1 + z_2 b_2 \mid z_1,z_2 \in \mathbb{Z}\}
+\]</div>
+
+</div>
+
+
+
+<p>从几何上看，这些点会像一张无限延展的规则点阵。</p>
+<p>下面这幅图展示了一个二维格的基本形状。</p>
+<p><img src="/images/lattice-2d.png" alt="二维格点图"></p>
+<p>可以看到：</p>
+<ul>
+<li>每个格点都可以由整数系数组合得到</li>
+<li>相邻格点之间具有重复的平移结构</li>
+<li>这是一种离散但高度规则的几何对象</li>
+</ul>
+<h2 id="5-基不唯一"><a href="#5-基不唯一" class="headerlink" title="5. 基不唯一"></a>5. 基不唯一</h2><p>同一个格往往可以由不同的基生成。</p>
+<p>例如，在二维平面上，下面两组向量可能生成同一个格：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+B_1 = \{b_1,b_2\}, \qquad B_2 = \{b_1',b_2'\}
+\]</div>
+
+</div>
+
+
+
+<p>虽然这两组向量看起来不同，但它们张成的整数组合集合可能完全相同。</p>
+<p>这说明：</p>
+<ul>
+<li>格是“集合”</li>
+<li>基是“表示方法”</li>
+<li>不同的基可以描述同一个格</li>
+</ul>
+<p>这也是为什么在格密码中，我们常常先得到一组“很差的基”，然后再想办法把它变成“更好的基”。</p>
+<p>下面这幅图展示了同一个格的两组不同基。</p>
+<p><img src="/images/lattice-bases.png" alt="不同的基生成同一个格"></p>
+<h2 id="6-短向量与基约简"><a href="#6-短向量与基约简" class="headerlink" title="6. 短向量与基约简"></a>6. 短向量与基约简</h2><p>在格中，一个非常重要的问题是寻找<strong>短向量</strong>。</p>
+<p>所谓短向量，就是范数较小的格向量。通常我们关心的是：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\|v\| \text{ 尽可能小}
+\]</div>
+
+</div>
+
+
+
+<p>为什么短向量重要？因为很多密码学问题都会被转化为：</p>
+<ul>
+<li>在一个大格中找出某个特殊的短向量</li>
+<li>或者找出某个接近短向量的整数关系</li>
+</ul>
+<p>但实际中，直接寻找最短向量是非常困难的。</p>
+<p>因此，我们先做一个更容易的事：<strong>基约简</strong>。</p>
+<p>基约简的目标不是立刻求出最短向量，而是把一组“很差的基”变得更短、更接近正交，从而更容易暴露格中的短向量。</p>
+<h3 id="6-1-直观理解"><a href="#6-1-直观理解" class="headerlink" title="6.1 直观理解"></a>6.1 直观理解</h3><p>如果一组基向量非常长，而且夹角很小，那么它们生成的格虽然不变，但表示方式并不好。经过约简后，基向量会变得更短，几何上更“规整”，更容易进行后续计算。</p>
+<p>下面这幅图给出一种约简前后的直观对比。</p>
+<p><img src="/images/lattice-reduction.png" alt="基约简前后对比"></p>
+<h2 id="7-一个二维例子"><a href="#7-一个二维例子" class="headerlink" title="7. 一个二维例子"></a>7. 一个二维例子</h2><p>设二维格由向量</p>
+<div class="math-display">
+
+<div class="math-display">\[
+b_1 = (4,1), \qquad b_2 = (1,3)
+\]</div>
+
+</div>
+
+
+
+<p>生成。则格中的任意点都可以写成</p>
+<div class="math-display">
+
+<div class="math-display">\[
+z_1(4,1) + z_2(1,3), \quad z_1,z_2\in\mathbb Z
+\]</div>
+
+</div>
+
+
+
+<p>例如：</p>
+<ul>
+<li><span class="math-inline">(b_1 + b_2 &#x3D; (5,4))</span></li>
+<li><span class="math-inline">(2b_1 - b_2 &#x3D; (7,-1))</span></li>
+<li><span class="math-inline">(-b_1 + 2b_2 &#x3D; (-2,5))</span></li>
+</ul>
+<p>这些点都属于同一个格。</p>
+<p><img src="/images/lattice-example.png" alt="二维格例子 b1&#x3D;(4,1), b2&#x3D;(1,3)"></p>
+<p>如果换一组基，例如通过整数线性变换得到另一组生成向量，只要生成的整数组合集合不变，它们仍然是同一个格的不同基。</p>
+<h2 id="8-为什么格在密码学中重要"><a href="#8-为什么格在密码学中重要" class="headerlink" title="8. 为什么格在密码学中重要"></a>8. 为什么格在密码学中重要</h2><p>格密码并不是因为“格很漂亮”才重要，而是因为它能把某些看似复杂的代数问题转成几何问题。</p>
+<p>在很多构造中，攻击者面对的是：</p>
+<ul>
+<li>巨大的整数空间</li>
+<li>线性同余关系</li>
+<li>带噪声的线性方程</li>
+<li>隐藏的小参数</li>
+</ul>
+<p>这些问题常常可以被编码成格中的短向量问题或约简问题。</p>
+<p>因此，理解格的定义、基、格向量和几何结构，是进入格密码的第一步。</p>
+<h2 id="9-LLL-算法的直观解释"><a href="#9-LLL-算法的直观解释" class="headerlink" title="9. LLL 算法的直观解释"></a>9. LLL 算法的直观解释</h2><p>LLL 算法全称为 <strong>Lenstra–Lenstra–Lovász lattice basis reduction algorithm</strong>，是一种经典的格基约简算法。</p>
+<p>它的目标不是直接求出格中的最短向量，而是把一组原本很差的基变成一组相对较好的基。</p>
+<p>所谓“较好”，主要体现在两个方面：</p>
+<ul>
+<li>基向量尽量短</li>
+<li>基向量之间尽量接近正交</li>
+</ul>
+<p>在直观上，如果一组基向量又长又接近共线，那么用它来描述格会非常不方便。LLL 的作用就是不断调整这组基，使其变得更短、更规整。</p>
+<h3 id="9-1-为什么要做格基约简"><a href="#9-1-为什么要做格基约简" class="headerlink" title="9.1 为什么要做格基约简"></a>9.1 为什么要做格基约简</h3><p>设一个格有两组基：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+B = (b_1,b_2,\dots,b_n)
+\]</div>
+
+</div>
+
+
+
+<p>和</p>
+<div class="math-display">
+
+<div class="math-display">\[
+B' = (b_1',b_2',\dots,b_n')
+\]</div>
+
+</div>
+
+
+
+<p>它们可能生成同一个格，但几何形状差别很大。一组基可能非常长、夹角很小；另一组基可能更短、更接近正交。</p>
+<p>在实际计算中，后一种基更有价值，因为它更容易暴露格中的短向量结构。</p>
+<h3 id="9-2-LLL-在做什么"><a href="#9-2-LLL-在做什么" class="headerlink" title="9.2 LLL 在做什么"></a>9.2 LLL 在做什么</h3><p>LLL 可以理解为重复做两类操作：</p>
+<ol>
+<li><strong>缩短向量</strong>：用前面的基向量去减小后面的基向量</li>
+<li><strong>交换向量</strong>：如果当前顺序不合适，就交换两个基向量的位置</li>
+</ol>
+<p>这些操作不会改变格本身，因为它们本质上只是对基做整数可逆变换。换句话说，LLL 改变的是“表示方法”，不是格点集合。</p>
+<p><img src="/images/lattice-lll-steps.png" alt="LLL 约简的两类操作"></p>
+<h3 id="9-3-Gram-Schmidt-正交化"><a href="#9-3-Gram-Schmidt-正交化" class="headerlink" title="9.3 Gram-Schmidt 正交化"></a>9.3 Gram-Schmidt 正交化</h3><p>为了判断一组基是否“接近正交”，LLL 会用到 Gram-Schmidt 正交化。</p>
+<p>给定基向量：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+b_1,b_2,\dots,b_n
+\]</div>
+
+</div>
+
+
+
+<p>可以构造一组正交向量：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+b_1^*,b_2^*,\dots,b_n^*
+\]</div>
+
+</div>
+
+
+
+<p>其中 <span class="math-inline">(b_i^*)</span> 表示 <span class="math-inline">(b_i)</span> 去掉前面方向分量后剩下的正交部分。</p>
+<p>LLL 不要求原始基完全正交，因为完全正交通常做不到；它只要求基向量之间不要过度倾斜。</p>
+<p><img src="/images/lattice-gram-schmidt.png" alt="Gram-Schmidt 正交化示意"></p>
+<h3 id="9-4-LLL-约简条件"><a href="#9-4-LLL-约简条件" class="headerlink" title="9.4 LLL 约简条件"></a>9.4 LLL 约简条件</h3><p>LLL 约简后的基一般需要满足两个条件。</p>
+<p>第一个是<strong>大小约简条件</strong>：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+|\mu_{i,j}| \leq \frac{1}{2}, \quad j&amp;lt;i
+\]</div>
+
+</div>
+
+
+
+<p>这里 <span class="math-inline">(\mu_{i,j})</span> 表示 <span class="math-inline">(b_i)</span> 在 <span class="math-inline">(b_j^*)</span> 方向上的投影系数。</p>
+<p>这个条件的含义是：如果 <span class="math-inline">(b_i)</span> 在前面某个方向上的分量太大，就用前面的基向量把它减掉一些。</p>
+<p>第二个是 <strong>Lovász 条件</strong>：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\delta \|b_{i-1}^*\|^2 \leq \|b_i^* + \mu_{i,i-1}b_{i-1}^*\|^2
+\]</div>
+
+</div>
+
+
+
+<p>其中通常取</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\frac{1}{4} &amp;lt; \delta &amp;lt; 1
+\]</div>
+
+</div>
+
+
+
+<p>这个条件用于判断当前基向量顺序是否合理。如果不满足，就交换相邻基向量，并重新进行约简。</p>
+<h3 id="9-5-LLL-的结果意味着什么"><a href="#9-5-LLL-的结果意味着什么" class="headerlink" title="9.5 LLL 的结果意味着什么"></a>9.5 LLL 的结果意味着什么</h3><p>经过 LLL 约简后，得到的第一条基向量 <span class="math-inline">(b_1)</span> 通常会比较短，但它不一定就是最短向量。</p>
+<p>因此，LLL 给出的不是精确最优解，而是一个近似意义下比较好的结果。</p>
+<p>它的重要性在于：</p>
+<ul>
+<li>算法效率较高</li>
+<li>在很多实际问题中效果很好</li>
+<li>能把隐藏的短向量结构暴露出来</li>
+<li>是很多格攻击的基础工具</li>
+</ul>
+<p>在密码学中，LLL 经常用于：</p>
+<ul>
+<li>小根问题</li>
+<li>低密度背包攻击</li>
+<li>RSA 部分信息泄露攻击</li>
+<li>Coppersmith 方法</li>
+<li>多项式关系求解</li>
+</ul>
+<h2 id="10-BKZ-算法的直观解释"><a href="#10-BKZ-算法的直观解释" class="headerlink" title="10. BKZ 算法的直观解释"></a>10. BKZ 算法的直观解释</h2><p>BKZ 全称为 <strong>Block Korkine-Zolotarev reduction</strong>，可以看作是比 LLL 更强的格基约简算法。</p>
+<p>如果说 LLL 是“逐步把基变好”，那么 BKZ 更像是“分块地把基变好”。</p>
+<p>它的核心思想是：</p>
+<ul>
+<li>不一次处理整个高维格</li>
+<li>而是每次取出一个较小的局部块</li>
+<li>在这个局部块中寻找更短的向量</li>
+<li>再把结果更新回原来的基</li>
+</ul>
+<h3 id="10-1-为什么需要-BKZ"><a href="#10-1-为什么需要-BKZ" class="headerlink" title="10.1 为什么需要 BKZ"></a>10.1 为什么需要 BKZ</h3><p>LLL 虽然速度快，但约简质量有限。在高维格中，如果需要更短的向量，LLL 往往不够。</p>
+<p>BKZ 通过引入一个参数 <span class="math-inline">(\beta)</span>，称为<strong>块大小</strong>（block size），来控制算法强度。</p>
+<p>例如：</p>
+<ul>
+<li><span class="math-inline">(\beta)</span> 较小，BKZ 速度较快，但效果较弱</li>
+<li><span class="math-inline">(\beta)</span> 较大，BKZ 效果更强，但计算代价迅速增加</li>
+</ul>
+<p>当 <span class="math-inline">(\beta&#x3D;2)</span> 时，BKZ 的行为和 LLL 非常接近；当 <span class="math-inline">(\beta)</span> 增大时，它会越来越接近更强的约简效果。</p>
+<h3 id="10-2-BKZ-在做什么"><a href="#10-2-BKZ-在做什么" class="headerlink" title="10.2 BKZ 在做什么"></a>10.2 BKZ 在做什么</h3><p>BKZ 会沿着基向量序列滑动一个窗口。每次只处理其中连续的 <span class="math-inline">(\beta)</span> 个向量，例如：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+(b_i,b_{i+1},\dots,b_{i+\beta-1})
+\]</div>
+
+</div>
+
+
+
+<p>在这个局部子格中，算法尝试寻找较短向量，并用它来改善当前基。</p>
+<p>可以把它理解成：</p>
+<ul>
+<li>LLL 主要做局部相邻调整</li>
+<li>BKZ 在更大的局部块里寻找更好的结构</li>
+<li>块越大，看到的信息越多，约简效果越强</li>
+</ul>
+<p><img src="/images/lattice-bkz-block.png" alt="BKZ 滑动块示意"></p>
+<h3 id="10-3-BKZ-与-SVP-Oracle"><a href="#10-3-BKZ-与-SVP-Oracle" class="headerlink" title="10.3 BKZ 与 SVP Oracle"></a>10.3 BKZ 与 SVP Oracle</h3><p>在理论描述中，BKZ 通常会调用一个 SVP oracle。</p>
+<p>SVP 是最短向量问题（Shortest Vector Problem），目标是在格中找到非零最短向量。</p>
+<p>在 BKZ 的每个块中，算法会尝试求解一个较低维的 SVP 问题。由于块大小 <span class="math-inline">(\beta)</span> 通常远小于整个格的维度，所以局部 SVP 的代价相对可控。</p>
+<p>当然，在真实实现中，并不一定真的有完美的 SVP oracle，而是会使用枚举、筛法或近似算法来完成这一步。</p>
+<h3 id="10-4-块大小的意义"><a href="#10-4-块大小的意义" class="headerlink" title="10.4 块大小的意义"></a>10.4 块大小的意义</h3><p>BKZ 的核心参数就是块大小 <span class="math-inline">(\beta)</span>。</p>
+<p>它决定了算法的强度和代价：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\beta \uparrow \quad \Rightarrow \quad \text{约简质量提高，计算复杂度升高}
+\]</div>
+
+</div>
+
+
+
+<p>也就是说，BKZ 并不是一个固定强度的算法，而是一族由 <span class="math-inline">(\beta)</span> 控制的算法。</p>
+<p>在格密码安全估计中，攻击者通常会估算：</p>
+<ul>
+<li>需要多大的 <span class="math-inline">(\beta)</span> 才能攻击成功</li>
+<li>对应的 BKZ 成本有多高</li>
+<li>这个成本是否超过安全参数要求</li>
+</ul>
+<h3 id="10-5-LLL-与-BKZ-的关系"><a href="#10-5-LLL-与-BKZ-的关系" class="headerlink" title="10.5 LLL 与 BKZ 的关系"></a>10.5 LLL 与 BKZ 的关系</h3><p>LLL 和 BKZ 都是格基约简算法，但它们的定位不同。</p>
+<p>LLL 更适合作为基础工具：</p>
+<ul>
+<li>速度快</li>
+<li>实现简单</li>
+<li>适合中低维或预处理</li>
+</ul>
+<p>BKZ 更适合作为强攻击工具：</p>
+<ul>
+<li>约简质量高</li>
+<li>可以处理更困难的格结构</li>
+<li>常用于格密码安全性估计</li>
+</ul>
+<p>可以简单理解为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\text{LLL：快，但不够强}
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+\text{BKZ：强，但更昂贵}
+\]</div>
+
+</div>
+
+
+
+<p>在很多实际流程中，会先用 LLL 做预处理，再使用 BKZ 做更深层次的约简。</p>
+
+		</div>
+		<div class="meta split">
+			<time class="post-date" datetime="2026-05-29T02:00:00.000Z" itemprop="datePublished">2026-05-29</time>
+		</div>
+	</div>
+	
+		<aside class="post-toc">
+			<div class="post-toc-title">&#30446;&#24405;</div>
+			<details class="toc-node level-1"><summary><span>格的定义与几何直观</span><a href="#格的定义与几何直观" aria-label="Jump to 格的定义与几何直观">#</a></summary><div class="toc-children"><a class="toc-link level-2" href="#1-什么是格">1. 什么是格</a><a class="toc-link level-2" href="#2-什么是基">2. 什么是基</a><a class="toc-link level-2" href="#3-什么是格向量">3. 什么是格向量</a><a class="toc-link level-2" href="#4-二维格的几何直观">4. 二维格的几何直观</a><a class="toc-link level-2" href="#5-基不唯一">5. 基不唯一</a><details class="toc-node level-2"><summary><span>6. 短向量与基约简</span><a href="#6-短向量与基约简" aria-label="Jump to 6. 短向量与基约简">#</a></summary><div class="toc-children"><a class="toc-link level-3" href="#6-1-直观理解">6.1 直观理解</a></div></details><a class="toc-link level-2" href="#7-一个二维例子">7. 一个二维例子</a><a class="toc-link level-2" href="#8-为什么格在密码学中重要">8. 为什么格在密码学中重要</a><details class="toc-node level-2"><summary><span>9. LLL 算法的直观解释</span><a href="#9-LLL-算法的直观解释" aria-label="Jump to 9. LLL 算法的直观解释">#</a></summary><div class="toc-children"><a class="toc-link level-3" href="#9-1-为什么要做格基约简">9.1 为什么要做格基约简</a><a class="toc-link level-3" href="#9-2-LLL-在做什么">9.2 LLL 在做什么</a><a class="toc-link level-3" href="#9-3-Gram-Schmidt-正交化">9.3 Gram-Schmidt 正交化</a><a class="toc-link level-3" href="#9-4-LLL-约简条件">9.4 LLL 约简条件</a><a class="toc-link level-3" href="#9-5-LLL-的结果意味着什么">9.5 LLL 的结果意味着什么</a></div></details><details class="toc-node level-2"><summary><span>10. BKZ 算法的直观解释</span><a href="#10-BKZ-算法的直观解释" aria-label="Jump to 10. BKZ 算法的直观解释">#</a></summary><div class="toc-children"><a class="toc-link level-3" href="#10-1-为什么需要-BKZ">10.1 为什么需要 BKZ</a><a class="toc-link level-3" href="#10-2-BKZ-在做什么">10.2 BKZ 在做什么</a><a class="toc-link level-3" href="#10-3-BKZ-与-SVP-Oracle">10.3 BKZ 与 SVP Oracle</a><a class="toc-link level-3" href="#10-4-块大小的意义">10.4 块大小的意义</a><a class="toc-link level-3" href="#10-5-LLL-与-BKZ-的关系">10.5 LLL 与 BKZ 的关系</a></div></details></div></details>
+		</aside>
+	
+</article>
+
+<!-- comments -->
+
+
+  
+</div>
+
+
+  <svg id="bigTriangleColor" width="100%" height="40" viewBox="0 0 100 102" preserveAspectRatio="none">
+    <path d="M0 0 L50 100 L100 0 Z"></path>
+  </svg>
+
+  
+
+
+  <div class="wrapper"></div>
+
+
+
+
 
 
 
