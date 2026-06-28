@@ -1372,6 +1372,9 @@ R5：(R^*,・, 1) 为群，这里 R^* = R − {0}，则称 R 为体
 
 
 
+<blockquote>
+<p>说明：很多教材里“体”与“域”在中文语境下常常混用；在这里我们按“域”来理解最常见的交换情形。</p>
+</blockquote>
 <h2 id="域"><a href="#域" class="headerlink" title="域"></a>域</h2><p>若环 (R, +,・, 0, 1) 满足</p>
 <div class="math-display">
 
@@ -1381,6 +1384,29 @@ R6：(R^*,・, 1) 为交换群，则称 R 为域
 
 </div>
 
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+也就是说，域就是“乘法可交换的体”：除了 0 之外，每个元素都可逆，而且乘法满足交换律。
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+在域中，非零元素都能做除法，因此可以在域上进行完整的多项式运算、线性方程组运算等。
+\]</div>
+
+</div>
 
 
 
@@ -1494,7 +1520,7 @@ R6：(R^*,・, 1) 为交换群，则称 R 为域
 <h2 id="环上的多项式"><a href="#环上的多项式" class="headerlink" title="环上的多项式"></a>环上的多项式</h2><div class="math-display">
 
 <div class="math-display">\[
-设 x 为文字，R 为交换环，x ∉ R。定义为 R 上多项式集
+设 x 为文字，R 为交换环，x ∉ R。定义 R 上多项式集
 \]</div>
 
 </div>
@@ -1506,7 +1532,7 @@ R6：(R^*,・, 1) 为交换群，则称 R 为域
 <div class="math-display">
 
 <div class="math-display">\[
-R[x] = \left\{ f(x) = \sum_{i=0}^{n} a_i x^i \mid n \in \mathbb{Z},\ a_i \in R \right\}
+R[x] = \left\{ f(x) = \sum_{i=0}^{n} a_i x^i \mid n \in \mathbb{Z}_{\ge 0},\ a_i \in R \right\}
 \]</div>
 
 </div>
@@ -1518,7 +1544,7 @@ R[x] = \left\{ f(x) = \sum_{i=0}^{n} a_i x^i \mid n \in \mathbb{Z},\ a_i \in R \
 <div class="math-display">
 
 <div class="math-display">\[
-1.f(x) = \sum_{i=0}^{n} a_i x^i 称为交换环 R 上关于文字 x 的多项式
+1. f(x) = \sum_{i=0}^{n} a_i x^i 称为交换环 R 上关于文字 x 的多项式
 \]</div>
 
 </div>
@@ -1527,11 +1553,10 @@ R[x] = \left\{ f(x) = \sum_{i=0}^{n} a_i x^i \mid n \in \mathbb{Z},\ a_i \in R \
 
 
 
-
 <div class="math-display">
 
 <div class="math-display">\[
-2. a_i x^i 称为 f(x) 的第 i 次项，a_i 为 f(x) 的第 i 次项系数；a_0 x^0 写为 a_0
+2. a_i x^i 称为 f(x) 的第 i 次项，a_i 为 f(x) 的第 i 次项系数；其中 a_0 x^0 约定简写为 a_0
 \]</div>
 
 </div>
@@ -1540,11 +1565,10 @@ R[x] = \left\{ f(x) = \sum_{i=0}^{n} a_i x^i \mid n \in \mathbb{Z},\ a_i \in R \
 
 
 
-
 <div class="math-display">
 
 <div class="math-display">\[
-3.当 a_n \neq 0 时，a_n x^n 称为 f(x) 的首项，n 称为 f(x) 的次数，记为 \partial f(x) = n；特别当 a_n = 1 时，称 f(x) 为首1多项式
+3. 当 a_n \neq 0 时，a_n x^n 称为 f(x) 的首项，a_n 称为首项系数，n 称为 f(x) 的次数，记作 \deg f(x)=n；特别地，当 a_n=1 时，称 f(x) 为首一多项式
 \]</div>
 
 </div>
@@ -1553,11 +1577,130 @@ R[x] = \left\{ f(x) = \sum_{i=0}^{n} a_i x^i \mid n \in \mathbb{Z},\ a_i \in R \
 
 
 
+<div class="math-display">
+
+<div class="math-display">\[
+4. 称 0 \in R[x] 为零多项式，并约定 \deg(0)=-\infty，且对任意非负整数 n，有 n+(-\infty)=-\infty
+\]</div>
+
+</div>
+
+
+
+
 
 <div class="math-display">
 
 <div class="math-display">\[
-4. 称 0 \in R 为 R[x] 中的零多项式，并约定 \partial(0) = -\infty（负无穷大），任意非负整数 n，n + (-\infty) = -\infty
+5. 若 f(x)=\sum_{i=0}^{n} a_i x^i，g(x)=\sum_{i=0}^{m} b_i x^i，则规定
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+f(x)+g(x)=\sum_{i=0}^{\max(n,m)} (a_i+b_i)x^i
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+其中不足的系数按 0 补齐；乘法定义为
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+这就是多项式的普通加法与卷积乘法。因为 R 是交换环，所以 R[x] 仍是交换环，并且若 R 有单位元 1，则 R[x] 的单位元也是常数多项式 1
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+6. 若 f(x),g(x)\in R[x] 且 g(x)\neq 0，存在 q(x),r(x)\in R[x] 使得 f(x)=q(x)g(x)+r(x)，且 \deg r(x)&amp;lt;\deg g(x)，则称 q(x) 为商式，r(x) 为余式
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+在域上，多项式除法总是成立；但在一般交换环上，除法未必总能进行
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+7. 若存在 h(x)\in R[x] 使 f(x)=g(x)h(x)，则称 g(x) 整除 f(x)，记作 g(x)\mid f(x)
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+8. 若 f(x) 在 R[x] 中不能分解为两个次数都大于 0 的多项式之积，则称 f(x) 为不可约多项式
+\]</div>
+
+</div>
+
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+9. 当 R 是域时，R[x] 的结构最完整：可做加法、乘法、除法余式运算，也可以讨论最大公因式、因式分解、不可约多项式等概念
 \]</div>
 
 </div>

@@ -297,8 +297,38 @@
     window.addEventListener('scroll', onScroll, { passive: true });
   }
 
+  function bindAnimeOrbit() {
+    var orbit = document.querySelector('.home-anime__orbit');
+    if (!orbit) return;
+    var nodes = Array.prototype.slice.call(orbit.querySelectorAll('.home-anime__node'));
+    var poster = byId('home-anime-poster');
+    var name = byId('home-anime-name');
+    if (!nodes.length || !poster || !name) return;
+
+    function activate(node) {
+      nodes.forEach(function (item) {
+        item.classList.toggle('is-active', item === node);
+      });
+      var img = node.querySelector('img');
+      if (!img) return;
+      poster.src = img.currentSrc || img.src;
+      poster.alt = img.alt || '';
+      name.textContent = img.alt || '';
+    }
+
+    nodes.forEach(function (node) {
+      node.addEventListener('click', function () {
+        activate(node);
+      });
+      node.addEventListener('focus', function () {
+        activate(node);
+      });
+    });
+  }
+
   function init() {
     bindHeaderScroll();
+    bindAnimeOrbit();
     fetchRecords().then(function (records) {
       var map = buildMap(records);
       updateYesterday(map);
