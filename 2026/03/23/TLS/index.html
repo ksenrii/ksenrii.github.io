@@ -722,191 +722,167 @@ article {
   
 
 		<div class='post-body mb'>
-			<h1 id="TLS"><a href="#TLS" class="headerlink" title="TLS"></a>TLS</h1><p>TLS（Transport Layer Security，传输层安全协议）是现代互联网中最重要的安全协议之一。我们平常访问的 HTTPS、登录网页、在线支付、接口鉴权、移动应用通信，背后大多都依赖 TLS 来保证通信的<strong>机密性</strong>、<strong>完整性</strong>和<strong>身份认证</strong>。</p>
-<p>TLS 并不是单一的加密算法，而是一套协议体系。它结合了非对称加密、对称加密、消息认证码、数字证书、密钥交换等多种密码学机制，解决“如何在不可信网络上安全通信”这个核心问题。</p>
+			<h1 id="TLS"><a href="#TLS" class="headerlink" title="TLS"></a>TLS</h1><p>TLS（Transport Layer Security）是现在 HTTPS 背后的核心协议。它解决的问题很直接：在一个不可信的网络里，客户端和服务器如何确认对方身份，并协商出后续通信要用的密钥。</p>
+<p>TLS 本身不是某一种加密算法，而是把证书、密钥交换、对称加密、哈希和消息认证组合在一起的一套协议。</p>
 <span id="more"></span>
 
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>TLS 的主要目标有三个：</p>
-<ol>
-<li><strong>机密性</strong>：防止第三方看到通信内容；</li>
-<li><strong>完整性</strong>：防止数据在传输过程中被篡改；</li>
-<li><strong>身份认证</strong>：确认对方确实是你想连接的服务器，必要时也可验证客户端身份。</li>
-</ol>
-<p>在实际使用中，TLS 最常见的场景就是 <strong>HTTPS</strong>。HTTP 本身是明文协议，而 HTTPS 本质上就是在 HTTP 外层套了一层 TLS。</p>
-<p>从协议演化上看，TLS 可以理解为 SSL 的继任者。早期有 SSL 2.0、SSL 3.0，后来逐步发展为 TLS 1.0、TLS 1.1、TLS 1.2，再到目前更推荐使用的 TLS 1.3。</p>
-<h2 id="TLS-的基本组成"><a href="#TLS-的基本组成" class="headerlink" title="TLS 的基本组成"></a>TLS 的基本组成</h2><p>TLS 主要由以下几部分构成：</p>
-<ul>
-<li><strong>握手协议（Handshake Protocol）</strong>：协商版本、密码套件、密钥，并完成身份认证</li>
-<li><strong>记录协议（Record Protocol）</strong>：负责将上层数据切分、加密、完整性校验后发送</li>
-<li><strong>告警协议（Alert Protocol）</strong>：在出现错误或连接关闭时传递告警信息</li>
-<li><strong>变更密码规范协议（Change Cipher Spec）</strong>：用于通知后续开始使用协商好的加密参数</li>
-</ul>
-<p>其中，最关键的是 <strong>握手协议</strong>。握手阶段完成之后，双方才会进入加密通信阶段。</p>
-<h2 id="TLS-的核心目标"><a href="#TLS-的核心目标" class="headerlink" title="TLS 的核心目标"></a>TLS 的核心目标</h2><p>TLS 要解决的问题，可以概括为下面这句：</p>
-<blockquote>
-<p>在一个任何人都能监听的网络上，如何安全地建立一条只有通信双方能理解的信道。</p>
-</blockquote>
-<p>为此，它通常需要完成：</p>
-<ul>
-<li>协商使用哪种密码套件；</li>
-<li>服务器向客户端证明自己的身份；</li>
-<li>生成双方共享的会话密钥；</li>
-<li>之后用对称加密高效传输数据。</li>
-</ul>
-<p>这里的设计思路很典型：</p>
-<ul>
-<li><strong>握手阶段</strong>使用非对称密码学来完成身份确认和密钥交换；</li>
-<li><strong>数据传输阶段</strong>使用对称密码学来提高效率。</li>
-</ul>
-<p>这是因为非对称加密虽然安全性和灵活性更强，但计算开销较大；而对称加密速度更快，更适合大量数据传输。</p>
-<p><img src="/images/symmetric%20vs%20asymmetric%20encryption%20diagram.png" alt="symmetric-vs-asymmetric"></p>
-<h2 id="TLS-握手流程"><a href="#TLS-握手流程" class="headerlink" title="TLS 握手流程"></a>TLS 握手流程</h2><p>下面以最常见的 TLS 1.2 &#x2F; TLS 1.3 思想来理解握手过程。</p>
-<h3 id="1-客户端发起连接"><a href="#1-客户端发起连接" class="headerlink" title="1. 客户端发起连接"></a>1. 客户端发起连接</h3><p>客户端首先向服务器发送 <code>ClientHello</code>，里面通常包含：</p>
-<ul>
-<li>支持的 TLS 版本</li>
-<li>支持的密码套件</li>
-<li>随机数 <code>ClientRandom</code></li>
-<li>扩展信息，例如 SNI、ALPN、支持的椭圆曲线等</li>
-</ul>
-<p>这一阶段的作用是告诉服务器：</p>
-<blockquote>
-<p>“我能支持什么，你看看你选哪个。”</p>
-</blockquote>
-<h3 id="2-服务器响应"><a href="#2-服务器响应" class="headerlink" title="2. 服务器响应"></a>2. 服务器响应</h3><p>服务器收到后，返回 <code>ServerHello</code>，并给出：</p>
-<ul>
-<li>选择使用的 TLS 版本</li>
-<li>选择的密码套件</li>
-<li>随机数 <code>ServerRandom</code></li>
-<li>服务器证书</li>
-<li>必要时还会发送密钥交换参数</li>
-</ul>
-<p>如果服务器需要客户端证书认证，也会在这里请求客户端证书。</p>
-<h3 id="3-验证服务器证书"><a href="#3-验证服务器证书" class="headerlink" title="3. 验证服务器证书"></a>3. 验证服务器证书</h3><p>客户端会检查服务器证书是否可信，通常包括：</p>
-<ul>
-<li>证书是否过期</li>
-<li>域名是否匹配</li>
-<li>证书链是否能追溯到受信任的根证书</li>
-<li>证书是否被吊销（视实现而定）</li>
-</ul>
-<p>如果证书验证失败，客户端通常会直接中断连接。</p>
-<h3 id="4-密钥交换"><a href="#4-密钥交换" class="headerlink" title="4. 密钥交换"></a>4. 密钥交换</h3><p>握手中最关键的一步，是让双方在不安全网络上协商出一个共享密钥。</p>
-<p>在旧版本 TLS 中，常见做法是使用 RSA 直接加密预主密钥（Pre-Master Secret）。<br>而在现代 TLS 中，更常见的是使用 <strong>(EC)DHE</strong> 进行密钥交换。</p>
-<p>其核心思想可以写成：</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>HTTP 本身是明文的，如果直接传输登录密码、Cookie 或接口数据，中间人只要能抓包就能看到内容。HTTPS 可以理解为：</p>
 <div class="math-display">
 
 <div class="math-display">\[
-\text{shared secret} = f(\text{client private}, \text{server public})
+\text{HTTPS} = \text{HTTP} + \text{TLS}
 \]</div>
 
 </div>
 
 
 
-<p>但这个共享秘密不会直接作为通信密钥，而是进一步经过密钥派生函数（KDF）生成会话密钥。</p>
-<h3 id="5-派生会话密钥"><a href="#5-派生会话密钥" class="headerlink" title="5. 派生会话密钥"></a>5. 派生会话密钥</h3><p>握手双方会基于共享秘密、<code>ClientRandom</code>、<code>ServerRandom</code> 等信息，使用密钥派生算法生成后续通信所需的密钥材料，例如：</p>
+<p>也就是说，HTTP 负责应用层语义，TLS 负责在传输前先建立一条安全信道。</p>
+<p>TLS 主要保证三件事：</p>
 <ul>
-<li>客户端写入密钥</li>
-<li>服务器写入密钥</li>
-<li>初始化向量（IV）</li>
-<li>完整性校验密钥</li>
+<li><strong>机密性</strong>：别人抓到流量也看不懂内容</li>
+<li><strong>完整性</strong>：传输过程中数据不能被随便篡改</li>
+<li><strong>身份认证</strong>：客户端能确认自己连到的确实是目标服务器</li>
 </ul>
-<p>TLS 1.2 和 TLS 1.3 在具体派生方式上有所不同，但核心思想一致：<br><strong>不要直接把共享秘密拿来用，而是通过 KDF 派生出多个用途明确的密钥。</strong></p>
-<h3 id="6-握手完成"><a href="#6-握手完成" class="headerlink" title="6. 握手完成"></a>6. 握手完成</h3><p>双方在确认握手消息无误后，会发送 <code>Finished</code> 报文。这个报文中包含握手摘要的校验值，用于证明：</p>
-<ul>
-<li>前面的握手消息没有被篡改；</li>
-<li>双方对握手内容的理解一致；</li>
-<li>后续开始使用协商好的加密参数。</li>
-</ul>
-<p>此后，连接正式进入加密数据传输阶段。</p>
-<h2 id="TLS-1-2-与-TLS-1-3-的区别"><a href="#TLS-1-2-与-TLS-1-3-的区别" class="headerlink" title="TLS 1.2 与 TLS 1.3 的区别"></a>TLS 1.2 与 TLS 1.3 的区别</h2><p><img src="/images/TLS1.3vsTLS1.2.png" alt="TLS1.3-vs-TLS1.2"></p>
-<p>TLS 1.3 相比 TLS 1.2 做了很大的简化和增强，主要体现在：</p>
-<ul>
-<li>握手轮次更少，延迟更低</li>
-<li>删除了很多不安全或过时的算法</li>
-<li>强制使用前向安全性更好的密钥交换方式</li>
-<li>加密范围更大，安全性更强</li>
-<li>握手逻辑更清晰</li>
-</ul>
-<h3 id="TLS-1-2-的特点"><a href="#TLS-1-2-的特点" class="headerlink" title="TLS 1.2 的特点"></a>TLS 1.2 的特点</h3><p>TLS 1.2 仍然支持较多旧算法，例如：</p>
-<ul>
-<li>RSA 密钥交换</li>
-<li>CBC 模式加密</li>
-<li>一些旧的哈希和签名算法</li>
-</ul>
-<p>虽然它仍然广泛使用，但安全性和协议复杂度都不如 TLS 1.3。</p>
-<h3 id="TLS-1-3-的特点"><a href="#TLS-1-3-的特点" class="headerlink" title="TLS 1.3 的特点"></a>TLS 1.3 的特点</h3><p>TLS 1.3 的设计目标之一就是“减法”：</p>
-<ul>
-<li>去掉不安全的历史包袱</li>
-<li>强制使用更现代的密码套件</li>
-<li>默认使用前向安全的密钥交换</li>
-<li>将握手流程简化为更少的消息往返</li>
-</ul>
-<p>这使得 TLS 1.3 不但更安全，而且更快。</p>
-<h2 id="TLS-中的密码学组件"><a href="#TLS-中的密码学组件" class="headerlink" title="TLS 中的密码学组件"></a>TLS 中的密码学组件</h2><p>TLS 并不是单独依赖某一种算法，而是组合使用多种密码学原语。</p>
-<h3 id="非对称加密-密钥交换"><a href="#非对称加密-密钥交换" class="headerlink" title="非对称加密 &#x2F; 密钥交换"></a>非对称加密 &#x2F; 密钥交换</h3><p>常见用于握手阶段：</p>
-<ul>
-<li>RSA</li>
-<li>Diffie-Hellman</li>
-<li>ECDHE</li>
-</ul>
-<p><img src="/images/DiffieHellman.png" alt="Diffie-Hellman"></p>
-<p>其中，现代 TLS 更推荐 <strong>ECDHE</strong>，因为它通常具有更好的性能和前向安全性。</p>
-<h3 id="对称加密"><a href="#对称加密" class="headerlink" title="对称加密"></a>对称加密</h3><p>用于后续数据传输，常见有：</p>
-<ul>
-<li>AES-GCM</li>
-<li>ChaCha20-Poly1305</li>
-</ul>
-<p>它们既能提供加密，又能提供认证，属于 <strong>AEAD</strong>（Authenticated Encryption with Associated Data）方案。</p>
-<h3 id="哈希与消息认证"><a href="#哈希与消息认证" class="headerlink" title="哈希与消息认证"></a>哈希与消息认证</h3><p>TLS 需要对握手和记录进行完整性校验，常用：</p>
-<ul>
-<li>SHA-256</li>
-<li>SHA-384</li>
-<li>HMAC</li>
-</ul>
-<p>在现代 TLS 中，很多完整性校验已经由 AEAD 模式统一解决。</p>
-<h2 id="为什么-TLS-需要证书"><a href="#为什么-TLS-需要证书" class="headerlink" title="为什么 TLS 需要证书"></a>为什么 TLS 需要证书</h2><p>如果没有证书，客户端无法确认“你连到的服务器到底是谁”。</p>
-<p>假设攻击者伪装成银行服务器，客户端如果没有验证身份，就可能把密码、验证码、银行卡信息发送给攻击者。</p>
-<p>证书的作用就是：</p>
-<ul>
-<li>证明服务器身份；</li>
-<li>把服务器公钥和域名绑定；</li>
-<li>由可信的 CA（证书颁发机构）进行背书。</li>
-</ul>
-<p>因此，证书机制是 TLS 身份认证的关键。</p>
-<p><img src="/images/certificate%20chain1.png" alt="certificate-chain"></p>
-<h2 id="一个简化的-TLS-流程示意"><a href="#一个简化的-TLS-流程示意" class="headerlink" title="一个简化的 TLS 流程示意"></a>一个简化的 TLS 流程示意</h2><p>可以把 TLS 看成下面这个过程：</p>
+<p>从整体上看，TLS 的过程可以分成两段：</p>
 <ol>
-<li>客户端发起 <code>ClientHello</code></li>
+<li>握手阶段：认证身份，协商密钥</li>
+<li>传输阶段：用会话密钥加密通信数据</li>
+</ol>
+<p>前者主要依赖非对称密码学，后者主要依赖对称加密。</p>
+<p><img src="/images/symmetric%20vs%20asymmetric%20encryption%20diagram.png" alt="symmetric-vs-asymmetric"></p>
+<h2 id="握手流程"><a href="#握手流程" class="headerlink" title="握手流程"></a>握手流程</h2><p>TLS 握手的目标是让客户端和服务器在公开网络上得到同一个会话密钥。攻击者可以看到双方发出的报文，但不能推出最终密钥。</p>
+<p>一个简化流程如下：</p>
+<ol>
+<li>客户端发送 <code>ClientHello</code></li>
 <li>服务器返回 <code>ServerHello</code> 和证书</li>
 <li>客户端验证证书</li>
 <li>双方完成密钥交换</li>
 <li>双方派生会话密钥</li>
-<li>后续数据用对称加密传输</li>
+<li>后续数据开始加密传输</li>
 </ol>
 <p><img src="/images/TLS.png" alt="TLS"></p>
-<h2 id="安全性分析"><a href="#安全性分析" class="headerlink" title="安全性分析"></a>安全性分析</h2><p>TLS 的安全性来源于多个层面：</p>
+<h3 id="ClientHello"><a href="#ClientHello" class="headerlink" title="ClientHello"></a>ClientHello</h3><p>客户端先发一个 <code>ClientHello</code>，里面会带上：</p>
 <ul>
-<li><strong>证书体系</strong>确保你连的是正确的服务器；</li>
-<li><strong>密钥交换</strong>确保窃听者无法得到会话密钥；</li>
-<li><strong>对称加密</strong>确保消息内容不可读；</li>
-<li><strong>认证加密</strong>确保消息未被篡改；</li>
-<li><strong>前向安全性</strong>确保即使未来服务器私钥泄露，历史会话也不一定能被解密。</li>
+<li>支持的 TLS 版本</li>
+<li>支持的密码套件</li>
+<li>随机数 <code>ClientRandom</code></li>
+<li>扩展字段，例如 SNI、ALPN、支持的椭圆曲线等</li>
 </ul>
-<p>其中，前向安全性是现代 TLS 非常重要的特性。<br>如果使用静态 RSA 密钥交换，服务器私钥一旦泄露，过去抓到的通信流量就可能被解密。<br>而使用 ECDHE 时，每次会话都会生成临时密钥，即使长期私钥泄露，历史会话也更难被恢复。</p>
-<h2 id="TLS-的实际应用场景"><a href="#TLS-的实际应用场景" class="headerlink" title="TLS 的实际应用场景"></a>TLS 的实际应用场景</h2><p>TLS 几乎已经是互联网基础设施的一部分，常见于：</p>
+<p>它的作用可以理解为客户端告诉服务器：</p>
+<blockquote>
+<p>我支持这些算法和参数，你从里面选一套。</p>
+</blockquote>
+<h3 id="ServerHello"><a href="#ServerHello" class="headerlink" title="ServerHello"></a>ServerHello</h3><p>服务器收到后返回 <code>ServerHello</code>，主要包括：</p>
 <ul>
-<li>网页访问（HTTPS）</li>
-<li>API 接口通信</li>
-<li>邮件传输</li>
-<li>即时通信</li>
-<li>VPN</li>
-<li>云服务 API</li>
-<li>物联网设备通信</li>
+<li>选择的 TLS 版本</li>
+<li>选择的密码套件</li>
+<li>随机数 <code>ServerRandom</code></li>
+<li>服务器证书</li>
+<li>密钥交换需要的参数</li>
 </ul>
-<p>也就是说，只要你看到地址栏里有小锁图标，或者客户端和服务器之间要传敏感信息，TLS 往往就在发挥作用。</p>
-<h2 id="一个简单的-OpenSSL-示例"><a href="#一个简单的-OpenSSL-示例" class="headerlink" title="一个简单的 OpenSSL 示例"></a>一个简单的 OpenSSL 示例</h2><p>下面给出一个最基础的命令行示例，用来查看网站的证书和握手信息：</p>
-<pre><code class="language-bash">openssl s_client -connect example.com:443 -servername example.com
-</code></pre>
+<p>这里最重要的是证书和密钥交换参数。证书用来证明服务器身份，密钥交换参数用来生成后续共享秘密。</p>
+<h2 id="证书"><a href="#证书" class="headerlink" title="证书"></a>证书</h2><p>如果没有证书，客户端并不知道自己连到的是不是真服务器。攻击者完全可以伪造一个服务器，截获客户端请求。</p>
+<p>证书的作用就是把域名和公钥绑定起来，并由 CA 做背书。</p>
+<p>客户端验证证书时通常会检查：</p>
+<ul>
+<li>证书是否过期</li>
+<li>域名是否匹配</li>
+<li>证书链是否能追溯到可信根证书</li>
+<li>证书是否被吊销</li>
+</ul>
+<p><img src="/images/certificate%20chain1.png" alt="certificate-chain"></p>
+<p>可以把证书链理解为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\text{服务器证书} \rightarrow \text{中间 CA} \rightarrow \text{根 CA}
+\]</div>
+
+</div>
+
+
+
+<p>只要这条链能接到本地信任的根证书，客户端就可以相信这个服务器公钥确实属于目标域名。</p>
+<h2 id="密钥交换"><a href="#密钥交换" class="headerlink" title="密钥交换"></a>密钥交换</h2><p>TLS 握手中最关键的一步是密钥交换。它要解决的问题是：双方如何在不安全网络里得到同一个秘密值。</p>
+<p>以 Diffie-Hellman 思想来看，双方最终会得到：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+K = g^{ab} \mod p
+\]</div>
+
+</div>
+
+
+
+<p>其中客户端掌握 <span class="math-inline">(a)</span>，服务器掌握 <span class="math-inline">(b)</span>。攻击者能看到公开参数和交换值，但要从中推出 <span class="math-inline">(K)</span>，本质上要解决离散对数相关问题。</p>
+<p><img src="/images/DiffieHellman.png" alt="Diffie-Hellman"></p>
+<p>现代 TLS 中更常见的是 ECDHE，也就是椭圆曲线上的临时 Diffie-Hellman 密钥交换。它的好处是可以提供<strong>前向安全性</strong>。</p>
+<p>所谓前向安全性，就是即使服务器长期私钥以后泄露，之前抓到的历史流量也不容易被解密。</p>
+<p>原因在于每次会话都会生成临时密钥。长期私钥主要用于认证，不直接决定历史会话密钥。</p>
+<h2 id="会话密钥"><a href="#会话密钥" class="headerlink" title="会话密钥"></a>会话密钥</h2><p>密钥交换得到的共享秘密不会直接拿来加密数据，而是会经过 KDF 派生出多组密钥。</p>
+<p>这些密钥通常包括：</p>
+<ul>
+<li>客户端写入密钥</li>
+<li>服务器写入密钥</li>
+<li>初始化向量 IV</li>
+<li>认证相关密钥</li>
+</ul>
+<p>可以简单写成：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\text{traffic keys} = \mathrm{KDF}(\text{shared secret}, \text{handshake context})
+\]</div>
+
+</div>
+
+
+
+<p>这里的 <code>handshake context</code> 包含握手过程中的随机数、协商参数和握手摘要等信息。</p>
+<p>也就是说，会话密钥不是孤立生成的，而是和本次握手过程绑定在一起。</p>
+<h2 id="记录协议"><a href="#记录协议" class="headerlink" title="记录协议"></a>记录协议</h2><p>握手完成之后，应用层数据不会直接发出去，而是交给 TLS Record 层处理。</p>
+<p>大致流程如下：</p>
+<ol>
+<li>将数据切分为记录</li>
+<li>对记录进行加密</li>
+<li>加上完整性校验</li>
+<li>发送给对方</li>
+</ol>
+<p>现代 TLS 常用 AEAD 算法，例如：</p>
+<ul>
+<li>AES-GCM</li>
+<li>ChaCha20-Poly1305</li>
+</ul>
+<p>AEAD 的特点是同时提供加密和认证。也就是说，它既保证内容不可读，也能发现数据是否被篡改。</p>
+<h2 id="TLS-1-2-和-TLS-1-3"><a href="#TLS-1-2-和-TLS-1-3" class="headerlink" title="TLS 1.2 和 TLS 1.3"></a>TLS 1.2 和 TLS 1.3</h2><p>TLS 1.3 相比 TLS 1.2 做了很多减法。</p>
+<p><img src="/images/TLS1.3vsTLS1.2.png" alt="TLS1.3-vs-TLS1.2"></p>
+<p>主要区别包括：</p>
+<ul>
+<li>握手轮次更少</li>
+<li>删除 RSA 密钥交换</li>
+<li>删除 CBC 等旧算法</li>
+<li>默认使用前向安全的密钥交换</li>
+<li>握手阶段更多内容被加密保护</li>
+</ul>
+<p>TLS 1.2 仍然支持很多历史算法，因此兼容性更强，但协议复杂度也更高。TLS 1.3 则更像一次清理：把容易出问题的旧东西去掉，只保留更现代的方案。</p>
+<h2 id="OpenSSL-查看证书"><a href="#OpenSSL-查看证书" class="headerlink" title="OpenSSL 查看证书"></a>OpenSSL 查看证书</h2><p>可以用下面命令查看一个网站的证书和握手信息：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl s_client -connect example.com:443 -servername example.com</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>-connect</code> 指定连接地址，<code>-servername</code> 用来发送 SNI。现在很多服务器会根据 SNI 返回不同证书，所以一般要带上。</p>
+<p>如果只想看证书链，可以这样：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl s_client -connect example.com:443 -servername example.com -showcerts</span><br></pre></td></tr></table></figure>
+
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>TLS 的核心不是“用了某个加密算法”，而是把身份认证、密钥交换和对称加密组合成一条安全信道。</p>
+<p>简单来说：</p>
+<ul>
+<li>证书解决“我连的是谁”</li>
+<li>密钥交换解决“双方如何得到共享密钥”</li>
+<li>对称加密解决“后续数据如何高效加密”</li>
+<li>完整性校验解决“数据有没有被改”</li>
+</ul>
+<p>理解 TLS 时，不必一开始就陷进所有报文字段里。先抓住握手、证书、密钥交换、会话密钥这条主线，后面再看 TLS 1.2 和 TLS 1.3 的具体差异会清楚很多。</p>
 
 		</div>
 		<div class="meta split">
@@ -916,7 +892,7 @@ article {
 	
 		<aside class="post-toc">
 			<div class="post-toc-title">&#30446;&#24405;</div>
-			<details class="toc-node level-1"><summary><span>TLS</span><a href="#TLS" aria-label="Jump to TLS">#</a></summary><div class="toc-children"><a class="toc-link level-2" href="#概述">概述</a><a class="toc-link level-2" href="#TLS-的基本组成">TLS 的基本组成</a><a class="toc-link level-2" href="#TLS-的核心目标">TLS 的核心目标</a><details class="toc-node level-2"><summary><span>TLS 握手流程</span><a href="#TLS-握手流程" aria-label="Jump to TLS 握手流程">#</a></summary><div class="toc-children"><a class="toc-link level-3" href="#1-客户端发起连接">1. 客户端发起连接</a><a class="toc-link level-3" href="#2-服务器响应">2. 服务器响应</a><a class="toc-link level-3" href="#3-验证服务器证书">3. 验证服务器证书</a><a class="toc-link level-3" href="#4-密钥交换">4. 密钥交换</a><a class="toc-link level-3" href="#5-派生会话密钥">5. 派生会话密钥</a><a class="toc-link level-3" href="#6-握手完成">6. 握手完成</a></div></details><details class="toc-node level-2"><summary><span>TLS 1.2 与 TLS 1.3 的区别</span><a href="#TLS-1-2-与-TLS-1-3-的区别" aria-label="Jump to TLS 1.2 与 TLS 1.3 的区别">#</a></summary><div class="toc-children"><a class="toc-link level-3" href="#TLS-1-2-的特点">TLS 1.2 的特点</a><a class="toc-link level-3" href="#TLS-1-3-的特点">TLS 1.3 的特点</a></div></details><details class="toc-node level-2"><summary><span>TLS 中的密码学组件</span><a href="#TLS-中的密码学组件" aria-label="Jump to TLS 中的密码学组件">#</a></summary><div class="toc-children"><a class="toc-link level-3" href="#非对称加密-密钥交换">非对称加密 &amp;#x2F; 密钥交换</a><a class="toc-link level-3" href="#对称加密">对称加密</a><a class="toc-link level-3" href="#哈希与消息认证">哈希与消息认证</a></div></details><a class="toc-link level-2" href="#为什么-TLS-需要证书">为什么 TLS 需要证书</a><a class="toc-link level-2" href="#一个简化的-TLS-流程示意">一个简化的 TLS 流程示意</a><a class="toc-link level-2" href="#安全性分析">安全性分析</a><a class="toc-link level-2" href="#TLS-的实际应用场景">TLS 的实际应用场景</a><a class="toc-link level-2" href="#一个简单的-OpenSSL-示例">一个简单的 OpenSSL 示例</a></div></details>
+			<details class="toc-node level-1"><summary><span>TLS</span><a href="#TLS" aria-label="Jump to TLS">#</a></summary><div class="toc-children"><a class="toc-link level-2" href="#概述">概述</a><details class="toc-node level-2"><summary><span>握手流程</span><a href="#握手流程" aria-label="Jump to 握手流程">#</a></summary><div class="toc-children"><a class="toc-link level-3" href="#ClientHello">ClientHello</a><a class="toc-link level-3" href="#ServerHello">ServerHello</a></div></details><a class="toc-link level-2" href="#证书">证书</a><a class="toc-link level-2" href="#密钥交换">密钥交换</a><a class="toc-link level-2" href="#会话密钥">会话密钥</a><a class="toc-link level-2" href="#记录协议">记录协议</a><a class="toc-link level-2" href="#TLS-1-2-和-TLS-1-3">TLS 1.2 和 TLS 1.3</a><a class="toc-link level-2" href="#OpenSSL-查看证书">OpenSSL 查看证书</a><a class="toc-link level-2" href="#总结">总结</a></div></details>
 		</aside>
 	
 </article>

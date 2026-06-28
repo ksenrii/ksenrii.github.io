@@ -722,139 +722,117 @@ article {
   
 
 		<div class='post-body mb'>
-			<h1 id="线程局部存储（TLS）与-TLS-回调函数"><a href="#线程局部存储（TLS）与-TLS-回调函数" class="headerlink" title="线程局部存储（TLS）与 TLS 回调函数"></a>线程局部存储（TLS）与 TLS 回调函数</h1><p>TLS（Thread Local Storage，线程局部存储）是 Windows 中一个容易被忽视但又非常重要的机制。它最初被设计用来解决多线程中的变量隔离问题，但在逆向工程领域，TLS 回调函数早已成为反调试的常用手段。</p>
+			<h1 id="线程局部存储（TLS）与-TLS-回调函数"><a href="#线程局部存储（TLS）与-TLS-回调函数" class="headerlink" title="线程局部存储（TLS）与 TLS 回调函数"></a>线程局部存储（TLS）与 TLS 回调函数</h1><p>这里的 TLS 不是 Transport Layer Security，而是 <strong>Thread Local Storage</strong>，也就是线程局部存储。它本来是 Windows 用来解决多线程数据隔离的机制，但在逆向里经常和反调试联系在一起，因为 TLS 回调函数会在程序入口点之前执行。</p>
 <span id="more"></span>
 
-<h2 id="什么是线程局部存储"><a href="#什么是线程局部存储" class="headerlink" title="什么是线程局部存储"></a>什么是线程局部存储</h2><p>先看官方定义（<a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/cpp/parallel/thread-local-storage-tls?view=msvc-160">Microsoft Docs</a>）：</p>
-<blockquote>
-<p>Thread Local Storage (TLS) is the method by which each thread in a given multithreaded process can allocate locations in which to store thread-specific data.</p>
-</blockquote>
-<p>翻译过来就是：<strong>TLS 是一种让每个线程拥有独立数据副本的机制。</strong> 同一个进程里的多个线程，对 TLS 变量各自持有一份拷贝，互不干扰。</p>
-<h2 id="为什么需要它"><a href="#为什么需要它" class="headerlink" title="为什么需要它"></a>为什么需要它</h2><p>想象一个场景：你写了一个网络请求库，内部用一个全局变量记录当前请求的 ID。在单线程里没问题，一旦多个线程同时调用，不同请求的 ID 就会互相覆盖，导致日志混乱。</p>
-<p>传统的解决办法是加锁，但锁本身有开销。TLS 提供了另一种思路：<strong>让每个线程自然持有自己的那份数据，根本不需要抢。</strong></p>
-<p>这通过底层 <code>FS</code>（32 位）&#x2F; <code>GS</code>（64 位）段寄存器实现——TLS 变量不经过普通的 <code>DS</code> 数据段，而是走独立的段寻址，天然与线程绑定。</p>
-<h2 id="两种使用方式"><a href="#两种使用方式" class="headerlink" title="两种使用方式"></a>两种使用方式</h2><p>Windows 支持静态和动态两种方式。</p>
-<h3 id="静态：-declspec-thread-和-thread-local"><a href="#静态：-declspec-thread-和-thread-local" class="headerlink" title="静态：__declspec(thread) 和 thread_local"></a>静态：<code>__declspec(thread)</code> 和 <code>thread_local</code></h3><p>编译期确定，变量放入 <code>.tls</code> 段：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__declspec(thread) <span class="type">int</span> session_id = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+<h2 id="线程局部存储"><a href="#线程局部存储" class="headerlink" title="线程局部存储"></a>线程局部存储</h2><p>在多线程程序里，普通全局变量是所有线程共享的。如果多个线程同时读写同一个全局变量，就可能互相覆盖。</p>
+<p>TLS 的思路很直接：让每个线程都拥有同一个变量的独立副本。</p>
+<p>也就是说，变量名看起来一样，但不同线程访问到的是不同数据。</p>
+<p>例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__declspec(thread) <span class="type">int</span> last_error = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
 
-<p>C++11 之后也可以用标准写法：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">thread_local</span> <span class="type">int</span> session_id = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+<p>此时每个线程都有自己的 <code>last_error</code>。A 线程写入 <code>1001</code>，B 线程写入 <code>2002</code>，它们互不影响。</p>
+<p>这和 <code>GetLastError()</code> 的行为很像。每个线程都有自己的错误码，所以 A 线程的错误不会覆盖 B 线程。</p>
+<h2 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h2><p>Windows 中 TLS 常见有两种使用方式。</p>
+<h3 id="静态-TLS"><a href="#静态-TLS" class="headerlink" title="静态 TLS"></a>静态 TLS</h3><p>静态 TLS 在编译期就确定，常见写法是：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__declspec(thread) <span class="type">int</span> value = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
 
-<p>最大的优点是简洁，但灵活性差——变量数量在编译期就固定了，且 DLL 动态加载时有兼容问题（Windows Vista 之前会直接崩溃）。</p>
-<h3 id="动态：TLS-API"><a href="#动态：TLS-API" class="headerlink" title="动态：TLS API"></a>动态：TLS API</h3><p>运行时按需分配，四步走：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DWORD idx = TlsAlloc();         <span class="comment">// 1. 申请一个槽位</span></span><br><span class="line">TlsSetValue(idx, data_ptr);     <span class="comment">// 2. 往槽位存数据</span></span><br><span class="line"><span class="type">void</span>* p = TlsGetValue(idx);     <span class="comment">// 3. 从槽位取数据</span></span><br><span class="line">TlsFree(idx);                   <span class="comment">// 4. 释放槽位</span></span><br></pre></td></tr></table></figure>
+<p>C++11 之后也可以写成：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">thread_local</span> <span class="type">int</span> value = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
 
-<p>动态方式适合 DLL 插件、不确定线程数量的场景。Windows 内部每个线程维护一个指针数组，TLS 索引就是数组下标。所以 <code>TlsAlloc</code> 分配的索引有上限（通常是 64 或 1088，取决于系统版本）。</p>
-<h2 id="declspec-thread-的使用限制"><a href="#declspec-thread-的使用限制" class="headerlink" title="__declspec(thread) 的使用限制"></a><code>__declspec(thread)</code> 的使用限制</h2><p>以下是 MSVC 编译器的硬性规则（来自官方文档）：</p>
-<ol>
-<li><p><strong>不能修饰函数</strong></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__declspec(thread) <span class="type">void</span> <span class="title function_">handler</span><span class="params">()</span>;  <span class="comment">// 编译错误</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>只能修饰静态存储期的变量</strong>——全局变量、函数内的 <code>static</code> 变量、类的静态成员。栈上的自动变量不行：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> <span class="title function_">foo</span><span class="params">()</span> &#123;</span><br><span class="line">    __declspec(thread) <span class="type">int</span> local;   <span class="comment">// 编译错误</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>声明和定义必须一致</strong></p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">extern</span> <span class="type">int</span> n;                        <span class="comment">// 普通声明</span></span><br><span class="line">__declspec(thread) <span class="type">int</span> n;            <span class="comment">// 定义却带了 thread → 错误</span></span><br><span class="line"><span class="keyword">extern</span> __declspec(thread) <span class="type">int</span> n;     <span class="comment">// 声明也必须带 thread</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>不能用作类型修饰符</strong>——<code>__declspec(thread)</code> 修饰的是变量本身，不是它指向的类型：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">char</span> __declspec(thread) *p;  <span class="comment">// 编译错误，意图模糊</span></span><br></pre></td></tr></table></figure>
-</li>
-<li><p><strong>C 与 C++ 的差异</strong>——C 语言不允许用 TLS 变量的地址去初始化另一个指针或变量，但 C++ 可以，因为 C++ 支持动态初始化：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">__declspec(thread) <span class="type">int</span> v;</span><br><span class="line"><span class="type">int</span> *ptr = &amp;v;       <span class="comment">// C 报错，C++ 允许</span></span><br></pre></td></tr></table></figure>
+<p>这种方式简单，但变量数量和位置在编译期就固定了，灵活性不如动态 TLS。</p>
+<h3 id="动态-TLS"><a href="#动态-TLS" class="headerlink" title="动态 TLS"></a>动态 TLS</h3><p>动态 TLS 通过 Windows API 在运行时分配槽位：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DWORD idx = TlsAlloc();</span><br><span class="line">TlsSetValue(idx, ptr);</span><br><span class="line"><span class="type">void</span> *p = TlsGetValue(idx);</span><br><span class="line">TlsFree(idx);</span><br></pre></td></tr></table></figure>
 
-<p>但有一个例外：无论在 C 还是 C++ 中，TLS 变量<strong>不能用自身的值来初始化自身</strong>：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">__declspec(thread) <span class="type">int</span> v = v;        <span class="comment">// C 和 C++ 都报错</span></span><br><span class="line">__declspec(thread) <span class="type">int</span> v = <span class="keyword">sizeof</span>(v); <span class="comment">// 但 sizeof 不构成自引用，合法</span></span><br></pre></td></tr></table></figure></li>
-</ol>
-<h3 id="直观验证"><a href="#直观验证" class="headerlink" title="直观验证"></a>直观验证</h3><p>写一个简单例子感受一下线程隔离的效果：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">__declspec(thread) DWORD last_error_code = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 模拟某种操作，把错误码记到 TLS 里</span></span><br><span class="line">DWORD WINAPI <span class="title function_">worker</span><span class="params">(LPVOID seed)</span> &#123;</span><br><span class="line">    DWORD tid = GetCurrentThreadId();</span><br><span class="line">    last_error_code = (DWORD)(ULONG_PTR)seed;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[tid %lu] write error code = %lu\n&quot;</span>, tid, last_error_code);</span><br><span class="line">    Sleep(<span class="number">200</span>);   <span class="comment">// 让步给其他线程</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[tid %lu] read error code = %lu\n&quot;</span>, tid, last_error_code);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    HANDLE t1 = CreateThread(<span class="literal">NULL</span>, <span class="number">0</span>, worker, (LPVOID)<span class="number">1001</span>, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line">    HANDLE t2 = CreateThread(<span class="literal">NULL</span>, <span class="number">0</span>, worker, (LPVOID)<span class="number">2002</span>, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    WaitForSingleObject(t1, INFINITE);</span><br><span class="line">    WaitForSingleObject(t2, INFINITE);</span><br><span class="line">    CloseHandle(t1);</span><br><span class="line">    CloseHandle(t2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以把 <code>idx</code> 理解成当前线程 TLS 数组里的下标。不同线程用同一个下标取值，但取到的是各自线程里的数据。</p>
+<h2 id="一个例子"><a href="#一个例子" class="headerlink" title="一个例子"></a>一个例子</h2><p>下面这个例子可以直观看到 TLS 变量不会被其他线程覆盖：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">__declspec(thread) DWORD code = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">DWORD WINAPI <span class="title function_">worker</span><span class="params">(LPVOID arg)</span> &#123;</span><br><span class="line">    DWORD tid = GetCurrentThreadId();</span><br><span class="line">    code = (DWORD)(ULONG_PTR)arg;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[tid %lu] write = %lu\n&quot;</span>, tid, code);</span><br><span class="line">    Sleep(<span class="number">200</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[tid %lu] read  = %lu\n&quot;</span>, tid, code);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    HANDLE t1 = CreateThread(<span class="literal">NULL</span>, <span class="number">0</span>, worker, (LPVOID)<span class="number">1001</span>, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line">    HANDLE t2 = CreateThread(<span class="literal">NULL</span>, <span class="number">0</span>, worker, (LPVOID)<span class="number">2002</span>, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    WaitForSingleObject(t1, INFINITE);</span><br><span class="line">    WaitForSingleObject(t2, INFINITE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>输出类似：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[tid 1234] write error code = 1001</span><br><span class="line">[tid 5678] write error code = 2002</span><br><span class="line">[tid 1234] read error code = 1001</span><br><span class="line">[tid 5678] read error code = 2002</span><br></pre></td></tr></table></figure>
+<p>输出大概是：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[tid 1234] write = 1001</span><br><span class="line">[tid 5678] write = 2002</span><br><span class="line">[tid 1234] read  = 1001</span><br><span class="line">[tid 5678] read  = 2002</span><br></pre></td></tr></table></figure>
 
-<p>每个线程读回的都是自己写进去的值，不会被另一个线程覆盖。如果是普通全局变量，后写入的 <code>2002</code> 会把 <code>1001</code> 冲掉。</p>
-<p>这个模式在实际工程里很常见——比如 <code>GetLastError()</code> 返回的错误码其实就是线程局部存储的，这也是为什么你在 A 线程调 <code>SetLastError</code> 不会影响 B 线程。</p>
-<h2 id="TLS-回调函数"><a href="#TLS-回调函数" class="headerlink" title="TLS 回调函数"></a>TLS 回调函数</h2><h3 id="回调函数的原型和时机"><a href="#回调函数的原型和时机" class="headerlink" title="回调函数的原型和时机"></a>回调函数的原型和时机</h3><p>PE 格式允许程序注册一个或多个 <strong>TLS 回调函数指针</strong>，存放在一个以 NULL 结尾的数组里。这些回调在以下时机会被系统调用：</p>
+<p>如果 <code>code</code> 是普通全局变量，那么后写入的值就可能把前一个线程的值冲掉。</p>
+<h2 id="TLS-回调函数"><a href="#TLS-回调函数" class="headerlink" title="TLS 回调函数"></a>TLS 回调函数</h2><p>TLS 另一个更关键的点是 <strong>TLS 回调函数</strong>。</p>
+<p>PE 文件可以注册一组 TLS callback。系统加载程序时，会在进入 <code>main</code> &#x2F; <code>WinMain</code> 之前调用这些回调函数。</p>
+<p>函数原型和 <code>DllMain</code> 类似：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">VOID</span> <span class="params">(NTAPI *PIMAGE_TLS_CALLBACK)</span><span class="params">(</span></span><br><span class="line"><span class="params">    PVOID DllHandle,</span></span><br><span class="line"><span class="params">    DWORD Reason,</span></span><br><span class="line"><span class="params">    PVOID Reserved</span></span><br><span class="line"><span class="params">)</span>;</span><br></pre></td></tr></table></figure>
+
+<p>常见 <code>Reason</code> 有：</p>
 <table>
 <thead>
 <tr>
-<th><code>Reason</code> 值</th>
+<th>Reason</th>
 <th>含义</th>
 </tr>
 </thead>
 <tbody><tr>
-<td><code>DLL_PROCESS_ATTACH</code> (1)</td>
-<td>进程启动，包括创建主线程</td>
+<td><code>DLL_PROCESS_ATTACH</code></td>
+<td>进程启动</td>
 </tr>
 <tr>
-<td><code>DLL_THREAD_ATTACH</code> (2)</td>
-<td>新线程创建（主线程除外）</td>
+<td><code>DLL_THREAD_ATTACH</code></td>
+<td>新线程创建</td>
 </tr>
 <tr>
-<td><code>DLL_THREAD_DETACH</code> (3)</td>
-<td>线程即将销毁</td>
+<td><code>DLL_THREAD_DETACH</code></td>
+<td>线程退出</td>
 </tr>
 <tr>
-<td><code>DLL_PROCESS_DETACH</code> (0)</td>
+<td><code>DLL_PROCESS_DETACH</code></td>
 <td>进程退出</td>
 </tr>
 </tbody></table>
-<p>函数签名和 <code>DllMain</code> 完全一样：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">VOID</span> <span class="params">(NTAPI *PIMAGE_TLS_CALLBACK)</span><span class="params">(</span></span><br><span class="line"><span class="params">    PVOID DllHandle,</span></span><br><span class="line"><span class="params">    DWORD Reason,</span></span><br><span class="line"><span class="params">    PVOID Reserved</span></span><br><span class="line"><span class="params">)</span>;</span><br></pre></td></tr></table></figure>
+<p>重点在第一项：进程启动时，TLS callback 会比入口点更早执行。</p>
+<p>这也是它常用于反调试的原因。</p>
+<h2 id="注册回调"><a href="#注册回调" class="headerlink" title="注册回调"></a>注册回调</h2><p>MSVC 下可以用 <code>.CRT$XL*</code> 段注册 TLS 回调。</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> _WIN64</span></span><br><span class="line">    <span class="meta">#<span class="keyword">pragma</span> comment(linker, <span class="string">&quot;/INCLUDE:_tls_used&quot;</span>)</span></span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">    <span class="meta">#<span class="keyword">pragma</span> comment(linker, <span class="string">&quot;/INCLUDE:__tls_used&quot;</span>)</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> NTAPI <span class="title function_">tls_callback</span><span class="params">(PVOID mod, DWORD reason, PVOID reserved)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (reason == DLL_PROCESS_ATTACH) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;[TLS] before main\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> data_seg(<span class="string">&quot;.CRT$XLB&quot;</span>)</span></span><br><span class="line">PIMAGE_TLS_CALLBACK g_tls[] = &#123; tls_callback, <span class="literal">NULL</span> &#125;;</span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> data_seg()</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[main]\n&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>核心要点：<strong>进程启动时，TLS 回调在用户代码入口点之前就被调用了。</strong> 也就是说，当你的 <code>main</code> &#x2F; <code>WinMain</code> 还没执行，甚至 CRT 还没完全初始化时，TLS 回调已经跑完了第一轮。这是它被反调试利用的根本原因。</p>
-<h3 id="注册方法"><a href="#注册方法" class="headerlink" title="注册方法"></a>注册方法</h3><p>要让编译器生成 TLS 回调，需要三步。</p>
-<p><strong>第一步</strong>，用 <code>#pragma comment(linker, ...)</code> 告诉链接器引入 TLS 相关的符号。32 位和 64 位的符号名不同：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">ifdef</span> _WIN64</span></span><br><span class="line">    <span class="meta">#<span class="keyword">pragma</span> comment(linker, <span class="string">&quot;/INCLUDE:_tls_used&quot;</span>)</span></span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">    <span class="meta">#<span class="keyword">pragma</span> comment(linker, <span class="string">&quot;/INCLUDE:__tls_used&quot;</span>)</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+<p>运行时会先看到：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[TLS] before main</span><br><span class="line">[main]</span><br></pre></td></tr></table></figure>
 
-<p><code>_tls_used</code>（64 位）和 <code>__tls_used</code>（32 位）这个符号是 CRT 自动生成的，指向 <code>IMAGE_TLS_DIRECTORY</code> 结构。链接器默认会把它优化掉（因为代码里没有直接引用它），所以必须用 <code>/INCLUDE</code> 强制保留。</p>
-<p><strong>第二步</strong>，把回调函数指针数组放到 <code>.CRT$XLx</code> 段里：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> NTAPI <span class="title function_">my_tls_callback</span><span class="params">(PVOID handle, DWORD reason, PVOID reserved)</span> &#123;</span><br><span class="line">    <span class="comment">// 回调逻辑</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 注册：32 位放 data 段，64 位放 const 段</span></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> data_seg(<span class="string">&quot;.CRT$XLB&quot;</span>)</span></span><br><span class="line">EXTERN_C PIMAGE_TLS_CALLBACK tls_callbacks[] = &#123; my_tls_callback, <span class="literal">NULL</span> &#125;;</span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> data_seg()</span></span><br></pre></td></tr></table></figure>
+<p>也就是说，调试器如果只断在 <code>main</code>，这时 TLS 回调已经执行过了。</p>
+<p><code>.CRT&lt;span class=&quot;math-inline&quot;&gt;\(XLB</code> 里的 <code>B</code> 决定了链接时的排序。链接器会把 <code>.CRT\)&lt;/span&gt;XL*</code> 这类段按字母顺序合并，所以不同字母会影响回调的执行顺序。</p>
+<h2 id="PE-中的位置"><a href="#PE-中的位置" class="headerlink" title="PE 中的位置"></a>PE 中的位置</h2><p>TLS 信息在 PE 的 DataDirectory 里，对应：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">IMAGE_DIRECTORY_ENTRY_TLS = 9</span><br></pre></td></tr></table></figure>
 
-<p>段名 <code>.CRT$XLx</code> 的含义拆解：</p>
+<p>里面有一个 <code>IMAGE_TLS_DIRECTORY</code> 结构，比较重要的字段是：</p>
 <ul>
-<li><strong>CRT</strong> — 属于 C Runtime 的约定</li>
-<li><strong>X</strong> — 前缀，表示这个段里的内容是 TLS 回调指针</li>
-<li><strong>L</strong> — 标记为 TLS callback section</li>
-<li><strong>最后一位</strong>（B ~ Y）— 决定链接时的合并顺序。链接器会把所有 <code>.CRT$XL*</code> 段按字母序拼在一起，所以 B 的回调会比 C 的回调先执行</li>
+<li><code>StartAddressOfRawData</code></li>
+<li><code>EndAddressOfRawData</code></li>
+<li><code>AddressOfIndex</code></li>
+<li><code>AddressOfCallBacks</code></li>
 </ul>
-<p>第三步其实隐含在第二步里了：<code>tls_callbacks</code> 这个全局变量名只要与链接器 <code>/INCLUDE</code> 中指定的符号名一致，链接器就能找到它。</p>
-<h3 id="完整示例"><a href="#完整示例" class="headerlink" title="完整示例"></a>完整示例</h3><p>下面是一个能直接编译运行的演示，展示回调函数的调用时机早于 <code>main</code>：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 链接器声明 —— 32/64 位兼容</span></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> _WIN64</span></span><br><span class="line">    <span class="meta">#<span class="keyword">pragma</span> comment(linker, <span class="string">&quot;/INCLUDE:_tls_used&quot;</span>)</span></span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">    <span class="meta">#<span class="keyword">pragma</span> comment(linker, <span class="string">&quot;/INCLUDE:__tls_used&quot;</span>)</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="comment">// TLS 回调</span></span><br><span class="line"><span class="type">void</span> NTAPI <span class="title function_">on_tls_event</span><span class="params">(PVOID mod, DWORD reason, PVOID reserved)</span> &#123;</span><br><span class="line">    <span class="type">const</span> <span class="type">char</span> *name;</span><br><span class="line">    <span class="keyword">switch</span> (reason) &#123;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">1</span>:  name = <span class="string">&quot;PROCESS_ATTACH&quot;</span>;  <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">2</span>:  name = <span class="string">&quot;THREAD_ATTACH&quot;</span>;   <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">3</span>:  name = <span class="string">&quot;THREAD_DETACH&quot;</span>;   <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">case</span> <span class="number">0</span>:  name = <span class="string">&quot;PROCESS_DETACH&quot;</span>;  <span class="keyword">break</span>;</span><br><span class="line">        <span class="keyword">default</span>: name = <span class="string">&quot;UNKNOWN&quot;</span>;         <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[TLS callback] reason = %s, tid = %lu\n&quot;</span>,</span><br><span class="line">           name, GetCurrentThreadId());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 注册回调数组</span></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> data_seg(<span class="string">&quot;.CRT$XLB&quot;</span>)</span></span><br><span class="line">PIMAGE_TLS_CALLBACK g_tls[] = &#123; on_tls_event, <span class="literal">NULL</span> &#125;;</span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> data_seg()</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[main] hello from tid = %lu\n&quot;</span>, GetCurrentThreadId());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>运行结果：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">[TLS callback] reason = PROCESS_ATTACH, tid = 8140</span><br><span class="line">[main] hello from tid = 8140</span><br><span class="line">[TLS callback] reason = PROCESS_DETACH, tid = 8140</span><br></pre></td></tr></table></figure>
-
-<p><code>PROCESS_ATTACH</code> 的打印出现在 <code>[main]</code> 之前，这就是 TLS 回调的特点。</p>
-<h2 id="在-PE-文件中的位置"><a href="#在-PE-文件中的位置" class="headerlink" title="在 PE 文件中的位置"></a>在 PE 文件中的位置</h2><p>从二进制角度看，TLS 信息通过 <code>IMAGE_TLS_DIRECTORY</code> 记录，它是 PE 可选头里 <code>DataDirectory[9]</code>（即 <code>IMAGE_DIRECTORY_ENTRY_TLS</code>）。</p>
-<p>用 CFF Explorer 或 PE-bear 打开一个带 TLS 回调的 exe，在 TLS 目录中能看到：</p>
-<ul>
-<li><strong>AddressOfCallBacks</strong>：指向回调函数指针数组（以 NULL 结尾）</li>
-<li><strong>StartAddressOfRawData &#x2F; EndAddressOfRawData</strong>：<code>.tls</code> 数据段起止</li>
-<li><strong>AddressOfIndex</strong>：指向存放当前线程 TLS 索引的位置</li>
-</ul>
-<p>知道这个结构后，逆向分析时看一眼 DataDirectory[9] 就能判断程序是否用了 TLS 回调——如果 AddressOfCallBacks 非零，里面大概率有料。</p>
-<h2 id="反调试中的应用"><a href="#反调试中的应用" class="headerlink" title="反调试中的应用"></a>反调试中的应用</h2><p>TLS 回调在反调试场景里太常见了，核心原因就一条：<strong>它比入口点更早执行。</strong></p>
-<p>普通的调试器默认断到 <code>main</code> 或 <code>WinMain</code>，而 TLS 回调在这之前已经把反调试检查做完了。一旦发现调试器，直接 <code>ExitProcess</code>，分析者看到的只是”程序闪退”。</p>
-<h3 id="检测逻辑"><a href="#检测逻辑" class="headerlink" title="检测逻辑"></a>检测逻辑</h3><p>思路很简单：在 <code>PROCESS_ATTACH</code> 阶段调用检测函数，判断当前进程是否被调试，有就退出。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> NTAPI <span class="title function_">antidebug_check</span><span class="params">(PVOID mod, DWORD reason, PVOID res)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (reason != <span class="number">1</span>) <span class="keyword">return</span>;  <span class="comment">// 只在进程启动时检查</span></span><br><span class="line"></span><br><span class="line">    BOOL being_debugged;</span><br><span class="line">    CheckRemoteDebuggerPresent(GetCurrentProcess(), &amp;being_debugged);</span><br><span class="line">    <span class="keyword">if</span> (being_debugged) &#123;</span><br><span class="line">        TerminateProcess(GetCurrentProcess(), <span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p><code>CheckRemoteDebuggerPresent</code> 的底层原理和 <code>IsDebuggerPresent</code> 一样，都是读当前进程 PEB 里的 <code>BeingDebugged</code> 字段（<code>PEB + 0x02</code>）。区别在于 <code>CheckRemoteDebuggerPresent</code> 的接口允许传入其他进程句柄，功能上更通用；而 <code>IsDebuggerPresent</code> 只能查自己。</p>
-<h3 id="绕过思路"><a href="#绕过思路" class="headerlink" title="绕过思路"></a>绕过思路</h3><p>既然知道了原理，绕过也不难：</p>
+<p>其中 <code>AddressOfCallBacks</code> 指向 TLS 回调函数指针数组，并且数组以 NULL 结尾。</p>
+<p>逆向时可以直接用 CFF Explorer、PE-bear 或者 IDA 看 TLS Directory。如果 <code>AddressOfCallBacks</code> 非空，就说明程序注册了 TLS 回调。</p>
+<h2 id="反调试"><a href="#反调试" class="headerlink" title="反调试"></a>反调试</h2><p>TLS 回调用于反调试的思路很简单：</p>
 <ol>
-<li><strong>在系统断点就停</strong>：x64dbg 里改成 System Breakpoint，此时 TLS 回调还没触发，可以直接在回调地址上下断</li>
-<li><strong>Patch TLS 回调表</strong>：把 <code>AddressOfCallBacks</code> 指向的数组第一项改为 NULL，等价于清空回调</li>
-<li><strong>Hook 检测 API</strong>：在 <code>CheckRemoteDebuggerPresent</code> 上做手脚，让它始终返回 FALSE</li>
-<li><strong>修改 PEB</strong>：最直接的方法，把 <code>BeingDebugged</code> 字段清零</li>
+<li>在入口点之前执行</li>
+<li>先检查有没有调试器</li>
+<li>如果发现调试器，直接退出</li>
 </ol>
-<p>如果你只是分析而不需要让程序正常跑完，最快的方法就是去 PE 的 TLS 目录看一眼，发现回调就清掉。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>TLS 本身是一个朴实的设计：为每个线程提供独立的存储空间，避免同步开销。但加上回调机制后，它变成了反调试的利器，利用的就是回调函数在程序入口点之前执行的时间窗口。</p>
-<p>理解 TLS，既有助于写出更严谨的多线程代码，也能在逆向时多一份敏感度——看到 DataDirectory[9] 非空时，你就知道有人想在你断下之前偷偷做点什么。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
-<li><a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/cpp/parallel/thread-local-storage-tls?view=msvc-160">Thread Local Storage (TLS) — Microsoft Docs</a></li>
-<li><a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/windows/win32/debug/pe-format#tls-callback-functions">PE Format: TLS Callback Functions — Microsoft Docs</a></li>
-<li><a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/windows/win32/procthread/using-thread-local-storage">Using Thread Local Storage — Win32 apps</a></li>
-<li><a target="_blank" rel="noopener" href="https://www.52pojie.cn/thread-1490663-1-1.html">反调试实战系列二 TLS反调试 — 52pojie</a></li>
-</ul>
+<p>例如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> NTAPI <span class="title function_">antidebug_tls</span><span class="params">(PVOID mod, DWORD reason, PVOID reserved)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (reason != DLL_PROCESS_ATTACH) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    BOOL debugged = FALSE;</span><br><span class="line">    CheckRemoteDebuggerPresent(GetCurrentProcess(), &amp;debugged);</span><br><span class="line">    <span class="keyword">if</span> (debugged) &#123;</span><br><span class="line">        ExitProcess(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样调试器如果默认断在入口点，可能看到的只是程序一闪而过，因为检查早就完成了。</p>
+<p><code>CheckRemoteDebuggerPresent</code> 和 <code>IsDebuggerPresent</code> 都会涉及 PEB 中的调试标志，例如 <code>BeingDebugged</code> 字段。</p>
+<h2 id="绕过"><a href="#绕过" class="headerlink" title="绕过"></a>绕过</h2><p>知道它在哪里执行，绕过思路也就清楚了。</p>
+<p>常见方法：</p>
+<ol>
+<li>在系统断点停下，不要等到程序入口点</li>
+<li>找到 TLS Directory，看 <code>AddressOfCallBacks</code></li>
+<li>在回调地址下断点，单步分析</li>
+<li>Patch 回调数组，把第一项改成 NULL</li>
+<li>Patch 检测逻辑，让它不退出</li>
+<li>修改 PEB 中的调试标志</li>
+</ol>
+<p>如果只是想让样本先跑起来，最直接的方法就是把 TLS 回调表清空。</p>
+<p>也就是让：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AddressOfCallBacks -&gt; NULL</span><br></pre></td></tr></table></figure>
+
+<p>或者把回调数组第一项改为 <code>0</code>。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>线程局部存储本身是一个多线程机制，用来让不同线程拥有独立数据。</p>
+<p>但 TLS 回调函数会在入口点之前执行，这就给反调试提供了一个很好的时间点。逆向时如果程序还没进 <code>main</code> 就退出，或者入口点前已经发生了异常行为，就应该先看 PE 的 TLS Directory。</p>
+<p>看到 <code>AddressOfCallBacks</code> 非空，就要意识到：真正的逻辑可能在入口点之前就已经开始了。</p>
 
 		</div>
 		<div class="meta split">
@@ -864,7 +842,7 @@ article {
 	
 		<aside class="post-toc">
 			<div class="post-toc-title">&#30446;&#24405;</div>
-			<details class="toc-node level-1"><summary><span>线程局部存储（TLS）与 TLS 回调函数</span><a href="#线程局部存储（TLS）与-TLS-回调函数" aria-label="Jump to 线程局部存储（TLS）与 TLS 回调函数">#</a></summary><div class="toc-children"><a class="toc-link level-2" href="#什么是线程局部存储">什么是线程局部存储</a><a class="toc-link level-2" href="#为什么需要它">为什么需要它</a><details class="toc-node level-2"><summary><span>两种使用方式</span><a href="#两种使用方式" aria-label="Jump to 两种使用方式">#</a></summary><div class="toc-children"><a class="toc-link level-3" href="#静态：-declspec-thread-和-thread-local">静态：__declspec(thread) 和 thread_local</a><a class="toc-link level-3" href="#动态：TLS-API">动态：TLS API</a></div></details><details class="toc-node level-2"><summary><span>__declspec(thread) 的使用限制</span><a href="#declspec-thread-的使用限制" aria-label="Jump to __declspec(thread) 的使用限制">#</a></summary><div class="toc-children"><a class="toc-link level-3" href="#直观验证">直观验证</a></div></details><details class="toc-node level-2"><summary><span>TLS 回调函数</span><a href="#TLS-回调函数" aria-label="Jump to TLS 回调函数">#</a></summary><div class="toc-children"><a class="toc-link level-3" href="#回调函数的原型和时机">回调函数的原型和时机</a><a class="toc-link level-3" href="#注册方法">注册方法</a><a class="toc-link level-3" href="#完整示例">完整示例</a></div></details><a class="toc-link level-2" href="#在-PE-文件中的位置">在 PE 文件中的位置</a><details class="toc-node level-2"><summary><span>反调试中的应用</span><a href="#反调试中的应用" aria-label="Jump to 反调试中的应用">#</a></summary><div class="toc-children"><a class="toc-link level-3" href="#检测逻辑">检测逻辑</a><a class="toc-link level-3" href="#绕过思路">绕过思路</a></div></details><a class="toc-link level-2" href="#总结">总结</a><a class="toc-link level-2" href="#参考">参考</a></div></details>
+			<details class="toc-node level-1"><summary><span>线程局部存储（TLS）与 TLS 回调函数</span><a href="#线程局部存储（TLS）与-TLS-回调函数" aria-label="Jump to 线程局部存储（TLS）与 TLS 回调函数">#</a></summary><div class="toc-children"><a class="toc-link level-2" href="#线程局部存储">线程局部存储</a><details class="toc-node level-2"><summary><span>使用方式</span><a href="#使用方式" aria-label="Jump to 使用方式">#</a></summary><div class="toc-children"><a class="toc-link level-3" href="#静态-TLS">静态 TLS</a><a class="toc-link level-3" href="#动态-TLS">动态 TLS</a></div></details><a class="toc-link level-2" href="#一个例子">一个例子</a><a class="toc-link level-2" href="#TLS-回调函数">TLS 回调函数</a><a class="toc-link level-2" href="#注册回调">注册回调</a><a class="toc-link level-2" href="#PE-中的位置">PE 中的位置</a><a class="toc-link level-2" href="#反调试">反调试</a><a class="toc-link level-2" href="#绕过">绕过</a><a class="toc-link level-2" href="#总结">总结</a></div></details>
 		</aside>
 	
 </article>
