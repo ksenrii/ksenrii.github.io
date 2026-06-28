@@ -556,12 +556,18 @@ body.page-home .footer-inner {
   letter-spacing: 0.1em;
   margin: 0;
 }
+.home-anime__body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 132px;
+  gap: 18px;
+  align-items: stretch;
+}
 .home-anime__orbit {
   position: relative;
   width: 100%;
-  aspect-ratio: 1.28;
-  min-height: 300px;
-  margin: 2px 0 18px;
+  aspect-ratio: 1.08;
+  min-height: 250px;
+  margin: 0;
 }
 .home-anime__ring {
   position: absolute;
@@ -631,15 +637,16 @@ body.page-home .footer-inner {
   border-color: #22c55e;
 }
 .home-anime__detail {
-  display: grid;
-  grid-template-columns: 92px 1fr;
-  gap: 16px;
-  align-items: center;
-  padding-top: 16px;
-  border-top: 1px solid rgba(0,0,0,0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  min-width: 0;
+  padding-left: 18px;
+  border-left: 1px solid rgba(0,0,0,0.06);
 }
 .home-anime__poster {
-  width: 92px;
+  width: 100%;
   aspect-ratio: 3/4;
   object-fit: cover;
   border-radius: 14px;
@@ -649,9 +656,10 @@ body.page-home .footer-inner {
 .home-anime__name {
   margin: 0;
   color: #333;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: 400;
   line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 body.page-home .home-tooltip {
   position: fixed !important;
@@ -717,11 +725,21 @@ body.page-home .home-tooltip.visible {
   .home-anime {
     padding: 20px;
   }
+  .home-anime__body {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
   .home-anime__orbit {
     min-height: 260px;
   }
   .home-anime__detail {
+    display: grid;
     grid-template-columns: 76px 1fr;
+    align-items: center;
+    padding-left: 0;
+    padding-top: 16px;
+    border-left: none;
+    border-top: 1px solid rgba(0,0,0,0.06);
   }
   .home-anime__poster {
     width: 76px;
