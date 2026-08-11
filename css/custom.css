@@ -1,67 +1,54 @@
-/* 1. 页脚/页头透明化（保留你的原有代码） */
+/* Butterfly theme custom overrides for ksenr's blog */
+
+/* Smooth math display scrolling */
+.math-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.35rem 0;
+}
+
+/* MathJax container responsive */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+
+mjx-container svg {
+  max-width: none;
+}
+
+/* Math inline spacing */
+.math-inline, span.mathjax, span.katex {
+  margin: 0 0.2em;
+}
+
+/* Article body line height for better readability */
+#article-container p {
+  line-height: 1.9;
+}
+
+/* Footer: replace solid blue with dark gradient */
 #footer {
-  background: transparent !important;
-}
-#page-header {
-  background: transparent !important;
-}
-#footer::before {
-  background: transparent !important;
-}
-#page-header::before {
-  background: transparent !important;
-}
-[data-theme="dark"] #footer::before {
-  background: transparent !important;
-}
-[data-theme="dark"] #page-header::before {
-  background: transparent !important;
+  background-color: #1a1a2e !important;
+  background-image: linear-gradient(135deg, #16213e 0%, #0f3460 100%) !important;
+  background-attachment: scroll !important;
 }
 
-/* 2. 给页面主体配置背景图（新增！这是显示背景的关键） */
-body.page-home {
-  background-color: #e4ecef !important;
-}
-body:not(.page-home) {
-  /* 本地图片路径写法（推荐，优先用这个测试） */
-  background-image: url('/images/2126e25907dfdf69707bae26ba6294c.png') !important;
-  /* 若用生成的URL，替换上面这行：
-  background-image: url('你的图片URL') !important;
-  */
-  
-  /* 以下属性必须加，避免图片拉伸/重复/显示不全 */
-  background-repeat: no-repeat !important;   /* 禁止图片重复 */
-  background-size: cover !important;        /* 覆盖整个屏幕 */
-  background-attachment: fixed !important;  /* 滚动时背景固定 */
-  background-position: center center !important; /* 图片居中 */
-  background-color: #f5f5f5 !important;     /* 图片加载失败时的备用底色 */
+#footer-wrap {
+  color: rgba(255, 255, 255, 0.85);
 }
 
-/* 3. 修复内容区域背景（避免文字区域遮挡背景） */
-#body-wrap {
-  background: transparent !important;
-}
-[data-theme="dark"] #body-wrap {
-  background: transparent !important;
+#footer-wrap a {
+  color: rgba(255, 255, 255, 0.7);
 }
 
-/* 首页副标题 - 自定义颜色（默认白天模式） */
-.subtitle {
-  color: #4a6cf7 !important; /* 主色：淡蓝色（可自己改，推荐十六进制色值） */
-  font-size: 16px !important; /* 字体大小，和主标题搭配，可微调 */
-  font-weight: 500 !important; /* 字体粗细，500是中等，不用太粗 */
+/* Remove avatar hover rotation */
+.avatar-img img:hover {
+  transform: none !important;
 }
 
-/* 副标题 - 夜间模式颜色（适配博客夜间主题，避免看不清） */
-[data-theme="dark"] .subtitle {
-  color: #7abaff !important; /* 夜间模式选浅一点的蓝色，和深色背景对比明显 */
-}
-
-/* 让 MathJax/KaTeX 公式与中文之间自动留间距 */
-.mathjax, .katex {
-    margin: 0 0.25em !important;
-}
-/* 行内公式与前后文字的最小间距 */
-span.mathjax, span.katex {
-    margin: 0 0.2em !important;
+/* Remove card-author description empty space */
+.card-info .author-info__description {
+  display: none;
 }

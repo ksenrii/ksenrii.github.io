@@ -1,954 +1,284 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    
-    <title>about | ksenr&#39;s blog</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-    
-    
-      <link rel="icon" type="image/png" href="/images/to.png">
-      <link rel="apple-touch-icon" href="/images/to.png">
-    
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>about | ksenr's blog</title><meta name="author" content="ksenr"><meta name="copyright" content="ksenr"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta property="og:type" content="website">
+<meta property="og:title" content="about">
+<meta property="og:url" content="https://ksenrii.github.io/about/index.html">
+<meta property="og:site_name" content="ksenr&#39;s blog">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ksenrii.github.io/images/avatar-jointed.jpg">
+<meta property="article:published_time" content="2026-02-06T08:03:02.000Z">
+<meta property="article:modified_time" content="2026-02-06T08:03:03.005Z">
+<meta property="article:author" content="ksenr">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ksenrii.github.io/images/avatar-jointed.jpg"><script type="application/ld+json"></script><link rel="shortcut icon" href="/images/to.png"><link rel="canonical" href="https://ksenrii.github.io/about/index.html"><link rel="preconnect" href="//unpkg.com"/><link rel="stylesheet" href="/css/index.css?v=5.7.0"><link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@7.3.1/css/all.min.css"><link rel="stylesheet" href="https://unpkg.com/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://unpkg.com/@fancyapps/ui@6.1.14/dist/fancybox/fancybox.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
 
-    
-<link rel="stylesheet" href="/css/style.css">
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
 
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
 
-    
+        try {
+          const data = JSON.parse(itemStr)
 
-    
-    
-<link rel="stylesheet" href="/js/google-code-prettify/tomorrow-night-eighties.min.css">
-
-    
-
-  <!-- hexo injector head_end start -->
-<script>
-window.MathJax = {
-  tex: {
-    inlineMath: [["\\(", "\\)"]],
-    displayMath: [["\\[", "\\]"]],
-    processEscapes: true,
-    processEnvironments: true,
-    tags: "ams"
-  },
-  options: {
-    skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"]
-  },
-  chtml: {
-    scale: 1,
-    matchFontHeight: false
-  }
-};
-</script>
-<style>
-:root {
-  --ksenr-brand: #35bfab;
-  --ksenr-ink: #334f52;
-  --ksenr-muted: #66777d;
-  --ksenr-panel: rgba(255, 255, 255, 0.74);
-}
-html {
-  scroll-behavior: smooth;
-  background: #f7fbfa;
-}
-body {
-  color: var(--ksenr-ink);
-  background: transparent !important;
-}
-body > * {
-  position: relative;
-  z-index: 1;
-}
-::selection {
-  background: rgba(53, 191, 171, 0.26);
-  color: #1f3437;
-}
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  background: url("/images/5.jpg") center / cover no-repeat;
-  opacity: 0.68;
-  filter: saturate(1.05);
-  pointer-events: none;
-}
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.28)),
-    radial-gradient(circle at 20% 12%, rgba(53, 191, 171, 0.08), transparent 34%),
-    rgba(255, 255, 255, 0.2);
-  pointer-events: none;
-}
-.reading-progress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 30;
-  width: 100%;
-  height: 3px;
-  transform: scaleX(0);
-  transform-origin: left;
-  background: linear-gradient(90deg, var(--ksenr-brand), #7edbd1);
-}
-.site-header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  height: 68px;
-  padding: 0 42px;
-  background: rgba(255, 255, 255, 0.42);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.52);
-  backdrop-filter: blur(14px);
-  transition: background 180ms ease, box-shadow 180ms ease;
-}
-.site-header.scrolled {
-  background: rgba(255, 255, 255, 0.76);
-  box-shadow: 0 6px 24px rgba(20, 24, 30, 0.08);
-}
-body.page-home::before,
-body.page-home::after {
-  display: none !important;
-}
-html.page-home {
-  background: #e4ecef !important;
-}
-body.page-home header.site-header {
-  position: absolute !important;
-  left: auto !important;
-  right: 0 !important;
-  width: auto !important;
-  max-width: 48% !important;
-  height: auto !important;
-  min-height: 0 !important;
-  padding: 18px 28px !important;
-  justify-content: flex-end !important;
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-  border-bottom: none !important;
-  box-shadow: none !important;
-}
-body.page-home .site-brand {
-  display: none !important;
-}
-body.page-home header.site-header.scrolled {
-  position: fixed !important;
-  background: rgba(255, 255, 255, 0.78) !important;
-  backdrop-filter: blur(14px) !important;
-  -webkit-backdrop-filter: blur(14px) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.52) !important;
-  box-shadow: 0 6px 24px rgba(20, 24, 30, 0.08) !important;
-}
-body.page-home .site-brand,
-body.page-home .site-nav a {
-  color: rgba(255, 255, 255, 0.96) !important;
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.38);
-}
-body.page-home header.site-header.scrolled .site-brand,
-body.page-home header.site-header.scrolled .site-nav a {
-  color: var(--ksenr-muted) !important;
-  text-shadow: none;
-}
-.site-brand {
-  color: var(--ksenr-ink);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-.site-nav {
-  display: flex !important;
-  align-items: center;
-  gap: 18px;
-}
-.site-nav a,
-.site-nav-button {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  min-height: 34px;
-  border: 0;
-  padding: 0 0.1rem;
-  background: transparent;
-  color: var(--ksenr-muted);
-  font: inherit;
-  font-size: 14px;
-  cursor: pointer;
-}
-.site-nav a::after,
-.site-nav-button::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 2px;
-  height: 2px;
-  transform: scaleX(0);
-  transform-origin: right;
-  border-radius: 999px;
-  background: var(--ksenr-brand);
-  transition: transform 0.18s ease;
-}
-.site-nav a:hover,
-.site-nav-button:hover {
-  color: var(--ksenr-brand);
-}
-.site-nav a:hover::after,
-.site-nav-button:hover::after {
-  transform: scaleX(1);
-  transform-origin: left;
-}
-.search-form--modal .search-form__inner {
-  align-items: flex-start;
-  padding-top: 16vh;
-}
-.search-panel {
-  width: min(720px, calc(100vw - 44px));
-  padding: 24px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 24px 90px rgba(20, 24, 30, 0.22);
-}
-.search-label {
-  display: block;
-  margin-bottom: 12px;
-  color: #334f52;
-  font-weight: 700;
-}
-.search-panel .text-input {
-  width: 100%;
-  height: 46px;
-  padding: 0 14px;
-  border: 1px solid #d9e0db;
-  border-radius: 8px;
-  outline: none;
-}
-.search-results {
-  margin-top: 16px;
-  max-height: 50vh;
-  overflow: auto;
-}
-.search-result {
-  display: block;
-  padding: 12px 0;
-  border-top: 1px solid rgba(83, 97, 106, 0.14);
-}
-.search-result strong {
-  display: block;
-  color: #334f52;
-}
-.search-result span {
-  color: #889198;
-  font-size: 12px;
-}
-.search-empty {
-  color: #889198;
-}
-.wrapper:has(.post-article) {
-  width: min(1320px, calc(100vw - 72px)) !important;
-  max-width: none !important;
-}
-.post-article {
-  position: relative;
-  left: 50%;
-  display: grid;
-  grid-template-columns: minmax(0, 900px) 280px;
-  gap: 42px;
-  align-items: start;
-  width: min(1270px, calc(100vw - 84px));
-  max-width: none;
-  margin: 0;
-  padding: 0;
-  transform: translateX(-50%);
-  background: transparent;
-  box-shadow: none;
-  isolation: isolate;
-}
-.post-main-panel {
-  position: relative;
-  grid-column: 1;
-  min-width: 0;
-  padding: 42px 50px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.76);
-  background: var(--ksenr-panel);
-  box-shadow: 0 20px 72px rgba(34, 42, 48, 0.11);
-  backdrop-filter: blur(13px);
-}
-.post-main-panel::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  background: linear-gradient(135deg, rgba(53, 191, 171, 0.08), transparent 42%);
-  pointer-events: none;
-}
-.post-main-panel > .post-title,
-.post-main-panel > .post-body,
-.post-main-panel > .meta,
-.post-body,
-.post-body p,
-.post-body li {
-  max-width: none !important;
-}
-.post-body,
-.post-body table,
-.post-body figure {
-  min-width: 0;
-}
-.post-body p {
-  line-height: 1.9;
-}
-.post-body .math-display {
-  margin: 1.25rem 0;
-  overflow-x: auto;
-  overflow-y: hidden;
-}
-.post-body mjx-container {
-  max-width: 100%;
-}
-.post-body mjx-container[display="true"] {
-  overflow-x: auto;
-  overflow-y: hidden;
-  padding: 0.35rem 0;
-}
-.post-body mjx-container svg {
-  max-width: none;
-}
-.post-body figure.highlight {
-  position: relative;
-  margin: 1.6rem 0;
-  overflow: hidden;
-  border-radius: 8px;
-  background: #1f2329;
-  box-shadow: 0 12px 34px rgba(17, 24, 39, 0.16);
-}
-.post-body figure.highlight table {
-  display: block;
-  width: 100%;
-  margin: 0;
-  border: 0;
-  overflow-x: auto;
-  border-collapse: collapse;
-  background: #282c34;
-}
-.post-body figure.highlight tbody,
-.post-body figure.highlight tr {
-  display: table;
-  width: 100%;
-}
-.post-body figure.highlight td {
-  border: 0;
-  padding: 0;
-  vertical-align: top;
-}
-.post-body figure.highlight .gutter {
-  width: 3.7rem;
-  min-width: 3.7rem;
-  user-select: none;
-  background: #21252b;
-  color: #6b7280;
-  text-align: right;
-}
-.post-body figure.highlight .code {
-  width: 100%;
-  background: #282c34;
-}
-.post-body figure.highlight pre {
-  margin: 0;
-  padding: 1rem 1.1rem;
-  overflow: visible !important;
-  color: #abb2bf;
-  font-family: Consolas, Monaco, "Cascadia Code", "Fira Code", monospace;
-  font-size: 14px;
-  line-height: 1.65;
-}
-.post-body figure.highlight .code pre {
-  min-width: max-content;
-}
-.post-body figure.highlight .line {
-  min-height: 1.65em;
-}
-.post-body figure.highlight .keyword,
-.post-body figure.highlight .type {
-  color: #c678dd;
-}
-.post-body figure.highlight .string {
-  color: #98c379;
-}
-.post-body figure.highlight .number,
-.post-body figure.highlight .literal {
-  color: #d19a66;
-}
-.post-body figure.highlight .comment {
-  color: #7f848e;
-}
-.post-body figure.highlight .meta,
-.post-body figure.highlight .built_in,
-.post-body figure.highlight .function .title {
-  color: #61afef;
-}
-.code-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 2.4rem;
-  padding: 0 0.75rem 0 1rem;
-  background: #1b1f27;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  color: #9ca3af;
-  font-size: 12px;
-  letter-spacing: 0.04em;
-}
-.code-copy-button {
-  border: 0;
-  border-radius: 6px;
-  padding: 0.32rem 0.65rem;
-  background: rgba(255, 255, 255, 0.08);
-  color: #d1d5db;
-  cursor: pointer;
-  transition: background 0.16s ease, color 0.16s ease;
-}
-.code-copy-button:hover {
-  background: #35bfab;
-  color: #111827;
-}
-article {
-  position: relative;
-}
-.post-toc {
-  position: sticky;
-  top: 90px;
-  grid-column: 2;
-  grid-row: 1 / span 4;
-  align-self: start;
-  width: auto;
-  max-height: calc(100vh - 116px);
-  overflow: auto;
-  padding: 1rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.72);
-  background: rgba(255, 255, 255, 0.74);
-  box-shadow: 0 14px 42px rgba(17, 24, 39, 0.12);
-  backdrop-filter: blur(12px);
-  z-index: 2;
-}
-.post-toc-title {
-  margin-bottom: 0.7rem;
-  color: var(--ksenr-ink);
-  font-weight: 700;
-}
-.toc-node {
-  margin: 2px 0;
-}
-.toc-node summary {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  align-items: center;
-  gap: 8px;
-  padding: 0.34rem 0.45rem;
-  border-radius: 5px;
-  color: #59666d;
-  cursor: pointer;
-  list-style: none;
-}
-.toc-node summary::-webkit-details-marker {
-  display: none;
-}
-.toc-node summary::before {
-  content: "+";
-  grid-column: 2;
-  grid-row: 1;
-  color: var(--ksenr-brand);
-  font-weight: 700;
-}
-.toc-node[open] > summary::before {
-  content: "-";
-}
-.toc-node summary span {
-  grid-column: 1;
-  min-width: 0;
-}
-.toc-node summary a {
-  grid-column: 2;
-  grid-row: 1;
-  opacity: 0;
-  pointer-events: none;
-}
-.toc-children {
-  margin-left: 0.65rem;
-  padding-left: 0.7rem;
-  border-left: 1px solid rgba(83, 97, 106, 0.16);
-}
-.toc-link {
-  display: block;
-  padding: 0.34rem 0.45rem;
-  border-radius: 5px;
-  color: #666;
-  font-size: 13px;
-  line-height: 1.5;
-  text-decoration: none;
-}
-.toc-link.level-3,
-.toc-node.level-3 summary {
-  font-size: 12px;
-}
-.toc-link.level-4,
-.toc-node.level-4 summary {
-  font-size: 12px;
-  color: #7b858a;
-}
-.toc-link.is-active,
-.toc-node summary:hover,
-.toc-link:hover {
-  background: rgba(53, 191, 171, 0.14);
-  color: #243b3d;
-}
-.click-ripple,
-.click-particle {
-  pointer-events: none;
-  position: fixed;
-}
-.click-ripple {
-  z-index: 9998;
-  left: 0;
-  top: 0;
-  width: 14px;
-  height: 14px;
-  border: 1px solid rgba(53, 191, 171, 0.72);
-  border-radius: 999px;
-  transform: translate(var(--x), var(--y)) translate(-50%, -50%) scale(1);
-  animation: ksenr-click-ripple 0.58s ease-out forwards;
-}
-.click-particle {
-  z-index: 9998;
-  left: 0;
-  top: 0;
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: var(--particle-color);
-  transform: translate(var(--x), var(--y)) translate(-50%, -50%) scale(1);
-  animation: ksenr-click-particle 0.68s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
-}
-@keyframes ksenr-click-ripple {
-  to {
-    opacity: 0;
-    transform: translate(var(--x), var(--y)) translate(-50%, -50%) scale(7);
-  }
-}
-@keyframes ksenr-click-particle {
-  to {
-    opacity: 0;
-    transform: translate(calc(var(--x) + var(--dx)), calc(var(--y) + var(--dy))) translate(-50%, -50%) scale(0.25);
-  }
-}
-.timeline-page {
-  padding-top: 42px;
-  padding-bottom: 80px;
-}
-.timeline-page h1 {
-  margin-bottom: 42px;
-  text-align: center;
-  color: #334f52;
-}
-.timeline-tree {
-  position: relative;
-  max-width: 860px;
-  margin: 0 auto;
-  padding: 16px 0;
-}
-.timeline-tree::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 2px;
-  background: linear-gradient(180deg, transparent, #35bfab 12%, #35bfab 88%, transparent);
-}
-.timeline-item {
-  position: relative;
-  display: block;
-  width: calc(50% - 34px);
-  margin: 0 0 24px;
-  padding: 16px 18px;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
-  color: #334f52;
-}
-.timeline-item.left {
-  margin-right: auto;
-  text-align: right;
-}
-.timeline-item.right {
-  margin-left: auto;
-}
-.timeline-dot {
-  position: absolute;
-  top: 22px;
-  width: 12px;
-  height: 12px;
-  border: 3px solid #35bfab;
-  border-radius: 999px;
-  background: #fff;
-}
-.timeline-item.left .timeline-dot {
-  right: -41px;
-}
-.timeline-item.right .timeline-dot {
-  left: -39px;
-}
-.timeline-item strong {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 700;
-}
-.timeline-item time {
-  color: #7b858a;
-  font-size: 13px;
-}
-.footer {
-  padding: 24px 0;
-  background: rgba(246, 247, 247, 0.9);
-}
-.footer-inner {
-  display: flex;
-  justify-content: flex-end;
-  padding: 0 9vw;
-  color: #9aa3a8;
-  font-size: 14px;
-}
-@media screen and (max-width: 1180px) {
-  .post-article {
-    display: block;
-    left: auto;
-    width: auto;
-    max-width: min(860px, calc(100vw - 32px));
-    margin: 0 auto;
-    transform: none;
-  }
-  .post-main-panel {
-    padding: 32px;
-  }
-  .post-toc {
-    position: static;
-    width: auto;
-    max-height: none;
-    margin: 0 0 1.6rem;
-  }
-}
-@media screen and (max-width: 719px) {
-  .site-header {
-    height: auto;
-    padding: 14px 18px;
-    align-items: flex-start;
-  }
-  .site-nav {
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 10px 14px;
-  }
-  .post-main-panel {
-    padding: 22px 18px;
-  }
-  .timeline-tree::before {
-    left: 8px;
-  }
-  .timeline-item,
-  .timeline-item.left,
-  .timeline-item.right {
-    width: auto;
-    margin-left: 34px;
-    margin-right: 0;
-    text-align: left;
-  }
-  .timeline-item.left .timeline-dot,
-  .timeline-item.right .timeline-dot {
-    left: -32px;
-    right: auto;
-  }
-}
-</style><!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.1.1"></head>
-
-  <body>
-
-<header class="site-header">
-	<a class="site-brand" href="/" aria-label="Home">ksenr</a>
-	<nav class="site-nav" aria-label="Main navigation">
-		<a href="/">Home</a>
-		<a href="/timeline/">Archive</a>
-		<a href="/daily-pause/">Daily Pause</a>
-	</nav>
-</header>
-
-
-<div class="m-header ">
-	<section id="hero1" class="hero">
-		<div class="inner">
-		</div>
-	</section>
-	
-		<figure class="top-image" style='background-image: url(/banner/4.jpg)' data-enable=false></figure>
-	
-</div>
-
-
-
-<!--文章列表-->
-<div class="wrapper">
-  
-    <!-- article -->
-<article class="post-article">
-	
-	<div class="post-main-panel">
-		
-  
-    <h1 class="post-title" itemprop="name">
-      about
-    </h1>
-  
-
-		<div class='post-body mb'>
-			
-		</div>
-		<div class="meta split">
-			<time class="post-date" datetime="2026-02-06T08:03:02.000Z" itemprop="datePublished">2026-02-06</time>
-		</div>
-	</div>
-	
-</article>
-
-<!-- comments -->
-
-
-  
-</div>
-
-
-  <svg id="bigTriangleColor" width="100%" height="40" viewBox="0 0 100 102" preserveAspectRatio="none">
-    <path d="M0 0 L50 100 L100 0 Z"></path>
-  </svg>
-
-  
-
-
-  <div class="wrapper"></div>
-
-
-
-
-
-
-
-<footer class="footer" role="contentinfo">
-	<div class="footer-inner">
-		<span>&copy; 2026 ksenr</span>
-	</div>
-</footer>
-
-	
-	
-<script src="/js/lib.js"></script>
-
-	
-<script src="/js/module.js"></script>
-
-	
-<script src="/js/script.js"></script>
-
-	
-	<!-- hexo injector body_end start -->
-<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
-<script>
-(function () {
-  var progress = document.createElement("div");
-  progress.className = "reading-progress";
-  document.body.appendChild(progress);
-
-  function updateProgress() {
-    var doc = document.documentElement;
-    var max = doc.scrollHeight - window.innerHeight;
-    var value = max > 0 ? window.scrollY / max : 0;
-    progress.style.transform = "scaleX(" + Math.max(0, Math.min(1, value)) + ")";
-  }
-
-  window.addEventListener("scroll", updateProgress, { passive: true });
-  window.addEventListener("resize", updateProgress);
-  updateProgress();
-
-  function createClickEffect(x, y) {
-    var colors = ["#35bfab", "#1fc9e7", "#f3b95f", "#ff7b9c"];
-    var ripple = document.createElement("span");
-    ripple.className = "click-ripple";
-    ripple.style.setProperty("--x", x + "px");
-    ripple.style.setProperty("--y", y + "px");
-    document.body.appendChild(ripple);
-    setTimeout(function () {
-      ripple.remove();
-    }, 620);
-
-    for (var i = 0; i < 10; i += 1) {
-      var particle = document.createElement("span");
-      var angle = (Math.PI * 2 * i) / 10;
-      var distance = 24 + Math.random() * 28;
-      particle.className = "click-particle";
-      particle.style.setProperty("--x", x + "px");
-      particle.style.setProperty("--y", y + "px");
-      particle.style.setProperty("--dx", Math.cos(angle) * distance + "px");
-      particle.style.setProperty("--dy", Math.sin(angle) * distance + "px");
-      particle.style.setProperty("--particle-color", colors[i % colors.length]);
-      document.body.appendChild(particle);
-      setTimeout(function (node) {
-        node.remove();
-      }, 720, particle);
-    }
-  }
-
-  document.addEventListener("pointerdown", function (event) {
-    if (event.button !== 0 && event.pointerType === "mouse") return;
-    createClickEffect(event.clientX, event.clientY);
-  });
-
-  function getCodeText(block) {
-    var code = block.querySelector(".code pre") || block.querySelector("pre");
-    return code ? code.innerText.replace(/\n$/, "") : "";
-  }
-
-  document.querySelectorAll(".post-body figure.highlight").forEach(function (block) {
-    if (block.querySelector(".code-toolbar")) return;
-
-    var language = Array.from(block.classList).filter(function (name) {
-      return name !== "highlight";
-    })[0] || "code";
-
-    var toolbar = document.createElement("div");
-    toolbar.className = "code-toolbar";
-    toolbar.innerHTML = "<span>" + language.toUpperCase() + "</span><button class=\"code-copy-button\" type=\"button\">Copy</button>";
-    block.insertBefore(toolbar, block.firstChild);
-
-    toolbar.querySelector("button").addEventListener("click", function () {
-      var button = this;
-      var text = getCodeText(block);
-      var copied = function () {
-        button.textContent = "Copied";
-        setTimeout(function () {
-          button.textContent = "Copy";
-        }, 1500);
-      };
-
-      if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(text).then(copied);
-      } else {
-        var textarea = document.createElement("textarea");
-        textarea.value = text;
-        textarea.setAttribute("readonly", "");
-        textarea.style.position = "fixed";
-        textarea.style.left = "-9999px";
-        document.body.appendChild(textarea);
-        textarea.select();
-        document.execCommand("copy");
-        textarea.remove();
-        copied();
-      }
-    });
-  });
-
-  var searchForm = document.querySelector(".js-search");
-  var searchInput = searchForm && searchForm.querySelector(".text-input");
-  var searchResults = searchForm && searchForm.querySelector(".search-results");
-  var searchIndex = [];
-
-  function renderSearch(query) {
-    if (!searchResults) return;
-    var q = query.trim().toLowerCase();
-    if (!q) {
-      searchResults.innerHTML = '<p class="search-empty">Type to search posts.</p>';
-      return;
-    }
-
-    var results = searchIndex.filter(function (item) {
-      return (item.title + " " + item.text).toLowerCase().indexOf(q) !== -1;
-    }).slice(0, 12);
-
-    if (!results.length) {
-      searchResults.innerHTML = '<p class="search-empty">No matching posts.</p>';
-      return;
-    }
-
-    searchResults.innerHTML = results.map(function (item) {
-      return '<a class="search-result" href="' + item.path + '"><strong>' + item.title + '</strong><span>' + item.date + '</span></a>';
-    }).join("");
-  }
-
-  if (searchForm && searchInput) {
-    fetch("/search.json")
-      .then(function (res) { return res.json(); })
-      .then(function (data) {
-        searchIndex = Array.isArray(data) ? data : [];
-        renderSearch(searchInput.value || "");
-      })
-      .catch(function () {
-        if (searchResults) searchResults.innerHTML = '<p class="search-empty">Search index is not ready.</p>';
-      });
-
-    searchForm.addEventListener("submit", function (event) {
-      event.preventDefault();
-      renderSearch(searchInput.value || "");
-    });
-
-    searchInput.addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        event.stopPropagation();
-        renderSearch(searchInput.value || "");
-      }
-    }, true);
-
-    searchInput.addEventListener("input", function () {
-      renderSearch(searchInput.value || "");
-    });
-  }
-
-  var links = Array.from(document.querySelectorAll(".post-toc a[href^='#']"));
-  if (links.length) {
-    var headings = links.map(function (link) {
-      return document.getElementById(decodeURIComponent(link.getAttribute("href").slice(1)));
-    }).filter(Boolean);
-
-    var observer = new IntersectionObserver(function (entries) {
-      entries.forEach(function (entry) {
-        if (!entry.isIntersecting) return;
-        links.forEach(function (link) {
-          var active = decodeURIComponent(link.getAttribute("href").slice(1)) === entry.target.id;
-          link.classList.toggle("is-active", active);
-          if (active) {
-            var parent = link.closest("details");
-            while (parent) {
-              parent.open = true;
-              parent = parent.parentElement && parent.parentElement.closest("details");
-            }
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
           }
-        });
-      });
-    }, { rootMargin: "-20% 0px -70% 0px", threshold: 0 });
 
-    headings.forEach(function (heading) {
-      observer.observe(heading);
-    });
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const start = 6
+              const end = 18
+              const isNight =
+                start < end
+                    ? hour < start || hour >= end
+                    : hour >= start || hour < end
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', e => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#425aef","bgDark":"#1f1f1f","position":"bottom-left"},
+  infinitegrid: {
+    js: 'https://unpkg.com/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'about',
+  isHighlightShrink: false,
+  isToc: false,
+  pageType: 'page'
+}</script><link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 8.1.1"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      if ($loadingBox.classList.contains('loaded')) return
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
   }
-})();
-</script><!-- hexo injector body_end end --></body>
-</html>
+
+  preloader.initLoading()
+
+  if (document.readyState === 'complete') {
+    preloader.endLoading()
+  } else {
+    window.addEventListener('load', preloader.endLoading)
+    document.addEventListener('DOMContentLoaded', preloader.endLoading)
+    // Add timeout protection: force end after 7 seconds
+    setTimeout(preloader.endLoading, 7000)
+  }
+
+  if (false) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/avatar-jointed.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/ loading='lazy'></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">13</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="not-home-page" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ksenr's blog</span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="page-site-info"><h1 id="site-title">about</h1></div></header><main class="layout" id="content-inner"><div id="page"><div class="container" id="article-container"></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/images/avatar-jointed.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/ loading='lazy'></div><div class="author-info-name">ksenr</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">13</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/ksenrii"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/ksenrii" target="_blank" title="GitHub"><i class="fab fa-github" style="color: #24292e;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到 ksenr's blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/07/13/%E4%BB%A3%E7%A0%81%E9%80%86%E5%90%91%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80/" title="代码逆向技术基础"><img src="/images/7.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="代码逆向技术基础"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/07/13/%E4%BB%A3%E7%A0%81%E9%80%86%E5%90%91%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80/" title="代码逆向技术基础">代码逆向技术基础</a><time datetime="2026-07-13T08:32:14.000Z" title="发表于 2026-07-13 16:32:14">2026-07-13</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/05/29/%E6%A0%BC%E5%AF%86%E7%A0%81%E5%9F%BA%E7%A1%80/" title="格密码基础"><img src="/images/4.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="格密码基础"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/05/29/%E6%A0%BC%E5%AF%86%E7%A0%81%E5%9F%BA%E7%A1%80/" title="格密码基础">格密码基础</a><time datetime="2026-05-29T02:00:00.000Z" title="发表于 2026-05-29 10:00:00">2026-05-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/03/23/SM4/" title="SM4"><img src="/images/1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="SM4"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/03/23/SM4/" title="SM4">SM4</a><time datetime="2026-03-23T03:55:44.000Z" title="发表于 2026-03-23 11:55:44">2026-03-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/03/23/TLS/" title="TLS"><img src="/images/1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="TLS"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/03/23/TLS/" title="TLS">TLS</a><time datetime="2026-03-23T03:55:44.000Z" title="发表于 2026-03-23 11:55:44">2026-03-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/03/19/Crypto-AES/" title="Crypto-AES"><img src="/images/1.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="Crypto-AES"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/03/19/Crypto-AES/" title="Crypto-AES">Crypto-AES</a><time datetime="2026-03-19T03:55:44.000Z" title="发表于 2026-03-19 11:55:44">2026-03-19</time></div></div></div></div><div class="card-widget card-categories"><div class="item-headline"><i class="fas fa-folder-open"></i><span>分类</span></div>
+          <ul class="card-category-list" id="aside-cat-list">
+            <li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Reverse/"><span class="card-category-list-name">Reverse</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/Web/"><span class="card-category-list-name">Web</span><span class="card-category-list-count">1</span></a></li><li class="card-category-list-item "><a class="card-category-list-link" href="/categories/%E5%AF%86%E7%A0%81%E5%AD%A6/"><span class="card-category-list-name">密码学</span><span class="card-category-list-count">10</span></a></li>
+          </ul></div><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>标签</span></div><div class="card-tag-cloud"><a href="/tags/Web/" style="font-size: 1.1em; color: #999">Web</a> <a href="/tags/%E5%AF%86%E7%A0%81%E5%AD%A6/" style="font-size: 1.5em; color: #99a9bf">密码学</a> <a href="/tags/Reverse/" style="font-size: 1.1em; color: #999">Reverse</a></div></div><div class="card-widget card-archives">
+    <div class="item-headline"><i class="fas fa-archive"></i><span>归档</span></div>
+  
+    <ul class="card-archive-list">
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/07/">
+            <span class="card-archive-list-date">
+              2026年07月
+            </span>
+            <span class="card-archive-list-count">1</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/05/">
+            <span class="card-archive-list-date">
+              2026年05月
+            </span>
+            <span class="card-archive-list-count">1</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/03/">
+            <span class="card-archive-list-date">
+              2026年03月
+            </span>
+            <span class="card-archive-list-count">7</span>
+          </a>
+        </li>
+      
+        <li class="card-archive-list-item">
+          <a class="card-archive-list-link" href="/archives/2026/02/">
+            <span class="card-archive-list-date">
+              2026年02月
+            </span>
+            <span class="card-archive-list-count">4</span>
+          </a>
+        </li>
+      
+    </ul>
+  </div><div class="card-widget card-webinfo"><div class="item-headline"><i class="fas fa-chart-line"></i><span>网站信息</span></div><div class="webinfo"><div class="webinfo-item"><div class="item-name">文章数目 :</div><div class="item-count">13</div></div><div class="webinfo-item"><div class="item-name">运行时间 :</div><div class="item-count" id="runtimeshow" data-publishDate="2026-02-05T16:00:00.000Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div><div class="webinfo-item"><div class="item-name">本站总字数 :</div><div class="item-count">44.2k</div></div><div class="webinfo-item"><div class="item-name">最后更新时间 :</div><div class="item-count" id="last-push-date" data-lastPushDate="2026-08-11T04:59:03.362Z"><i class="fa-solid fa-spinner fa-spin"></i></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By ksenr</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.7.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.7.0"></script><script src="/js/main.js?v=5.7.0"></script><script src="https://unpkg.com/@fancyapps/ui@6.1.14/dist/fancybox/fancybox.umd.js"></script><script src="https://unpkg.com/instant.page@5.2.0/instantpage.js" type="module"></script><script src="https://unpkg.com/node-snackbar@0.1.16/dist/snackbar.min.js"></script><div class="js-pjax"></div><script src="/js/bg-rotate.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章..." type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.7.0"></script></div></div></body></html>
