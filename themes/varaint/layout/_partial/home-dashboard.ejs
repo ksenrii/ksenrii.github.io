@@ -1,0 +1,126 @@
+<%
+  var home = theme.home || {};
+  var heroImg = url_for(home.hero_image || '/images/liz.png');
+  var safeRatio = home.character_safe_ratio || 0.55;
+  var posts = page.posts.toArray();
+  var listLimit = home.article_limit || 6;
+  var postStats = home_post_stats();
+  var yesterday = home_yesterday_stats();
+  var heatmapWeeks = home.heatmap_weeks || 26;
+  var animeOrbit = home.anime_orbit || {};
+  var animeItems = animeOrbit.items || [];
+  var centerAnime = animeItems.filter(function(item) {
+    return item.id === animeOrbit.center;
+  })[0] || animeItems[0];
+  var compactStats = postStats.map(function (row) {
+    return [row.todayTime, row.dailyNoteCount, row.dailyNoteWordCount];
+  });
+%>
+
+<style>
+  body.page-home {
+    --home-safe-left: <%= (safeRatio * 100) %>%;
+    --home-bg-url: url('<%= heroImg %>');
+    background-image: var(--home-bg-url) !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    background-position: left center !important;
+    background-attachment: fixed !important;
+  }
+</style>
+
+<script>
+  window.HOME_CONFIG = {
+    displayStart: '<%= home.display_start || "" %>',
+    heatmapWeeks: <%= heatmapWeeks %>,
+    statsSource: '<%= home.stats_source || "posts" %>',
+    apiUrl: '<%= home.api_url || "" %>'
+  };
+  window.HOME_POST_STATS = <%- JSON.stringify(compactStats) %>;
+</script>
+
+<div class="home-bg" aria-hidden="true">
+  <img class="home-bg__photo" src="<%= heroImg %>" alt="" decoding="async">
+  <div class="home-bg__overlay"></div>
+</div>
+
+<div class="home-shell">
+  <section class="home-panel glass-card" aria-label="笔记统计">
+    <div class="home-stats">
+      <p class="home-stats__label">YESTERDAY'S GROWTH</p>
+      <div class="home-stats__block">
+        <div class="home-stats__value" id="home-yesterday-count"><%= yesterday.dailyNoteCount %></div>
+        <div class="home-stats__unit">新增笔记（篇）</div>
+      </div>
+      <div class="home-stats__block">
+        <div class="home-stats__value" id="home-yesterday-words"><%= yesterday.dailyNoteWordCount.toLocaleString() %></div>
+        <div class="home-stats__unit">新增字数</div>
+      </div>
+      <p class="home-stats__date" id="home-yesterday-date">统计日期：<%= yesterday.date %></p>
+    </div>
+
+    <div class="home-heatmap-wrap">
+      <div class="home-heatmap" id="home-heatmap-grid" role="img" aria-label="笔记活跃度"></div>
+    </div>
+  </section>
+
+  <section class="home-articles glass-card" aria-label="最近文章">
+    <h2 class="home-articles__title">最近文章</h2>
+    <ul class="home-articles__list">
+      <% posts.forEach(function(post, i) { %>
+        <% if (i >= listLimit) return; %>
+        <li class="home-articles__item">
+          <a class="home-articles__link" href="<%- url_for(post.path) %>">
+            <span class="home-articles__name"><%= post.title %></span>
+            <time class="home-articles__time" datetime="<%= date(post.date, 'YYYY-MM-DD') %>">
+              <%= date(post.date, 'YYYY-MM-DD') %>
+            </time>
+          </a>
+        </li>
+      <% }) %>
+    </ul>
+    <% if (posts.length > listLimit) { %>
+      <a class="home-articles__more" href="/timeline/">查看全部 →</a>
+    <% } %>
+  </section>
+
+  <% if (animeOrbit.enable && animeItems.length) { %>
+    <section class="home-anime glass-card" aria-label="动漫星图">
+      <div class="home-anime__header">
+        <div>
+          <h2 class="home-anime__title"><%= animeOrbit.title || 'ANIME ORBIT' %></h2>
+        </div>
+      </div>
+
+      <div class="home-anime__body">
+        <div class="home-anime__orbit" aria-label="看过的动漫作品">
+          <div class="home-anime__ring home-anime__ring--outer"></div>
+          <div class="home-anime__ring home-anime__ring--middle"></div>
+          <div class="home-anime__ring home-anime__ring--inner"></div>
+
+          <% animeItems.forEach(function(item) { %>
+            <button
+              class="home-anime__node home-anime__node--<%= item.tone || 'green' %> <%= item.id === centerAnime.id ? 'is-active' : '' %>"
+              type="button"
+              style="--anime-x: <%= item.x %>%; --anime-y: <%= item.y %>%; --anime-size: <%= item.size || 52 %>px;"
+              aria-label="<%= item.title %>"
+            >
+              <img src="<%- url_for(item.image) %>" alt="<%= item.title %>" loading="lazy" decoding="async">
+            </button>
+          <% }) %>
+        </div>
+
+        <div class="home-anime__detail">
+          <img class="home-anime__poster" id="home-anime-poster" src="<%- url_for(centerAnime.image) %>" alt="<%= centerAnime.title %>" loading="lazy" decoding="async">
+          <div class="home-anime__copy">
+            <h3 class="home-anime__name" id="home-anime-name"><%= centerAnime.title %></h3>
+          </div>
+        </div>
+      </div>
+    </section>
+  <% } %>
+</div>
+
+<div class="home-tooltip" id="home-tooltip" role="tooltip"></div>
+
+<%- js('js/home-dashboard') %>

@@ -1,0 +1,8 @@
+<%- partial('_partial/head') %>
+<%- partial('_partial/header') %>
+<% if (!is_home() && !page.isTimeline) { %>
+<%- partial('_partial/banner',{post: page}) %>
+<% } %>
+<%- body -%>
+<%- partial('_partial/author') %>
+<%- partial('_partial/footer') %>

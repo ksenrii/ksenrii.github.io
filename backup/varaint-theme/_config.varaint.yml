@@ -1,0 +1,43 @@
+﻿favicon: /images/to.png
+
+headimg: /images/avatar.gif
+name: ksenr
+description: ''
+
+search:
+  enable: true
+  placeholder: Search posts...
+
+sidebar:
+  enable: true
+  menus:
+    -
+      name: Home
+      link: /
+      target: _self
+    -
+      name: Archive
+      link: /timeline/
+      target: _self
+    -
+      name: Daily Pause
+      link: /daily-pause/
+      target: _self
+
+reading_background:
+  enable: true
+  # Put your own image under source/images/, then use /images/name.jpg here.
+  image: /images/5.jpg
+  # Bigger opacity makes the image more visible.
+  opacity: 0.68
+  # Smaller overlay removes the white veil over the background.
+  overlay: 0.20
+  # Smaller panel makes the article card more translucent.
+  panel: 0.74
+
+count:
+  enable: false
+
+comments: {}
+
+social: []

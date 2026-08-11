@@ -1,0 +1,41 @@
+﻿scheme: Pisces
+
+menu:
+  home: /home/ || fa fa-home
+  archives: /archives/ || fa fa-archive
+  tags: /tags/ || fa fa-tags
+  categories: /categories/ || fa fa-th
+  about: /about/ || fa fa-user
+
+
+  daily_pause: /daily-pause/ || fa fa-camera-retro
+sidebar:
+  position: left
+  display: post
+
+avatar:
+  url: /images/EB423E68F516288F90CA5C2BF3E8F12D.jpg
+  rounded: true
+
+excerpt_description: true
+
+auto_excerpt:
+  enable: true
+  length: 150
+
+math:
+  every_page: false
+  mathjax:
+    enable: true
+    tags: none
+    
+  katex:
+    enable: false
+  copy_tex:
+    enable: false
+
+post_meta:
+  updated_at:
+    enable: false
+
+

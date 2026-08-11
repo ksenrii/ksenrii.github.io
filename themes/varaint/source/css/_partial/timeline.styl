@@ -1,0 +1,112 @@
+// Archive /timeline 时间轴
+
+timeline-ink = #334f52
+timeline-muted = #7b858a
+timeline-brand = #35bfab
+
+body.page-timeline
+    color: timeline-ink
+    background: #f7fbfa
+    padding-top: 68px
+
+.timeline-page
+    padding: 42px 0 80px
+
+.timeline-page h1
+    margin-bottom: 42px
+    text-align: center
+    color: timeline-ink
+    font-weight: 300
+
+.timeline-tree
+    position: relative
+    max-width: 860px
+    margin: 0 auto
+    padding: 16px 0
+
+.timeline-tree::before
+    content: ""
+    position: absolute
+    top: 0
+    bottom: 0
+    left: 50%
+    width: 2px
+    background: linear-gradient(180deg, transparent, timeline-brand 12%, timeline-brand 88%, transparent)
+
+.timeline-item
+    position: relative
+    display: block
+    width: calc(50% - 34px)
+    margin: 0 0 24px
+    padding: 16px 18px
+    border-radius: 8px
+    background: rgba(255, 255, 255, 0.88)
+    box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08)
+    color: timeline-ink
+    text-decoration: none
+    transition: transform 0.2s ease, box-shadow 0.2s ease
+
+.timeline-item:hover
+    transform: translateY(-2px)
+    box-shadow: 0 14px 36px rgba(17, 24, 39, 0.12)
+
+.timeline-item.left
+    margin-right: auto
+    text-align: right
+
+.timeline-item.right
+    margin-left: auto
+
+.timeline-dot
+    position: absolute
+    top: 22px
+    width: 12px
+    height: 12px
+    border: 3px solid timeline-brand
+    border-radius: 999px
+    background: #fff
+
+.timeline-item.left .timeline-dot
+    right: -41px
+
+.timeline-item.right .timeline-dot
+    left: -39px
+
+.timeline-item strong
+    display: block
+    margin-bottom: 6px
+    font-weight: 700
+
+.timeline-item time
+    color: timeline-muted
+    font-size: 13px
+
+body.page-timeline .footer
+    background: rgba(246, 247, 247, 0.9)
+
+body.page-timeline .footer-inner
+    display: flex
+    justify-content: flex-end
+    padding: 0 9vw
+    color: #9aa3a8
+    font-size: 14px
+
+@media screen and (max-width: 719px)
+    body.page-timeline
+        padding-top: 56px
+
+    .timeline-tree::before
+        left: 8px
+
+    .timeline-item,
+    .timeline-item.left,
+    .timeline-item.right
+        width: auto
+        margin-left: 34px
+        margin-right: 0
+        text-align: left
+
+    .timeline-item.left .timeline-dot,
+    .timeline-item.right .timeline-dot
+        left: -32px
+        right: auto

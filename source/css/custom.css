@@ -1,0 +1,29 @@
+/* Butterfly theme custom overrides for ksenr's blog */
+
+/* Smooth math display scrolling */
+.math-display {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.35rem 0;
+}
+
+/* MathJax container responsive */
+mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+}
+
+mjx-container svg {
+  max-width: none;
+}
+
+/* Math inline spacing */
+.math-inline, span.mathjax, span.katex {
+  margin: 0 0.2em;
+}
+
+/* Article body line height for better readability */
+#article-container p {
+  line-height: 1.9;
+}

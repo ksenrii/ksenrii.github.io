@@ -1,0 +1,137 @@
+favicon: /images/to.png
+headimg: /images/avatar.gif
+name: ksenr
+description: ''
+home:
+  hero_image: /images/liz.png
+  # 左侧留给人物的宽度比例（0.55 = 左 55% 不放卡片）
+  character_safe_ratio: 0.55
+  # 热力图显示最近 N 周（默认 26，类似 GitHub）；设 display_start 可固定起始日
+  heatmap_weeks: 26
+  display_start:
+  # 统计数据来源：posts = 仅 _posts 下 md；api = 后端接口
+  stats_source: posts
+  api_url: /api/nodeCount/list
+  article_limit: 6
+  anime_orbit:
+    enable: false
+    title: ANIME ORBIT
+    subtitle: 我的动漫星图
+    center: liz
+    items:
+      -
+        id: liz
+        title: 莉兹与青鸟
+        image: /images/anime/liz-and-the-blue-bird.jpg
+        x: 50
+        y: 50
+        size: 88
+        tone: green
+      -
+        id: lie
+        title: 四月是你的谎言
+        image: /images/anime/your-lie-in-april.jpg
+        x: 78
+        y: 24
+        size: 58
+        tone: sky
+      -
+        id: toradora
+        title: 龙与虎
+        image: /images/anime/toradora.jpg
+        x: 77
+        y: 69
+        size: 56
+        tone: pink
+      -
+        id: oregairu
+        title: 我的青春恋爱物语果然有问题
+        image: /images/anime/oregairu.jpg
+        x: 24
+        y: 28
+        size: 58
+        tone: violet
+      -
+        id: skip
+        title: 跃动青春
+        image: /images/anime/skip-and-loafer.jpg
+        x: 22
+        y: 66
+        size: 54
+        tone: amber
+      -
+        id: rikka
+        title: 中二病也要谈恋爱
+        image: /images/anime/chuunibyou.jpg
+        x: 46
+        y: 18
+        size: 52
+        tone: violet
+      -
+        id: aquatope
+        title: 白沙的水族馆
+        image: /images/anime/aquatope.jpg
+        x: 58
+        y: 82
+        size: 54
+        tone: sky
+      -
+        id: iroha
+        title: 花开伊吕波
+        image: /images/anime/hanasaku-iroha.jpg
+        x: 34
+        y: 82
+        size: 52
+        tone: green
+      -
+        id: horimiya
+        title: 堀与宫村
+        image: /images/anime/horimiya.jpg
+        x: 88
+        y: 48
+        size: 52
+        tone: pink
+      -
+        id: tsuki
+        title: 月色真美
+        image: /images/anime/tsuki-ga-kirei.jpg
+        x: 12
+        y: 48
+        size: 52
+        tone: amber
+  sakura:
+    enable: true
+    count: 20
+    z_index: 35
+search:
+  enable: false
+  placeholder: Search posts...
+sidebar:
+  enable: true
+  menus:
+    -
+      name: Home
+      link: /
+      target: _self
+    -
+      name: Archive
+      link: /timeline/
+      target: _self
+    -
+      name: Daily Pause
+      link: /daily-pause/
+      target: _self
+reading_background:
+  enable: true
+  # Put your own image under source/images/, then use /images/name.jpg here.
+  image: /images/5.jpg
+  # Bigger opacity makes the image more visible.
+  opacity: 0.68
+  # Smaller overlay removes the white veil over the background.
+  overlay: 0.20
+  # Smaller panel makes the article card more translucent.
+  panel: 0.74
+count:
+  enable: false
+comments: {}
+social: []

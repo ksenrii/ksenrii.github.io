@@ -1,0 +1,34 @@
+﻿<footer class="footer" role="contentinfo">
+	<div class="footer-inner">
+		<span>&copy; <%= new Date().getFullYear() %> ksenr</span>
+	</div>
+</footer>
+
+	<% if (is_home()) { %>
+	<% var sakura = theme.home && theme.home.sakura; %>
+	<% if (sakura && sakura.enable !== false) { %>
+	<script>
+	  window.SAKURA_CONFIG = {
+	    count: <%= sakura.count || 36 %>,
+	    zIndex: <%= sakura.z_index || 30 %>
+	  };
+	</script>
+	<%- js('js/sakura') %>
+	<% } %>
+	<% } else if (!page.isTimeline) { %>
+	<%- js('js/lib') %>
+	<%- js('js/module') %>
+	<%- js('js/script') %>
+	<% } else { %>
+	<script>
+	(function () {
+	  var header = document.querySelector('header.site-header');
+	  if (!header) return;
+	  function onScroll() { header.classList.toggle('scrolled', window.scrollY > 8); }
+	  onScroll();
+	  window.addEventListener('scroll', onScroll, { passive: true });
+	})();
+	</script>
+	<% } %>
+	</body>
+</html>

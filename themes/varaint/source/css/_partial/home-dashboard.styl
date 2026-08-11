@@ -1,0 +1,448 @@
+// 首页：liz 全图背景，左侧人物区零遮挡
+
+page-home-text = #333333
+page-home-muted = #6b7280
+page-home-accent = #22c55e
+page-home-fill = #e4ecef
+glass-bg = rgba(255, 255, 255, 0.82)
+glass-border = rgba(255, 255, 255, 0.6)
+glass-shadow = 0 8px 32px rgba(0, 0, 0, 0.1)
+heat-0 = #e5e7eb
+heat-1 = #bbf7d0
+heat-2 = #86efac
+heat-3 = #4ade80
+heat-4 = #22c55e
+home-font = 'Inter', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', sans-serif
+
+#sakura-canvas
+    position: fixed
+    inset: 0
+    pointer-events: none
+    z-index: 25
+
+html.page-home
+    background-color: page-home-fill
+    min-height: 100%
+    min-height: 100dvh
+
+body.page-home
+    --home-safe-left: 55%
+    background-color: page-home-fill !important
+    color: page-home-text
+    font-family: home-font
+    min-height: 100vh
+    min-height: 100dvh
+    padding-bottom: 0
+    overflow-x: hidden
+
+body.page-home::before,
+body.page-home::after
+    display: none !important
+
+// 原图完整显示在左侧，不裁切人物
+.home-bg
+    position: fixed
+    inset: 0
+    z-index: 0
+    pointer-events: none
+    background-color: page-home-fill
+
+// 固定铺满视口，滚动时不随内容移动
+.home-bg__photo
+    position: absolute
+    inset: 0
+    width: 100%
+    height: 100%
+    min-height: 100vh
+    min-height: 100dvh
+    object-fit: cover
+    object-position: left center
+    pointer-events: none
+    user-select: none
+
+.home-bg__overlay
+    position: absolute
+    inset: 0
+    background: unquote('linear-gradient(90deg, rgba(228,236,239,0) 0%, rgba(228,236,239,0) var(--home-safe-left), rgba(228,236,239,0.08) calc(var(--home-safe-left) + 6%), rgba(228,236,239,0.18) 100%)')
+
+body.page-home .footer
+    position: fixed !important
+    bottom: 20px !important
+    right: 28px !important
+    left: auto !important
+    top: auto !important
+    width: auto !important
+    max-width: none !important
+    padding: 0 !important
+    margin: 0 !important
+    background: none !important
+    border: none !important
+    box-shadow: none !important
+    z-index: 50
+    font-size: 12px
+    color: page-home-muted
+    letter-spacing: 0.04em
+    pointer-events: none
+
+body.page-home .footer-inner
+    text-align: right
+    pointer-events: auto
+
+.glass-card
+    background: glass-bg
+    backdrop-filter: blur(20px)
+    -webkit-backdrop-filter: blur(20px)
+    border-radius: 24px
+    border: 1px solid glass-border
+    box-shadow: glass-shadow
+    transition: transform 0.3s ease, box-shadow 0.3s ease
+
+.glass-card:hover
+    transform: translateY(-4px)
+    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.14)
+
+// 内容严格在人物右侧安全区外
+.home-shell
+    position: relative
+    z-index: 2
+    max-width: 560px
+    width: unquote('calc(100vw - var(--home-safe-left) - 20px)')
+    margin-left: unquote('calc(var(--home-safe-left) + 12px)')
+    margin-right: 16px
+    padding: 88px 0 48px
+    display: flex
+    flex-direction: column
+    gap: 20px
+    min-height: 100vh
+    box-sizing: border-box
+
+.home-panel
+    display: grid
+    grid-template-columns: minmax(180px, 220px) 1fr
+    gap: 20px
+    align-items: end
+    padding: 24px 26px
+
+.home-stats__label
+    font-size: 11px
+    color: page-home-muted
+    letter-spacing: 0.14em
+    margin-bottom: 16px
+
+.home-stats__block + .home-stats__block
+    margin-top: 20px
+
+.home-stats__value
+    font-size: clamp(36px, 3.5vw, 46px)
+    font-weight: 300
+    line-height: 1
+    color: page-home-text
+    font-variant-numeric: tabular-nums
+
+.home-stats__unit
+    font-size: 13px
+    color: page-home-muted
+    margin-top: 6px
+
+.home-stats__date
+    margin-top: 18px
+    font-size: 12px
+    color: page-home-muted
+
+.home-heatmap-wrap
+    display: flex
+    justify-content: flex-end
+    align-items: flex-end
+    overflow-x: auto
+    padding-bottom: 4px
+
+.home-heatmap
+    display: grid
+    grid-template-rows: repeat(7, 11px)
+    grid-auto-flow: column
+    grid-auto-columns: 11px
+    gap: 3px
+
+.home-heatmap__cell
+    width: 11px
+    height: 11px
+    border-radius: 2px
+    background: heat-0
+    cursor: pointer
+    transition: transform 0.12s ease, box-shadow 0.12s ease
+
+.home-heatmap__cell[data-level="1"]
+    background: heat-1
+
+.home-heatmap__cell[data-level="2"]
+    background: heat-2
+
+.home-heatmap__cell[data-level="3"]
+    background: heat-3
+
+.home-heatmap__cell[data-level="4"]
+    background: heat-4
+
+.home-heatmap__cell:hover
+    transform: scale(1.2)
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.35)
+
+.home-heatmap__cell.is-future
+    opacity: 0.3
+    pointer-events: none
+
+.home-articles
+    padding: 22px 26px 26px
+
+.home-articles__title
+    font-size: 13px
+    font-weight: 500
+    color: page-home-muted
+    letter-spacing: 0.1em
+    margin-bottom: 16px
+
+.home-articles__list
+    list-style: none
+    margin: 0
+    padding: 0
+
+.home-articles__item
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06)
+
+.home-articles__item:last-child
+    border-bottom: none
+
+.home-articles__link
+    display: flex
+    align-items: baseline
+    justify-content: space-between
+    gap: 12px
+    padding: 12px 0
+    color: page-home-text
+    text-decoration: none
+    transition: color 0.2s ease
+
+.home-articles__link:hover
+    color: page-home-accent
+
+.home-articles__name
+    font-size: 14px
+    font-weight: 400
+    line-height: 1.4
+    flex: 1
+    min-width: 0
+    overflow: hidden
+    text-overflow: ellipsis
+    white-space: nowrap
+
+.home-articles__time
+    font-size: 12px
+    color: page-home-muted
+    flex-shrink: 0
+
+.home-articles__more
+    display: inline-block
+    margin-top: 14px
+    font-size: 13px
+    color: page-home-muted
+    text-decoration: none
+    transition: color 0.2s ease
+
+.home-articles__more:hover
+    color: page-home-accent
+
+.home-anime
+    padding: 22px 26px 26px
+    overflow: hidden
+
+.home-anime__header
+    display: flex
+    align-items: flex-start
+    justify-content: space-between
+    gap: 18px
+    margin-bottom: 16px
+
+.home-anime__title
+    font-size: 13px
+    font-weight: 500
+    color: page-home-muted
+    letter-spacing: 0.1em
+    margin: 0
+
+.home-anime__body
+    display: block
+
+.home-anime__orbit
+    position: relative
+    width: 100%
+    aspect-ratio: 1.28
+    min-height: 300px
+    margin: 2px 0 18px
+
+.home-anime__ring
+    position: absolute
+    left: 50%
+    top: 50%
+    border: 1px solid rgba(148, 163, 184, 0.5)
+    border-radius: 50%
+    transform: translate(-50%, -50%)
+    pointer-events: none
+
+.home-anime__ring--outer
+    width: 88%
+    height: 88%
+
+.home-anime__ring--middle
+    width: 66%
+    height: 66%
+
+.home-anime__ring--inner
+    width: 42%
+    height: 42%
+
+.home-anime__node
+    position: absolute
+    left: var(--anime-x)
+    top: var(--anime-y)
+    width: var(--anime-size)
+    height: var(--anime-size)
+    padding: 0
+    border: 3px solid page-home-accent
+    border-radius: 50%
+    background: #fff
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16)
+    transform: translate(-50%, -50%)
+    cursor: pointer
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease
+    overflow: hidden
+    z-index: 2
+
+.home-anime__node img
+    width: 100%
+    height: 100%
+    display: block
+    object-fit: cover
+
+.home-anime__node:hover,
+.home-anime__node:focus-visible,
+.home-anime__node.is-active
+    transform: translate(-50%, -50%) scale(1.12)
+    box-shadow: 0 12px 26px rgba(0, 0, 0, 0.22), 0 0 0 5px rgba(34, 197, 94, 0.16)
+    outline: none
+    z-index: 5
+
+.home-anime__node--sky
+    border-color: #38bdf8
+
+.home-anime__node--pink
+    border-color: #f472b6
+
+.home-anime__node--violet
+    border-color: #8b5cf6
+
+.home-anime__node--amber
+    border-color: #f59e0b
+
+.home-anime__node--green
+    border-color: page-home-accent
+
+.home-anime__detail
+    display: grid
+    grid-template-columns: 92px 1fr
+    gap: 16px
+    align-items: center
+    padding-top: 16px
+    border-top: 1px solid rgba(0, 0, 0, 0.06)
+
+.home-anime__poster
+    width: 92px
+    aspect-ratio: 3 / 4
+    object-fit: cover
+    border-radius: 14px
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.16)
+    background: rgba(255, 255, 255, 0.6)
+
+.home-anime__name
+    margin: 0
+    color: page-home-text
+    font-size: 18px
+    font-weight: 400
+    line-height: 1.35
+    overflow-wrap: anywhere
+
+body.page-home .home-tooltip
+    position: fixed !important
+    pointer-events: none
+    padding: 8px 12px
+    background: rgba(30, 30, 30, 0.92)
+    color: #fff
+    font-size: 12px
+    border-radius: 8px
+    white-space: nowrap
+    opacity: 0
+    visibility: hidden
+    transform: translate(-50%, calc(-100% - 8px))
+    transition: opacity 0.15s, visibility 0.15s
+    z-index: 200 !important
+
+body.page-home .home-tooltip.visible
+    opacity: 1
+    visibility: visible
+
+@media (max-width: 1100px)
+    body.page-home
+        --home-safe-left: 48%
+
+@media (max-width: 900px)
+    body.page-home
+        --home-safe-left: 0%
+
+    .home-bg__photo
+        object-position: center top
+
+    .home-bg__overlay
+        background: linear-gradient(
+          to bottom,
+          rgba(228, 236, 239, 0) 0%,
+          rgba(228, 236, 239, 0) 42%,
+          rgba(255, 255, 255, 0.55) 58%,
+          rgba(255, 255, 255, 0.75) 100%
+        )
+
+    .home-shell
+        width: min(92%, 560px)
+        margin-left: auto
+        margin-right: auto
+        padding: min(52vh, 420px) 20px 40px
+
+    .home-panel
+        grid-template-columns: 1fr
+        align-items: start
+
+    .home-heatmap-wrap
+        justify-content: flex-start
+
+@media (max-width: 520px)
+    .home-shell
+        padding-top: 48vh
+
+    body.page-home .footer
+        bottom: 14px !important
+        right: 16px !important
+
+    .home-articles__link
+        flex-direction: column
+        align-items: flex-start
+        gap: 4px
+
+    .home-anime
+        padding: 20px
+
+    .home-anime__orbit
+        min-height: 260px
+
+    .home-anime__detail
+        grid-template-columns: 76px 1fr
+
+    .home-anime__poster
+        width: 76px

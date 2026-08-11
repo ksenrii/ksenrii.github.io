@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>动漫圆环 · 不规则四等分封面</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #1a1e2b;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: system-ui, sans-serif;
+            padding: 2rem;
+        }
+
+        .circle {
+            position: relative;
+            width: min(70vmin, 500px);
+            height: min(70vmin, 500px);
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .segment {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), filter 0.3s ease;
+            cursor: pointer;
+            will-change: transform, filter;
+            backface-visibility: hidden;
+            transform-origin: center bottom;
+        }
+
+        .segment:nth-child(1) {
+            width: 45%;
+            height: 65%;
+            transform: translate(-50%, -100%) rotate(-15deg);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            border-radius: 50% 50% 0 0;
+        }
+
+        .segment:nth-child(2) {
+            width: 38%;
+            height: 55%;
+            transform: translate(-50%, -100%) rotate(60deg);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            border-radius: 50% 50% 0 0;
+        }
+
+        .segment:nth-child(3) {
+            width: 42%;
+            height: 60%;
+            transform: translate(-50%, -100%) rotate(150deg);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            border-radius: 50% 50% 0 0;
+        }
+
+        .segment:nth-child(4) {
+            width: 50%;
+            height: 70%;
+            transform: translate(-50%, -100%) rotate(240deg);
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            border-radius: 50% 50% 0 0;
+        }
+
+        .segment:hover {
+            filter: brightness(1.25) contrast(1.1);
+            z-index: 5;
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);
+        }
+
+        .segment:nth-child(1):hover {
+            transform: translate(-50%, -105%) rotate(-15deg) scale(1.08);
+        }
+
+        .segment:nth-child(2):hover {
+            transform: translate(-50%, -105%) rotate(60deg) scale(1.08);
+        }
+
+        .segment:nth-child(3):hover {
+            transform: translate(-50%, -105%) rotate(150deg) scale(1.08);
+        }
+
+        .segment:nth-child(4):hover {
+            transform: translate(-50%, -105%) rotate(240deg) scale(1.08);
+        }
+    </style>
+</head>
+<body>
+    <div class="circle">
+        <div class="segment" style="background-image: url('https://picsum.photos/id/1012/400/400');" title="间谍过家家"></div>
+        <div class="segment" style="background-image: url('https://picsum.photos/id/1043/400/400');" title="鬼灭之刃"></div>
+        <div class="segment" style="background-image: url('https://picsum.photos/id/106/400/400');" title="葬送的芙莉莲"></div>
+        <div class="segment" style="background-image: url('https://picsum.photos/id/108/400/400');" title="我推的孩子"></div>
+    </div>
+</body>
+</html>

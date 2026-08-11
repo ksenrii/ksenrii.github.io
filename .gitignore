@@ -1,0 +1,17 @@
+.DS_Store
+Thumbs.db
+db.json
+*.log
+node_modules/
+public/
+.deploy*/
+_multiconfig.yml
+
+# Temporary / generated files
+tmp/
+output/
+anime-creative-mockups*.png
+anime-section-mockups*.html
+anime-section-mockups*.png
+anime-orbit-expanded-mockup.png
+*.pdf

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html<% if (is_home()) { %> class="page-home"<% } %>>
+  <head>
+    <meta charset="utf-8">
+    <%
+  	  var title = page.title;
+
+  	  if (is_archive()){
+  	    title = __('archive_a');
+
+  	    if (is_month()){
+  	      title += ': ' + page.year + '/' + page.month;
+  	    } else if (is_year()){
+  	      title += ': ' + page.year;
+  	    }
+  	  } else if (is_category()){
+  	    title = __('category') + ': ' + page.category;
+  	  } else if (is_tag()){
+  	    title = __('tag') + ': ' + page.tag;
+  	  }
+    %>
+    <title><% if (title){ %><%= title %> | <% } %><%= config.title %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <% if (theme.rss){ %>
+      <link rel="alternate" href="<%- theme.rss %>" title="<%= config.title %>" type="application/atom+xml">
+    <% } %>
+    <% if (theme.favicon){ %>
+      <link rel="icon" type="image/png" href="<%- url_for(theme.favicon) %>">
+      <link rel="apple-touch-icon" href="<%- url_for(theme.favicon) %>">
+    <% } %>
+
+    <%- css('css/style') %>
+
+    <% if (is_home()) { %>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+SC:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <% } %>
+
+    <% if (!is_home()) { %>
+    <%- css('js/google-code-prettify/tomorrow-night-eighties.min') %>
+    <% } %>
+
+  </head>
+
+  <body<% if (is_home()) { %> class="page-home"<% } else if (page.isTimeline) { %> class="page-timeline"<% } %>>

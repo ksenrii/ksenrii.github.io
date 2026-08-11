@@ -1,0 +1,12 @@
+﻿<main class="timeline-page wrapper wrapper--wide">
+	<h1>Archive</h1>
+	<div class="timeline-tree">
+		<% page.posts.sort('-date').each(function(post, index){ %>
+			<a class="timeline-item <%= index % 2 === 0 ? 'left' : 'right' %>" href="<%- url_for(post.path) %>">
+				<span class="timeline-dot"></span>
+				<strong><%= post.title %></strong>
+				<time><%- date(post.date, 'YYYY-MM-DD') %></time>
+			</a>
+		<% }) %>
+	</div>
+</main>

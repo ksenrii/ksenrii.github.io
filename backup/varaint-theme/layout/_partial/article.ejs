@@ -1,0 +1,101 @@
+﻿<!-- article -->
+<article class="post-article">
+	<%
+		var tocItems = [];
+		var html = post.content || '';
+		var headingPattern = /<h([1-4])\s+id="([^"]+)"[^>]*>([\s\S]*?)<\/h\1>/g;
+		var match;
+
+		function decodeEntities(text) {
+			return String(text)
+				.replace(/&amp;/g, '&')
+				.replace(/&lt;/g, '<')
+				.replace(/&gt;/g, '>')
+				.replace(/&quot;/g, '"')
+				.replace(/&#39;/g, "'");
+		}
+
+		function escapeHtml(text) {
+			return String(text)
+				.replace(/&/g, '&amp;')
+				.replace(/</g, '&lt;')
+				.replace(/>/g, '&gt;')
+				.replace(/"/g, '&quot;')
+				.replace(/'/g, '&#39;');
+		}
+
+		while ((match = headingPattern.exec(html))) {
+			var text = match[3]
+				.replace(/<a[^>]*><\/a>/g, '')
+				.replace(/<[^>]+>/g, '')
+				.replace(/\s+/g, ' ')
+				.trim();
+
+			if (text) {
+				tocItems.push({
+					level: Number(match[1]),
+					id: match[2],
+					text: decodeEntities(text),
+					children: []
+				});
+			}
+		}
+
+		var roots = [];
+		var stack = [{ level: 0, children: roots }];
+
+		tocItems.forEach(function(item) {
+			while (stack.length > 1 && stack[stack.length - 1].level >= item.level) {
+				stack.pop();
+			}
+			stack[stack.length - 1].children.push(item);
+			stack.push(item);
+		});
+
+		function renderToc(nodes) {
+			return nodes.map(function(node) {
+				var href = '#' + escapeHtml(node.id);
+				var label = escapeHtml(node.text);
+				var childHtml = node.children.length ? '<div class="toc-children">' + renderToc(node.children) + '</div>' : '';
+
+				if (node.children.length) {
+					return '<details class="toc-node level-' + node.level + '"><summary><span>' + label + '</span><a href="' + href + '" aria-label="Jump to ' + label + '">#</a></summary>' + childHtml + '</details>';
+				}
+
+				return '<a class="toc-link level-' + node.level + '" href="' + href + '">' + label + '</a>';
+			}).join('');
+		}
+	%>
+	<div class="post-main-panel">
+		<%- partial('_widget/title',{post: post,index: false,class_name: 'post-title'})%>
+		<div class='post-body mb'>
+			<%- post.content %>
+		</div>
+		<div class="meta split">
+			<%- partial('_widget/date',{post: post,class_name: 'post-date',date_format: null})%>
+		</div>
+	</div>
+	<% if(tocItems.length > 1){ %>
+		<aside class="post-toc">
+			<div class="post-toc-title">&#30446;&#24405;</div>
+			<%- renderToc(roots) %>
+		</aside>
+	<% } %>
+</article>
+
+<!-- comments -->
+<%if(theme.comments && theme.comments.livere_uid){%>
+	<%- partial('post/livere_comment',
+	{
+	    key: post.slug,
+	    title: post.title,
+	    url: config.url+url_for(post.path)
+	}) %>
+<%} else if(theme.comments && theme.comments.disqus_username){%>
+	<%- partial('post/disqus-comment',
+	{
+	    key: post.slug,
+	    title: post.title,
+	    url: config.url+url_for(post.path)
+	}) %>
+<%}%>
