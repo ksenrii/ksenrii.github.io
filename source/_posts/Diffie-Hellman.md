@@ -4,8 +4,8 @@ date: 2026-03-16 11:55:44
 tags: [密码学]
 categories: 密码学
 mathjax: true
-top_img: /images/1.jpg
-cover: /images/1.jpg
+top_img: /images/11.jpg
+cover: /images/11.jpg
 ---
 
 # Diffie-Hellman
@@ -57,7 +57,7 @@ $$
 
 
 
-![Diffie-Hellman](/images/DiffieHellman.png)
+![Diffie-Hellman](images/DiffieHellman.png)
 
 ## 安全性
 
@@ -103,3 +103,6 @@ $$
 
 7.**Bob** 认为，这条消息是经由安全的传输通道从 **Alice** 那里传来的。
 
+
+
+封面来自Enze_恩沢

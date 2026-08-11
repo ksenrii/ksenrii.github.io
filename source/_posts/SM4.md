@@ -4,8 +4,8 @@ date: 2026-03-23 11:55:44
 tags: [密码学]
 categories: 密码学
 mathjax: true
-top_img: /images/1.jpg
-cover: /images/1.jpg
+top_img: /images/13.jpg
+cover: /images/13.jpg
 ---
 
 # SM4
@@ -108,7 +108,7 @@ rk_i=K_{i+4}=K_i\oplus T'(K_{i+1}\oplus K_{i+2}\oplus K_{i+3}\oplus CK_i),\qquad
 $$
 也就是说，每一轮都会先将后面三个字 K_{i+1},K_{i+2},K_{i+3} 与固定参数 CK_i 进行异或，然后经过变换 T' 处理，最后再与前面的 K_i 异或，得到新的字 K_{i+4}。而这个新生成的 K_{i+4}，就是当前轮使用的轮密钥 rk_i。
 
-![CK](/images/CK.png)
+![CK](images/CK.png)
 
 换句话说，轮密钥并不是一次性全部算出来的，而是按轮递推生成的：
 
@@ -200,7 +200,7 @@ b_i=Sbox(a_i),\qquad i=0,1,2,3
 $$
 因此，非线性变换τ 可以理解为一种**逐字节替换操作**：它保持字节数不变，但会根据 S 盒查表规则，把每个输入字节替换成另一个输出字节。
 
-![SM4-Sbox.png](/images/SM4-Sbox.png)
+![SM4-Sbox.png](images/SM4-Sbox.png)
 
 若输入字节为 `EF`，则应在 S 盒表中查找第 `E` 行、第 `F` 列，对应得到的输出为 `84`，即
 $$
@@ -259,3 +259,6 @@ $$
 $$
 因此，从整体上看，SM4 的加密过程可以概括为：**明文分组、密钥扩展、32 轮轮函数迭代，以及最终的反序输出。**
 
+
+
+封面来自XilmO

@@ -4,8 +4,8 @@ date: 2026-03-19 11:55:44
 tags: [密码学]
 categories: 密码学
 mathjax: true
-top_img: /images/1.jpg
-cover: /images/1.jpg
+top_img: /images/9.jpg
+cover: /images/9.jpg
 ---
 
 # AES
@@ -66,7 +66,7 @@ p_3 & p_7 & p_{11} & p_{15}
 $$
 后续 AES 的各轮加密操作，例如字节代换（SubBytes）、行移位（ShiftRows）、列混淆（MixColumns）以及轮密钥加（AddRoundKey），都是围绕这个状态矩阵展开的。
 
-![blockstate](/images/blockstate.png)
+![blockstate](images/blockstate.png)
 
 ## 密钥处理
 
@@ -197,7 +197,7 @@ $$
 2. **高 4 位** 作为 **行号**（0 ~ F），**低 4 位** 作为 **列号**（0 ~ F）。
 3. 查表得到行列交叉处的值，即为 S 盒输出。
 
-![sbox](/images/sbox.png)
+![sbox](images/sbox.png)
 
 则在查 S 盒后，能得到
 
@@ -678,3 +678,6 @@ int main() {
 
 ```
 
+
+
+封面来自Sasaj

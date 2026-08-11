@@ -4,8 +4,8 @@ date: 2026-02-17 11:55:44
 tags: [密码学]
 categories: 密码学
 mathjax: true
-top_img: /images/7.jpg
-cover: /images/7.jpg
+top_img: /images/8.jpg
+cover: /images/8.jpg
 ---
 
 # **Elgamal**
@@ -336,4 +336,6 @@ $$
 那么签名有效；否则签名无效。
 
 
+
+封面来自汐風HY
 

@@ -29,8 +29,8 @@ social:
 favicon: /images/to.png
 
 avatar:
-  img: /images/to.png
-  effect: true
+  img: /images/avatar-jointed.jpg
+  effect: false
 
 disable_top_img: false
 
@@ -197,7 +197,7 @@ aside:
     category: true
   card_author:
     enable: true
-    description: Security & Crypto
+    description:
     button:
       enable: true
       icon: fab fa-github
@@ -304,9 +304,9 @@ wordcount:
   total_wordcount: true
 
 busuanzi:
-  site_uv: true
-  site_pv: true
-  page_pv: true
+  site_uv: false
+  site_pv: false
+  page_pv: false
 
 # --------------------------------------
 # Math
@@ -591,6 +591,7 @@ inject:
   head:
     - <link rel="stylesheet" href="/css/custom.css">
   bottom:
+    - <script src="/js/bg-rotate.js"></script>
 
 # CDN
 CDN:

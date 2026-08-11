@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="430" viewBox="0 0 980 430" role="img" aria-label="constructor section layout">
+  <defs>
+    <style>
+      .title { font-family: Consolas, Menlo, monospace; font-size: 22px; font-weight: 700; fill: #20242c; }
+      .text { font-family: Consolas, Menlo, monospace; font-size: 17px; fill: #20242c; }
+      .small { font-family: Consolas, Menlo, monospace; font-size: 14px; fill: #5b6472; }
+      .panel { fill: #fbfcfe; stroke: #4c566a; stroke-width: 2; rx: 10; }
+      .cell { fill: #eef3fb; stroke: #72819a; stroke-width: 1.5; }
+      .sentinel { fill: #fff4e5; stroke: #b36b00; }
+      .modern { fill: #e9f7ef; stroke: #2d8a50; }
+    </style>
+  </defs>
+
+  <rect x="40" y="45" width="410" height="330" class="panel"/>
+  <text x="245" y="85" text-anchor="middle" class="title">legacy .ctors</text>
+  <rect x="105" y="115" width="280" height="46" class="cell sentinel"/>
+  <text x="245" y="145" text-anchor="middle" class="text">-1 or count marker</text>
+  <rect x="105" y="161" width="280" height="46" class="cell"/>
+  <text x="245" y="191" text-anchor="middle" class="text">ctor_func_1</text>
+  <rect x="105" y="207" width="280" height="46" class="cell"/>
+  <text x="245" y="237" text-anchor="middle" class="text">ctor_func_2</text>
+  <rect x="105" y="253" width="280" height="46" class="cell"/>
+  <text x="245" y="283" text-anchor="middle" class="text">...</text>
+  <rect x="105" y="299" width="280" height="46" class="cell sentinel"/>
+  <text x="245" y="329" text-anchor="middle" class="text">0 terminator</text>
+
+  <rect x="530" y="45" width="410" height="330" class="panel"/>
+  <text x="735" y="85" text-anchor="middle" class="title">modern .init_array</text>
+  <rect x="595" y="125" width="280" height="54" class="cell modern"/>
+  <text x="735" y="159" text-anchor="middle" class="text">init_func_1 pointer</text>
+  <rect x="595" y="179" width="280" height="54" class="cell modern"/>
+  <text x="735" y="213" text-anchor="middle" class="text">init_func_2 pointer</text>
+  <rect x="595" y="233" width="280" height="54" class="cell modern"/>
+  <text x="735" y="267" text-anchor="middle" class="text">...</text>
+  <text x="735" y="323" text-anchor="middle" class="small">bounded by section size</text>
+
+  <text x="490" y="405" text-anchor="middle" class="small">Both mechanisms store function addresses that the runtime can call before main.</text>
+</svg>

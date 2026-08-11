@@ -4,8 +4,8 @@ date: 2026-02-05 11:55:44
 tags: [密码学]
 categories: 密码学
 mathjax: true
-top_img: /images/1.jpg
-cover: /images/1.jpg
+top_img: /images/10.jpg
+cover: /images/10.jpg
 ---
 
 # RSA
@@ -1783,3 +1783,6 @@ m = pow(c,d,n)
 print(long_to_bytes(int(m)))
 ```
 
+
+
+封面来自fjsmu(ふじしむ）

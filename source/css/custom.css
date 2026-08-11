@@ -27,3 +27,28 @@ mjx-container svg {
 #article-container p {
   line-height: 1.9;
 }
+
+/* Footer: replace solid blue with dark gradient */
+#footer {
+  background-color: #1a1a2e !important;
+  background-image: linear-gradient(135deg, #16213e 0%, #0f3460 100%) !important;
+  background-attachment: scroll !important;
+}
+
+#footer-wrap {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+#footer-wrap a {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* Remove avatar hover rotation */
+.avatar-img img:hover {
+  transform: none !important;
+}
+
+/* Remove card-author description empty space */
+.card-info .author-info__description {
+  display: none;
+}

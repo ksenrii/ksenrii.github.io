@@ -4,8 +4,8 @@ date: 2026-03-23 11:55:44
 tags: [密码学]
 categories: 密码学
 mathjax: true
-top_img: /images/1.jpg
-cover: /images/1.jpg
+top_img: /images/12.jpg
+cover: /images/12.jpg
 ---
 
 # TLS
@@ -39,7 +39,7 @@ TLS 主要保证三件事：
 
 前者主要依赖非对称密码学，后者主要依赖对称加密。
 
-![symmetric-vs-asymmetric](/images/symmetric%20vs%20asymmetric%20encryption%20diagram.png)
+![symmetric-vs-asymmetric](images/symmetric%20vs%20asymmetric%20encryption%20diagram.png)
 
 ## 握手流程
 
@@ -54,7 +54,7 @@ TLS 握手的目标是让客户端和服务器在公开网络上得到同一个�
 5. 双方派生会话密钥
 6. 后续数据开始加密传输
 
-![TLS](/images/TLS.png)
+![TLS](images/TLS.png)
 
 ### ClientHello
 
@@ -94,7 +94,7 @@ TLS 握手的目标是让客户端和服务器在公开网络上得到同一个�
 - 证书链是否能追溯到可信根证书
 - 证书是否被吊销
 
-![certificate-chain](/images/certificate%20chain1.png)
+![certificate-chain](images/certificate%20chain1.png)
 
 可以把证书链理解为：
 
@@ -116,7 +116,7 @@ $$
 
 其中客户端掌握 $a$，服务器掌握 $b$。攻击者能看到公开参数和交换值，但要从中推出 $K$，本质上要解决离散对数相关问题。
 
-![Diffie-Hellman](/images/DiffieHellman.png)
+![Diffie-Hellman](images/DiffieHellman.png)
 
 现代 TLS 中更常见的是 ECDHE，也就是椭圆曲线上的临时 Diffie-Hellman 密钥交换。它的好处是可以提供**前向安全性**。
 
@@ -167,7 +167,7 @@ AEAD 的特点是同时提供加密和认证。也就是说，它既保证内容
 
 TLS 1.3 相比 TLS 1.2 做了很多减法。
 
-![TLS1.3-vs-TLS1.2](/images/TLS1.3vsTLS1.2.png)
+![TLS1.3-vs-TLS1.2](images/TLS1.3vsTLS1.2.png)
 
 主要区别包括：
 
@@ -195,3 +195,6 @@ openssl s_client -connect example.com:443 -servername example.com
 openssl s_client -connect example.com:443 -servername example.com -showcerts
 ```
 
+
+
+封面来自fjsmu（ふじしむ）
