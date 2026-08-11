@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    
+    <title>ksenr&#39;s blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    
+    
+      <link rel="icon" type="image/png" href="/images/to.png">
+      <link rel="apple-touch-icon" href="/images/to.png">
+    
+
+    
+<link rel="stylesheet" href="/css/style.css">
+
+
+    
+
+    
+    
+<link rel="stylesheet" href="/js/google-code-prettify/tomorrow-night-eighties.min.css">
+
+    
+
+  <!-- hexo injector head_end start -->
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [["\\(", "\\)"]],
+    displayMath: [["\\[", "\\]"]],
+    processEscapes: true,
+    processEnvironments: true,
+    tags: "ams"
+  },
+  options: {
+    skipHtmlTags: ["script", "noscript", "style", "textarea", "pre", "code"]
+  },
+  chtml: {
+    scale: 1,
+    matchFontHeight: false
+  }
+};
+</script>
+<style>
+:root {
+  --ksenr-brand: #35bfab;
+  --ksenr-ink: #334f52;
+  --ksenr-muted: #66777d;
+  --ksenr-panel: rgba(255, 255, 255, 0.74);
+}
+html {
+  scroll-behavior: smooth;
+  background: #f7fbfa;
+}
+body {
+  color: var(--ksenr-ink);
+  background: transparent !important;
+}
+body > * {
+  position: relative;
+  z-index: 1;
+}
+::selection {
+  background: rgba(53, 191, 171, 0.26);
+  color: #1f3437;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: url("/images/5.jpg") center / cover no-repeat;
+  opacity: 0.68;
+  filter: saturate(1.05);
+  pointer-events: none;
+}
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.28)),
+    radial-gradient(circle at 20% 12%, rgba(53, 191, 171, 0.08), transparent 34%),
+    rgba(255, 255, 255, 0.2);
+  pointer-events: none;
+}
+.reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 30;
+  width: 100%;
+  height: 3px;
+  transform: scaleX(0);
+  transform-origin: left;
+  background: linear-gradient(90deg, var(--ksenr-brand), #7edbd1);
+}
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 68px;
+  padding: 0 42px;
+  background: rgba(255, 255, 255, 0.42);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.52);
+  backdrop-filter: blur(14px);
+  transition: background 180ms ease, box-shadow 180ms ease;
+}
+.site-header.scrolled {
+  background: rgba(255, 255, 255, 0.76);
+  box-shadow: 0 6px 24px rgba(20, 24, 30, 0.08);
+}
+body.page-home::before,
+body.page-home::after {
+  display: none !important;
+}
+html.page-home {
+  background: #e4ecef !important;
+}
+body.page-home header.site-header {
+  position: absolute !important;
+  left: auto !important;
+  right: 0 !important;
+  width: auto !important;
+  max-width: 48% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 18px 28px !important;
+  justify-content: flex-end !important;
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+body.page-home .site-brand {
+  display: none !important;
+}
+body.page-home header.site-header.scrolled {
+  position: fixed !important;
+  background: rgba(255, 255, 255, 0.78) !important;
+  backdrop-filter: blur(14px) !important;
+  -webkit-backdrop-filter: blur(14px) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.52) !important;
+  box-shadow: 0 6px 24px rgba(20, 24, 30, 0.08) !important;
+}
+body.page-home .site-brand,
+body.page-home .site-nav a {
+  color: rgba(255, 255, 255, 0.96) !important;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.38);
+}
+body.page-home header.site-header.scrolled .site-brand,
+body.page-home header.site-header.scrolled .site-nav a {
+  color: var(--ksenr-muted) !important;
+  text-shadow: none;
+}
+.site-brand {
+  color: var(--ksenr-ink);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.site-nav {
+  display: flex !important;
+  align-items: center;
+  gap: 18px;
+}
+.site-nav a,
+.site-nav-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  border: 0;
+  padding: 0 0.1rem;
+  background: transparent;
+  color: var(--ksenr-muted);
+  font: inherit;
+  font-size: 14px;
+  cursor: pointer;
+}
+.site-nav a::after,
+.site-nav-button::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 2px;
+  height: 2px;
+  transform: scaleX(0);
+  transform-origin: right;
+  border-radius: 999px;
+  background: var(--ksenr-brand);
+  transition: transform 0.18s ease;
+}
+.site-nav a:hover,
+.site-nav-button:hover {
+  color: var(--ksenr-brand);
+}
+.site-nav a:hover::after,
+.site-nav-button:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.search-form--modal .search-form__inner {
+  align-items: flex-start;
+  padding-top: 16vh;
+}
+.search-panel {
+  width: min(720px, calc(100vw - 44px));
+  padding: 24px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: 0 24px 90px rgba(20, 24, 30, 0.22);
+}
+.search-label {
+  display: block;
+  margin-bottom: 12px;
+  color: #334f52;
+  font-weight: 700;
+}
+.search-panel .text-input {
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 1px solid #d9e0db;
+  border-radius: 8px;
+  outline: none;
+}
+.search-results {
+  margin-top: 16px;
+  max-height: 50vh;
+  overflow: auto;
+}
+.search-result {
+  display: block;
+  padding: 12px 0;
+  border-top: 1px solid rgba(83, 97, 106, 0.14);
+}
+.search-result strong {
+  display: block;
+  color: #334f52;
+}
+.search-result span {
+  color: #889198;
+  font-size: 12px;
+}
+.search-empty {
+  color: #889198;
+}
+.wrapper:has(.post-article) {
+  width: min(1320px, calc(100vw - 72px)) !important;
+  max-width: none !important;
+}
+.post-article {
+  position: relative;
+  left: 50%;
+  display: grid;
+  grid-template-columns: minmax(0, 900px) 280px;
+  gap: 42px;
+  align-items: start;
+  width: min(1270px, calc(100vw - 84px));
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  transform: translateX(-50%);
+  background: transparent;
+  box-shadow: none;
+  isolation: isolate;
+}
+.post-main-panel {
+  position: relative;
+  grid-column: 1;
+  min-width: 0;
+  padding: 42px 50px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.76);
+  background: var(--ksenr-panel);
+  box-shadow: 0 20px 72px rgba(34, 42, 48, 0.11);
+  backdrop-filter: blur(13px);
+}
+.post-main-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: linear-gradient(135deg, rgba(53, 191, 171, 0.08), transparent 42%);
+  pointer-events: none;
+}
+.post-main-panel > .post-title,
+.post-main-panel > .post-body,
+.post-main-panel > .meta,
+.post-body,
+.post-body p,
+.post-body li {
+  max-width: none !important;
+}
+.post-body,
+.post-body table,
+.post-body figure {
+  min-width: 0;
+}
+.post-body p {
+  line-height: 1.9;
+}
+.post-body .math-display {
+  margin: 1.25rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.post-body mjx-container {
+  max-width: 100%;
+}
+.post-body mjx-container[display="true"] {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.35rem 0;
+}
+.post-body mjx-container svg {
+  max-width: none;
+}
+.post-body figure.highlight {
+  position: relative;
+  margin: 1.6rem 0;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #1f2329;
+  box-shadow: 0 12px 34px rgba(17, 24, 39, 0.16);
+}
+.post-body figure.highlight table {
+  display: block;
+  width: 100%;
+  margin: 0;
+  border: 0;
+  overflow-x: auto;
+  border-collapse: collapse;
+  background: #282c34;
+}
+.post-body figure.highlight tbody,
+.post-body figure.highlight tr {
+  display: table;
+  width: 100%;
+}
+.post-body figure.highlight td {
+  border: 0;
+  padding: 0;
+  vertical-align: top;
+}
+.post-body figure.highlight .gutter {
+  width: 3.7rem;
+  min-width: 3.7rem;
+  user-select: none;
+  background: #21252b;
+  color: #6b7280;
+  text-align: right;
+}
+.post-body figure.highlight .code {
+  width: 100%;
+  background: #282c34;
+}
+.post-body figure.highlight pre {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  overflow: visible !important;
+  color: #abb2bf;
+  font-family: Consolas, Monaco, "Cascadia Code", "Fira Code", monospace;
+  font-size: 14px;
+  line-height: 1.65;
+}
+.post-body figure.highlight .code pre {
+  min-width: max-content;
+}
+.post-body figure.highlight .line {
+  min-height: 1.65em;
+}
+.post-body figure.highlight .keyword,
+.post-body figure.highlight .type {
+  color: #c678dd;
+}
+.post-body figure.highlight .string {
+  color: #98c379;
+}
+.post-body figure.highlight .number,
+.post-body figure.highlight .literal {
+  color: #d19a66;
+}
+.post-body figure.highlight .comment {
+  color: #7f848e;
+}
+.post-body figure.highlight .meta,
+.post-body figure.highlight .built_in,
+.post-body figure.highlight .function .title {
+  color: #61afef;
+}
+.code-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 2.4rem;
+  padding: 0 0.75rem 0 1rem;
+  background: #1b1f27;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: #9ca3af;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.code-copy-button {
+  border: 0;
+  border-radius: 6px;
+  padding: 0.32rem 0.65rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: #d1d5db;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+.code-copy-button:hover {
+  background: #35bfab;
+  color: #111827;
+}
+article {
+  position: relative;
+}
+.post-toc {
+  position: sticky;
+  top: 90px;
+  grid-column: 2;
+  grid-row: 1 / span 4;
+  align-self: start;
+  width: auto;
+  max-height: calc(100vh - 116px);
+  overflow: auto;
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background: rgba(255, 255, 255, 0.74);
+  box-shadow: 0 14px 42px rgba(17, 24, 39, 0.12);
+  backdrop-filter: blur(12px);
+  z-index: 2;
+}
+.post-toc-title {
+  margin-bottom: 0.7rem;
+  color: var(--ksenr-ink);
+  font-weight: 700;
+}
+.toc-node {
+  margin: 2px 0;
+}
+.toc-node summary {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 0.34rem 0.45rem;
+  border-radius: 5px;
+  color: #59666d;
+  cursor: pointer;
+  list-style: none;
+}
+.toc-node summary::-webkit-details-marker {
+  display: none;
+}
+.toc-node summary::before {
+  content: "+";
+  grid-column: 2;
+  grid-row: 1;
+  color: var(--ksenr-brand);
+  font-weight: 700;
+}
+.toc-node[open] > summary::before {
+  content: "-";
+}
+.toc-node summary span {
+  grid-column: 1;
+  min-width: 0;
+}
+.toc-node summary a {
+  grid-column: 2;
+  grid-row: 1;
+  opacity: 0;
+  pointer-events: none;
+}
+.toc-children {
+  margin-left: 0.65rem;
+  padding-left: 0.7rem;
+  border-left: 1px solid rgba(83, 97, 106, 0.16);
+}
+.toc-link {
+  display: block;
+  padding: 0.34rem 0.45rem;
+  border-radius: 5px;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.5;
+  text-decoration: none;
+}
+.toc-link.level-3,
+.toc-node.level-3 summary {
+  font-size: 12px;
+}
+.toc-link.level-4,
+.toc-node.level-4 summary {
+  font-size: 12px;
+  color: #7b858a;
+}
+.toc-link.is-active,
+.toc-node summary:hover,
+.toc-link:hover {
+  background: rgba(53, 191, 171, 0.14);
+  color: #243b3d;
+}
+.click-ripple,
+.click-particle {
+  pointer-events: none;
+  position: fixed;
+}
+.click-ripple {
+  z-index: 9998;
+  left: 0;
+  top: 0;
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(53, 191, 171, 0.72);
+  border-radius: 999px;
+  transform: translate(var(--x), var(--y)) translate(-50%, -50%) scale(1);
+  animation: ksenr-click-ripple 0.58s ease-out forwards;
+}
+.click-particle {
+  z-index: 9998;
+  left: 0;
+  top: 0;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--particle-color);
+  transform: translate(var(--x), var(--y)) translate(-50%, -50%) scale(1);
+  animation: ksenr-click-particle 0.68s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+@keyframes ksenr-click-ripple {
+  to {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) translate(-50%, -50%) scale(7);
+  }
+}
+@keyframes ksenr-click-particle {
+  to {
+    opacity: 0;
+    transform: translate(calc(var(--x) + var(--dx)), calc(var(--y) + var(--dy))) translate(-50%, -50%) scale(0.25);
+  }
+}
+.timeline-page {
+  padding-top: 42px;
+  padding-bottom: 80px;
+}
+.timeline-page h1 {
+  margin-bottom: 42px;
+  text-align: center;
+  color: #334f52;
+}
+.timeline-tree {
+  position: relative;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 16px 0;
+}
+.timeline-tree::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  background: linear-gradient(180deg, transparent, #35bfab 12%, #35bfab 88%, transparent);
+}
+.timeline-item {
+  position: relative;
+  display: block;
+  width: calc(50% - 34px);
+  margin: 0 0 24px;
+  padding: 16px 18px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 10px 30px rgba(17, 24, 39, 0.08);
+  color: #334f52;
+}
+.timeline-item.left {
+  margin-right: auto;
+  text-align: right;
+}
+.timeline-item.right {
+  margin-left: auto;
+}
+.timeline-dot {
+  position: absolute;
+  top: 22px;
+  width: 12px;
+  height: 12px;
+  border: 3px solid #35bfab;
+  border-radius: 999px;
+  background: #fff;
+}
+.timeline-item.left .timeline-dot {
+  right: -41px;
+}
+.timeline-item.right .timeline-dot {
+  left: -39px;
+}
+.timeline-item strong {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+.timeline-item time {
+  color: #7b858a;
+  font-size: 13px;
+}
+.footer {
+  padding: 24px 0;
+  background: rgba(246, 247, 247, 0.9);
+}
+.footer-inner {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 9vw;
+  color: #9aa3a8;
+  font-size: 14px;
+}
+@media screen and (max-width: 1180px) {
+  .post-article {
+    display: block;
+    left: auto;
+    width: auto;
+    max-width: min(860px, calc(100vw - 32px));
+    margin: 0 auto;
+    transform: none;
+  }
+  .post-main-panel {
+    padding: 32px;
+  }
+  .post-toc {
+    position: static;
+    width: auto;
+    max-height: none;
+    margin: 0 0 1.6rem;
+  }
+}
+@media screen and (max-width: 719px) {
+  .site-header {
+    height: auto;
+    padding: 14px 18px;
+    align-items: flex-start;
+  }
+  .site-nav {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px 14px;
+  }
+  .post-main-panel {
+    padding: 22px 18px;
+  }
+  .timeline-tree::before {
+    left: 8px;
+  }
+  .timeline-item,
+  .timeline-item.left,
+  .timeline-item.right {
+    width: auto;
+    margin-left: 34px;
+    margin-right: 0;
+    text-align: left;
+  }
+  .timeline-item.left .timeline-dot,
+  .timeline-item.right .timeline-dot {
+    left: -32px;
+    right: auto;
+  }
+}
+</style><!-- hexo injector head_end end --><meta name="generator" content="Hexo 8.1.1"></head>
+
+  <body>
+
+<header class="site-header">
+	<a class="site-brand" href="/" aria-label="Home">ksenr</a>
+	<nav class="site-nav" aria-label="Main navigation">
+		<a href="/">Home</a>
+		<a href="/timeline/">Archive</a>
+		<a href="/daily-pause/">Daily Pause</a>
+	</nav>
+</header>
+
+
+<div class="m-header ">
+	<section id="hero1" class="hero">
+		<div class="inner">
+		</div>
+	</section>
+	
+		<figure class="top-image" style='background-image: url(/banner/4.jpg)' data-enable=false></figure>
+	
+</div>
+
+
+
+<!--文章列表-->
+<div class="wrapper">
+  
+    <!-- article -->
+<article class="post-article">
+	
+	<div class="post-main-panel">
+		
+		<div class='post-body mb'>
+			<h1 id="MoeCTF-2022-EquationPy"><a href="#MoeCTF-2022-EquationPy" class="headerlink" title="[MoeCTF 2022]EquationPy"></a>[MoeCTF 2022]EquationPy</h1><p>直接给了个pyc,找个在线网站转一下</p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260713220750201.png" alt="image-20260713220750201"></p>
+<p>明显的z3求解</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> z3 <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v = Ints(</span><br><span class="line">    <span class="string">&#x27;a b c d e f g h i j k l m n o p q r s t u v&#x27;</span></span><br><span class="line">)</span><br><span class="line"></span><br><span class="line">solver = Solver()</span><br><span class="line"></span><br><span class="line">rule = [</span><br><span class="line">a*<span class="number">7072</span>+b*<span class="number">2523</span>+c*<span class="number">6714</span>+d*<span class="number">8810</span>+e*<span class="number">6796</span>+f*<span class="number">2647</span>+g*<span class="number">1347</span>+h*<span class="number">1289</span>+i*<span class="number">8917</span>+j*<span class="number">2304</span>+k*<span class="number">5001</span>+l*<span class="number">2882</span>+m*<span class="number">7232</span>+n*<span class="number">3192</span>+o*<span class="number">9676</span>+p*<span class="number">5436</span>+q*<span class="number">4407</span>+r*<span class="number">6269</span>+s*<span class="number">9623</span>+t*<span class="number">6230</span>+u*<span class="number">6292</span>+v*<span class="number">57</span> == <span class="number">10743134</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">3492</span>+b*<span class="number">1613</span>+c*<span class="number">3234</span>+d*<span class="number">5656</span>+e*<span class="number">9182</span>+f*<span class="number">4240</span>+g*<span class="number">8808</span>+h*<span class="number">9484</span>+i*<span class="number">4000</span>+j*<span class="number">1475</span>+k*<span class="number">2616</span>+l*<span class="number">2766</span>+m*<span class="number">6822</span>+n*<span class="number">1068</span>+o*<span class="number">9768</span>+p*<span class="number">1420</span>+q*<span class="number">4528</span>+r*<span class="number">1031</span>+s*<span class="number">8388</span>+t*<span class="number">2029</span>+u*<span class="number">2463</span>+v*<span class="number">32</span> == <span class="number">9663091</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">9661</span>+b*<span class="number">1108</span>+c*<span class="number">2229</span>+d*<span class="number">1256</span>+e*<span class="number">7747</span>+f*<span class="number">5775</span>+g*<span class="number">5211</span>+h*<span class="number">2387</span>+i*<span class="number">1997</span>+j*<span class="number">4045</span>+k*<span class="number">7102</span>+l*<span class="number">7853</span>+m*<span class="number">5596</span>+n*<span class="number">6952</span>+o*<span class="number">8883</span>+p*<span class="number">5125</span>+q*<span class="number">9572</span>+r*<span class="number">1149</span>+s*<span class="number">7583</span>+t*<span class="number">1075</span>+u*<span class="number">9804</span>+v*<span class="number">72</span> == <span class="number">10521461</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">4314</span>+b*<span class="number">3509</span>+c*<span class="number">6200</span>+d*<span class="number">5546</span>+e*<span class="number">1705</span>+f*<span class="number">9518</span>+g*<span class="number">2975</span>+h*<span class="number">2689</span>+i*<span class="number">2412</span>+j*<span class="number">8659</span>+k*<span class="number">5459</span>+l*<span class="number">7572</span>+m*<span class="number">3042</span>+n*<span class="number">9701</span>+o*<span class="number">4697</span>+p*<span class="number">9863</span>+q*<span class="number">1296</span>+r*<span class="number">1278</span>+s*<span class="number">5721</span>+t*<span class="number">5116</span>+u*<span class="number">4147</span>+v*<span class="number">52</span> == <span class="number">9714028</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">2310</span>+b*<span class="number">1379</span>+c*<span class="number">5900</span>+d*<span class="number">4876</span>+e*<span class="number">5329</span>+f*<span class="number">6485</span>+g*<span class="number">6610</span>+h*<span class="number">7179</span>+i*<span class="number">7897</span>+j*<span class="number">1094</span>+k*<span class="number">4825</span>+l*<span class="number">8101</span>+m*<span class="number">9519</span>+n*<span class="number">3048</span>+o*<span class="number">3168</span>+p*<span class="number">2775</span>+q*<span class="number">4366</span>+r*<span class="number">4066</span>+s*<span class="number">7490</span>+t*<span class="number">5533</span>+u*<span class="number">2139</span>+v*<span class="number">87</span> == <span class="number">10030960</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">1549</span>+b*<span class="number">8554</span>+c*<span class="number">6510</span>+d*<span class="number">6559</span>+e*<span class="number">5570</span>+f*<span class="number">1003</span>+g*<span class="number">8562</span>+h*<span class="number">6793</span>+i*<span class="number">3509</span>+j*<span class="number">4965</span>+k*<span class="number">6111</span>+l*<span class="number">1229</span>+m*<span class="number">5654</span>+n*<span class="number">2204</span>+o*<span class="number">2217</span>+p*<span class="number">5039</span>+q*<span class="number">5657</span>+r*<span class="number">9426</span>+s*<span class="number">7604</span>+t*<span class="number">5883</span>+u*<span class="number">5285</span>+v*<span class="number">17</span> == <span class="number">10946682</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">2678</span>+b*<span class="number">4369</span>+c*<span class="number">7509</span>+d*<span class="number">1564</span>+e*<span class="number">7777</span>+f*<span class="number">2271</span>+g*<span class="number">9696</span>+h*<span class="number">3874</span>+i*<span class="number">2212</span>+j*<span class="number">6764</span>+k*<span class="number">5727</span>+l*<span class="number">5971</span>+m*<span class="number">5876</span>+n*<span class="number">9959</span>+o*<span class="number">4604</span>+p*<span class="number">8461</span>+q*<span class="number">2350</span>+r*<span class="number">3564</span>+s*<span class="number">1831</span>+t*<span class="number">6088</span>+u*<span class="number">4575</span>+v*<span class="number">9</span> == <span class="number">10286414</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">8916</span>+b*<span class="number">8647</span>+c*<span class="number">4522</span>+d*<span class="number">3579</span>+e*<span class="number">5319</span>+f*<span class="number">9124</span>+g*<span class="number">9535</span>+h*<span class="number">5125</span>+i*<span class="number">3235</span>+j*<span class="number">3246</span>+k*<span class="number">3378</span>+l*<span class="number">9221</span>+m*<span class="number">1875</span>+n*<span class="number">1008</span>+o*<span class="number">6262</span>+p*<span class="number">1524</span>+q*<span class="number">8851</span>+r*<span class="number">4367</span>+s*<span class="number">7628</span>+t*<span class="number">9404</span>+u*<span class="number">2065</span>+v*<span class="number">9</span> == <span class="number">11809388</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">9781</span>+b*<span class="number">9174</span>+c*<span class="number">3771</span>+d*<span class="number">6972</span>+e*<span class="number">6425</span>+f*<span class="number">7631</span>+g*<span class="number">8864</span>+h*<span class="number">9117</span>+i*<span class="number">4328</span>+j*<span class="number">3919</span>+k*<span class="number">6517</span>+l*<span class="number">7165</span>+m*<span class="number">6895</span>+n*<span class="number">3609</span>+o*<span class="number">3878</span>+p*<span class="number">1593</span>+q*<span class="number">9098</span>+r*<span class="number">6432</span>+s*<span class="number">2584</span>+t*<span class="number">8403</span>+u*<span class="number">4029</span>+v*<span class="number">30</span> == <span class="number">13060508</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">2511</span>+b*<span class="number">8583</span>+c*<span class="number">2428</span>+d*<span class="number">9439</span>+e*<span class="number">3662</span>+f*<span class="number">3278</span>+g*<span class="number">8305</span>+h*<span class="number">1100</span>+i*<span class="number">7972</span>+j*<span class="number">8510</span>+k*<span class="number">8552</span>+l*<span class="number">9993</span>+m*<span class="number">6855</span>+n*<span class="number">1702</span>+o*<span class="number">1640</span>+p*<span class="number">3787</span>+q*<span class="number">8161</span>+r*<span class="number">2110</span>+s*<span class="number">5320</span>+t*<span class="number">3313</span>+u*<span class="number">9286</span>+v*<span class="number">74</span> == <span class="number">10568195</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">4974</span>+b*<span class="number">4445</span>+c*<span class="number">7368</span>+d*<span class="number">9132</span>+e*<span class="number">5894</span>+f*<span class="number">7822</span>+g*<span class="number">7923</span>+h*<span class="number">6822</span>+i*<span class="number">2698</span>+j*<span class="number">3643</span>+k*<span class="number">8392</span>+l*<span class="number">4126</span>+m*<span class="number">1941</span>+n*<span class="number">6641</span>+o*<span class="number">2949</span>+p*<span class="number">7405</span>+q*<span class="number">9980</span>+r*<span class="number">6349</span>+s*<span class="number">3328</span>+t*<span class="number">8766</span>+u*<span class="number">9508</span>+v*<span class="number">65</span> == <span class="number">12514783</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">4127</span>+b*<span class="number">4703</span>+c*<span class="number">6409</span>+d*<span class="number">4907</span>+e*<span class="number">5230</span>+f*<span class="number">3371</span>+g*<span class="number">5666</span>+h*<span class="number">3194</span>+i*<span class="number">5448</span>+j*<span class="number">8415</span>+k*<span class="number">4525</span>+l*<span class="number">4152</span>+m*<span class="number">1467</span>+n*<span class="number">5254</span>+o*<span class="number">2256</span>+p*<span class="number">1643</span>+q*<span class="number">9113</span>+r*<span class="number">8805</span>+s*<span class="number">4315</span>+t*<span class="number">8371</span>+u*<span class="number">1919</span>+v*<span class="number">2</span> == <span class="number">10299950</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">6245</span>+b*<span class="number">8783</span>+c*<span class="number">6059</span>+d*<span class="number">9375</span>+e*<span class="number">9253</span>+f*<span class="number">1974</span>+g*<span class="number">8867</span>+h*<span class="number">6423</span>+i*<span class="number">2577</span>+j*<span class="number">6613</span>+k*<span class="number">2040</span>+l*<span class="number">2209</span>+m*<span class="number">4147</span>+n*<span class="number">7151</span>+o*<span class="number">1011</span>+p*<span class="number">9446</span>+q*<span class="number">4362</span>+r*<span class="number">3073</span>+s*<span class="number">3006</span>+t*<span class="number">5499</span>+u*<span class="number">8850</span>+v*<span class="number">23</span> == <span class="number">11180727</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">1907</span>+b*<span class="number">9038</span>+c*<span class="number">3932</span>+d*<span class="number">7054</span>+e*<span class="number">1135</span>+f*<span class="number">5095</span>+g*<span class="number">6962</span>+h*<span class="number">6481</span>+i*<span class="number">7049</span>+j*<span class="number">5995</span>+k*<span class="number">6233</span>+l*<span class="number">1321</span>+m*<span class="number">4455</span>+n*<span class="number">8181</span>+o*<span class="number">5757</span>+p*<span class="number">6953</span>+q*<span class="number">3167</span>+r*<span class="number">5508</span>+s*<span class="number">4602</span>+t*<span class="number">1420</span>+u*<span class="number">3075</span>+v*<span class="number">25</span> == <span class="number">10167536</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">1489</span>+b*<span class="number">9236</span>+c*<span class="number">7398</span>+d*<span class="number">4088</span>+e*<span class="number">4131</span>+f*<span class="number">1657</span>+g*<span class="number">9068</span>+h*<span class="number">6420</span>+i*<span class="number">3970</span>+j*<span class="number">3265</span>+k*<span class="number">5343</span>+l*<span class="number">5386</span>+m*<span class="number">2583</span>+n*<span class="number">2813</span>+o*<span class="number">7181</span>+p*<span class="number">9116</span>+q*<span class="number">4836</span>+r*<span class="number">6917</span>+s*<span class="number">1123</span>+t*<span class="number">7276</span>+u*<span class="number">2257</span>+v*<span class="number">65</span> == <span class="number">10202212</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">2097</span>+b*<span class="number">1253</span>+c*<span class="number">1469</span>+d*<span class="number">2731</span>+e*<span class="number">9565</span>+f*<span class="number">9185</span>+g*<span class="number">1095</span>+h*<span class="number">8666</span>+i*<span class="number">2919</span>+j*<span class="number">7962</span>+k*<span class="number">1497</span>+l*<span class="number">6642</span>+m*<span class="number">4108</span>+n*<span class="number">6892</span>+o*<span class="number">7161</span>+p*<span class="number">7552</span>+q*<span class="number">5666</span>+r*<span class="number">4060</span>+s*<span class="number">7799</span>+t*<span class="number">5080</span>+u*<span class="number">8516</span>+v*<span class="number">43</span> == <span class="number">10435786</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">1461</span>+b*<span class="number">1676</span>+c*<span class="number">4755</span>+d*<span class="number">7982</span>+e*<span class="number">3860</span>+f*<span class="number">1067</span>+g*<span class="number">6715</span>+h*<span class="number">4019</span>+i*<span class="number">4983</span>+j*<span class="number">2031</span>+k*<span class="number">1173</span>+l*<span class="number">2241</span>+m*<span class="number">2594</span>+n*<span class="number">8672</span>+o*<span class="number">4810</span>+p*<span class="number">7963</span>+q*<span class="number">7749</span>+r*<span class="number">5730</span>+s*<span class="number">9855</span>+t*<span class="number">5858</span>+u*<span class="number">2349</span>+v*<span class="number">71</span> == <span class="number">9526385</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">9025</span>+b*<span class="number">9536</span>+c*<span class="number">1515</span>+d*<span class="number">8177</span>+e*<span class="number">6109</span>+f*<span class="number">4856</span>+g*<span class="number">6692</span>+h*<span class="number">4929</span>+i*<span class="number">1010</span>+j*<span class="number">3995</span>+k*<span class="number">3511</span>+l*<span class="number">5910</span>+m*<span class="number">3501</span>+n*<span class="number">3731</span>+o*<span class="number">6601</span>+p*<span class="number">6200</span>+q*<span class="number">8177</span>+r*<span class="number">5488</span>+s*<span class="number">5957</span>+t*<span class="number">9661</span>+u*<span class="number">4956</span>+v*<span class="number">48</span> == <span class="number">11822714</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">4462</span>+b*<span class="number">1940</span>+c*<span class="number">5956</span>+d*<span class="number">4965</span>+e*<span class="number">9268</span>+f*<span class="number">9627</span>+g*<span class="number">3564</span>+h*<span class="number">5417</span>+i*<span class="number">2039</span>+j*<span class="number">7269</span>+k*<span class="number">9667</span>+l*<span class="number">4158</span>+m*<span class="number">2856</span>+n*<span class="number">2851</span>+o*<span class="number">9696</span>+p*<span class="number">5986</span>+q*<span class="number">6237</span>+r*<span class="number">5845</span>+s*<span class="number">5467</span>+t*<span class="number">5227</span>+u*<span class="number">4771</span>+v*<span class="number">72</span> == <span class="number">11486796</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">4618</span>+b*<span class="number">8621</span>+c*<span class="number">8144</span>+d*<span class="number">7115</span>+e*<span class="number">1577</span>+f*<span class="number">8602</span>+g*<span class="number">3886</span>+h*<span class="number">3712</span>+i*<span class="number">1258</span>+j*<span class="number">7063</span>+k*<span class="number">1872</span>+l*<span class="number">9855</span>+m*<span class="number">4167</span>+n*<span class="number">7615</span>+o*<span class="number">6298</span>+p*<span class="number">7682</span>+q*<span class="number">8795</span>+r*<span class="number">3856</span>+s*<span class="number">6217</span>+t*<span class="number">5764</span>+u*<span class="number">5076</span>+v*<span class="number">93</span> == <span class="number">11540145</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">7466</span>+b*<span class="number">8442</span>+c*<span class="number">4822</span>+d*<span class="number">7639</span>+e*<span class="number">2049</span>+f*<span class="number">7311</span>+g*<span class="number">5816</span>+h*<span class="number">8433</span>+i*<span class="number">5905</span>+j*<span class="number">4838</span>+k*<span class="number">1251</span>+l*<span class="number">8184</span>+m*<span class="number">6465</span>+n*<span class="number">4634</span>+o*<span class="number">5513</span>+p*<span class="number">3160</span>+q*<span class="number">6720</span>+r*<span class="number">9205</span>+s*<span class="number">6671</span>+t*<span class="number">7716</span>+u*<span class="number">1905</span>+v*<span class="number">29</span> == <span class="number">12227250</span>,</span><br><span class="line"></span><br><span class="line">a*<span class="number">5926</span>+b*<span class="number">9095</span>+c*<span class="number">2048</span>+d*<span class="number">4639</span>+e*<span class="number">3035</span>+f*<span class="number">9560</span>+g*<span class="number">1591</span>+h*<span class="number">2392</span>+i*<span class="number">1812</span>+j*<span class="number">6732</span>+k*<span class="number">9454</span>+l*<span class="number">8175</span>+m*<span class="number">7346</span>+n*<span class="number">6333</span>+o*<span class="number">9812</span>+p*<span class="number">2034</span>+q*<span class="number">6634</span>+r*<span class="number">1762</span>+s*<span class="number">7058</span>+t*<span class="number">3524</span>+u*<span class="number">7462</span>+v*<span class="number">11</span> == <span class="number">11118093</span></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">solver.add(rule)</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> solver.check() == sat:</span><br><span class="line">    model = solver.model()</span><br><span class="line">    flag = <span class="string">&#x27;&#x27;</span>.join(<span class="built_in">chr</span>(model[x].as_long()) <span class="keyword">for</span> x <span class="keyword">in</span> [</span><br><span class="line">        a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v</span><br><span class="line">    ])</span><br><span class="line">    <span class="built_in">print</span>(flag)</span><br></pre></td></tr></table></figure>
+
+<h1 id="LitCTF-2024-ezrc4"><a href="#LitCTF-2024-ezrc4" class="headerlink" title="[LitCTF 2024]ezrc4"></a>[LitCTF 2024]ezrc4</h1><p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260713222122365.png" alt="image-20260713222122365"></p>
+<p>没壳进IDA</p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260714091744021.png" alt="image-20260714091744021"></p>
+<p>rc4,密文是</p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260714091825148.png" alt="image-20260714091825148"> </p>
+<p>注意到函数列表有X_X和X_X_init,也可对key交叉引用看</p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260714091931704.png" alt="image-20260714091931704"></p>
+<p>对RC4的key进行了异或修改</p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260714092029681.png" alt="image-20260714092029681"></p>
+<p>得到key是litctf!</p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260714092553547.png" alt="image-20260714092553547"></p>
+<h1 id="HNCTF-2022-WEEK3-What’s-1n-DLL"><a href="#HNCTF-2022-WEEK3-What’s-1n-DLL" class="headerlink" title="[HNCTF 2022 WEEK3]What’s 1n DLL?"></a>[HNCTF 2022 WEEK3]What’s 1n DLL?</h1><p>给了exe和dll</p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260714094001163.png" alt="image-20260714094001163"></p>
+<p>给了密文和key.接下来找加密方式即可</p>
+<p>加载dll,<code>GetProcAddress</code> 从 DLL 的导出表里查找名为ttt的函数返回地址</p>
+<p>dll加了壳,改成UPX即可</p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260714093321607.png" alt="image-20260714093321607"></p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260714093814984.png" alt="image-20260714093814984"></p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260714095748892.png" alt="image-20260714095748892"></p>
+<p>xxtea</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> struct</span><br><span class="line"></span><br><span class="line">MASK = <span class="number">0xffffffff</span></span><br><span class="line">DELTA = <span class="number">0x9E3779B9</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">mx</span>(<span class="params">s, y, z, p, e, key</span>):</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">        (((z &gt;&gt; <span class="number">5</span>) ^ (y &lt;&lt; <span class="number">2</span>)) + ((y &gt;&gt; <span class="number">3</span>) ^ (z &lt;&lt; <span class="number">4</span>)))</span><br><span class="line">        ^ ((s ^ y) + (key[(p &amp; <span class="number">3</span>) ^ e] ^ z))</span><br><span class="line">    ) &amp; MASK</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">xxtea_encrypt</span>(<span class="params">data, key</span>):</span><br><span class="line">    v = data[:]</span><br><span class="line">    n = <span class="built_in">len</span>(v)</span><br><span class="line">    <span class="keyword">if</span> n &lt; <span class="number">2</span>:</span><br><span class="line">        <span class="keyword">return</span> v</span><br><span class="line"></span><br><span class="line">    rounds = <span class="number">6</span> + <span class="number">52</span> // n</span><br><span class="line">    s = <span class="number">0</span></span><br><span class="line">    z = v[-<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(rounds):</span><br><span class="line">        s = (s + DELTA) &amp; MASK</span><br><span class="line">        e = (s &gt;&gt; <span class="number">2</span>) &amp; <span class="number">3</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> p <span class="keyword">in</span> <span class="built_in">range</span>(n - <span class="number">1</span>):</span><br><span class="line">            y = v[p + <span class="number">1</span>]</span><br><span class="line">            v[p] = (v[p] + mx(s, y, z, p, e, key)) &amp; MASK</span><br><span class="line">            z = v[p]</span><br><span class="line"></span><br><span class="line">        y = v[<span class="number">0</span>]</span><br><span class="line">        v[-<span class="number">1</span>] = (v[-<span class="number">1</span>] + mx(s, y, z, n - <span class="number">1</span>, e, key)) &amp; MASK</span><br><span class="line">        z = v[-<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> v</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">xxtea_decrypt</span>(<span class="params">data, key</span>):</span><br><span class="line">    v = data[:]</span><br><span class="line">    n = <span class="built_in">len</span>(v)</span><br><span class="line">    <span class="keyword">if</span> n &lt; <span class="number">2</span>:</span><br><span class="line">        <span class="keyword">return</span> v</span><br><span class="line"></span><br><span class="line">    rounds = <span class="number">6</span> + <span class="number">52</span> // n</span><br><span class="line">    s = (rounds * DELTA) &amp; MASK</span><br><span class="line">    y = v[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> s:</span><br><span class="line">        e = (s &gt;&gt; <span class="number">2</span>) &amp; <span class="number">3</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> p <span class="keyword">in</span> <span class="built_in">range</span>(n - <span class="number">1</span>, <span class="number">0</span>, -<span class="number">1</span>):</span><br><span class="line">            z = v[p - <span class="number">1</span>]</span><br><span class="line">            v[p] = (v[p] - mx(s, y, z, p, e, key)) &amp; MASK</span><br><span class="line">            y = v[p]</span><br><span class="line"></span><br><span class="line">        z = v[-<span class="number">1</span>]</span><br><span class="line">        v[<span class="number">0</span>] = (v[<span class="number">0</span>] - mx(s, y, z, <span class="number">0</span>, e, key)) &amp; MASK</span><br><span class="line">        y = v[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">        s = (s - DELTA) &amp; MASK</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> v</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">bytes_to_dwords</span>(<span class="params">data</span>):</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">list</span>(struct.unpack(<span class="string">&quot;&lt;%dI&quot;</span> % (<span class="built_in">len</span>(data) // <span class="number">4</span>), data))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">dwords_to_bytes</span>(<span class="params">data</span>):</span><br><span class="line">    <span class="keyword">return</span> struct.pack(<span class="string">&quot;&lt;%dI&quot;</span> % <span class="built_in">len</span>(data), *data)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">key = [<span class="number">0x37</span>, <span class="number">0x42</span>, <span class="number">0x4D</span>, <span class="number">0x58</span>]</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">enc = [<span class="number">0x22A577C1</span>,</span><br><span class="line">       <span class="number">0x1C12C03</span>,</span><br><span class="line">       <span class="number">0xC74C3EBD</span>,</span><br><span class="line">       <span class="number">0xA9D03C85</span>,</span><br><span class="line">       <span class="number">0xADB8FFB3</span></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line">plain = xxtea_decrypt(enc, key)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;DWORD：&quot;</span>, [<span class="built_in">hex</span>(x) <span class="keyword">for</span> x <span class="keyword">in</span> plain])</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;plain：&quot;</span>, dwords_to_bytes(plain))</span><br></pre></td></tr></table></figure>
+
+<h1 id="SWPUCTF-2021-新生赛-简单的逻辑"><a href="#SWPUCTF-2021-新生赛-简单的逻辑" class="headerlink" title="[SWPUCTF 2021 新生赛]简单的逻辑"></a>[SWPUCTF 2021 新生赛]简单的逻辑</h1><p>z3爆,套上flag的前后缀</p>
+<h1 id="NSSRound-16-Basic-test-your-Debugger"><a href="#NSSRound-16-Basic-test-your-Debugger" class="headerlink" title="[NSSRound#16 Basic]test your Debugger"></a>[NSSRound#16 Basic]test your Debugger</h1><p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260714102511481.png" alt="image-20260714102511481"></p>
+<p>按题目提示下断点运行即可</p>
+<h1 id="长城杯-2021-院校组-Just-cmp-re"><a href="#长城杯-2021-院校组-Just-cmp-re" class="headerlink" title="[长城杯 2021 院校组]Just_cmp-re"></a>[长城杯 2021 院校组]Just_cmp-re</h1><h1 id="HNCTF-2022-WEEK4-ez-maze"><a href="#HNCTF-2022-WEEK4-ez-maze" class="headerlink" title="[HNCTF 2022 WEEK4]ez_maze"></a>[HNCTF 2022 WEEK4]ez_maze</h1><p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260716122416737.png" alt="image-20260716122416737"></p>
+<p>pyinstall打包了,用pyinstxtrctor.py</p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260716124342723.png" alt="image-20260716124342723"></p>
+<p>找个在线的pyc转py</p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260716140051376.png" alt="image-20260716140051376"></p>
+<p>这样的一个迷宫</p>
+<p>推荐一个工具<a target="_blank" rel="noopener" href="https://github.com/LingerJAB/MazeSolver">https://github.com/LingerJAB/MazeSolver</a></p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260716142539473.png" alt="image-20260716142539473"></p>
+<p>得到路径再md5即可</p>
+<h1 id="NSSRound-X-Basic-ez-z3"><a href="#NSSRound-X-Basic-ez-z3" class="headerlink" title="[NSSRound#X Basic]ez_z3"></a>[NSSRound#X Basic]ez_z3</h1><p>z3</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> z3 <span class="keyword">import</span> *</span><br><span class="line"></span><br><span class="line">c = [BitVec(<span class="string">f&#x27;z<span class="subst">&#123;i&#125;</span>&#x27;</span>, <span class="number">8</span>) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">20</span>)]</span><br><span class="line"></span><br><span class="line">z = [ZeroExt(<span class="number">24</span>, c[i]) <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">20</span>)]</span><br><span class="line"></span><br><span class="line">solver = SolverFor(<span class="string">&quot;QF_BV&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">20</span>):</span><br><span class="line">    solver.add(UGE(c[i], <span class="number">32</span>), ULE(c[i], <span class="number">126</span>))</span><br><span class="line">rule=[</span><br><span class="line">z[<span class="number">0</span>] + <span class="number">2</span> * z[<span class="number">1</span>] - <span class="number">3</span> * z[<span class="number">2</span>] - <span class="number">4</span> * z[<span class="number">3</span>] + <span class="number">5</span> * z[<span class="number">4</span>]</span><br><span class="line">+ <span class="number">30</span> * z[<span class="number">5</span>] - <span class="number">7</span> * z[<span class="number">6</span>] + <span class="number">8</span> * z[<span class="number">7</span>] - <span class="number">9</span> * z[<span class="number">8</span>]</span><br><span class="line">+ <span class="number">110</span> * z[<span class="number">9</span>] * z[<span class="number">10</span>] - <span class="number">12</span> * z[<span class="number">11</span>] + <span class="number">13</span> * z[<span class="number">12</span>]</span><br><span class="line">+ <span class="number">14</span> * z[<span class="number">13</span>] - <span class="number">240</span> * z[<span class="number">14</span>] * z[<span class="number">15</span>] - <span class="number">17</span> * z[<span class="number">16</span>]</span><br><span class="line">- <span class="number">18</span> * z[<span class="number">17</span>] + <span class="number">380</span> * z[<span class="number">18</span>] * z[<span class="number">19</span>] == <span class="number">0x2766DF</span>,</span><br><span class="line"></span><br><span class="line"><span class="number">2</span> * z[<span class="number">0</span>] * z[<span class="number">1</span>] + <span class="number">3</span> * z[<span class="number">2</span>] - <span class="number">4</span> * z[<span class="number">3</span>] + <span class="number">5</span> * z[<span class="number">4</span>]</span><br><span class="line">+ <span class="number">30</span> * z[<span class="number">5</span>] - <span class="number">7</span> * z[<span class="number">6</span>] + <span class="number">8</span> * z[<span class="number">7</span>] - <span class="number">9</span> * z[<span class="number">8</span>]</span><br><span class="line">+ <span class="number">110</span> * z[<span class="number">9</span>] * z[<span class="number">10</span>] - <span class="number">12</span> * z[<span class="number">11</span>] + <span class="number">13</span> * z[<span class="number">12</span>]</span><br><span class="line">+ <span class="number">14</span> * z[<span class="number">13</span>] - <span class="number">240</span> * z[<span class="number">14</span>] * z[<span class="number">15</span>] - <span class="number">17</span> * z[<span class="number">16</span>]</span><br><span class="line">- <span class="number">18</span> * z[<span class="number">17</span>] + <span class="number">380</span> * z[<span class="number">18</span>] * z[<span class="number">19</span>] == <span class="number">0x27B6F5</span>,</span><br><span class="line"></span><br><span class="line">z[<span class="number">0</span>] - <span class="number">2</span> * z[<span class="number">1</span>] - <span class="number">12</span> * z[<span class="number">2</span>] * z[<span class="number">3</span>] - <span class="number">5</span> * z[<span class="number">4</span>]</span><br><span class="line">+ <span class="number">210</span> * z[<span class="number">5</span>] * z[<span class="number">6</span>] + <span class="number">8</span> * z[<span class="number">7</span>] + <span class="number">9</span> * z[<span class="number">8</span>] - <span class="number">10</span> * z[<span class="number">9</span>]</span><br><span class="line">+ <span class="number">132</span> * z[<span class="number">10</span>] * z[<span class="number">11</span>] + <span class="number">182</span> * z[<span class="number">12</span>] * z[<span class="number">13</span>]</span><br><span class="line">- <span class="number">15</span> * z[<span class="number">14</span>] - <span class="number">272</span> * z[<span class="number">15</span>] * z[<span class="number">16</span>] + <span class="number">18</span> * z[<span class="number">17</span>]</span><br><span class="line">+ <span class="number">19</span> * z[<span class="number">18</span>] - <span class="number">20</span> * z[<span class="number">19</span>] == <span class="number">0x28B65B</span>,</span><br><span class="line"></span><br><span class="line">z[<span class="number">0</span>] + <span class="number">2</span> * z[<span class="number">1</span>] - <span class="number">3</span> * z[<span class="number">2</span>] - <span class="number">4</span> * z[<span class="number">3</span>] + <span class="number">5</span> * z[<span class="number">4</span>]</span><br><span class="line">+ <span class="number">30</span> * z[<span class="number">5</span>] - <span class="number">7</span> * z[<span class="number">6</span>] + <span class="number">8</span> * z[<span class="number">7</span>] - <span class="number">9</span> * z[<span class="number">8</span>]</span><br><span class="line">+ <span class="number">110</span> * z[<span class="number">9</span>] * z[<span class="number">10</span>] - <span class="number">120</span> * z[<span class="number">9</span>] * z[<span class="number">11</span>]</span><br><span class="line">+ <span class="number">130</span> * z[<span class="number">9</span>] * z[<span class="number">12</span>] + <span class="number">14</span> * z[<span class="number">13</span>]</span><br><span class="line">- <span class="number">240</span> * z[<span class="number">14</span>] * z[<span class="number">15</span>] - <span class="number">17</span> * z[<span class="number">16</span>] - <span class="number">18</span> * z[<span class="number">17</span>]</span><br><span class="line">+ <span class="number">380</span> * z[<span class="number">18</span>] * z[<span class="number">19</span>] == <span class="number">0x267481</span>,</span><br><span class="line"></span><br><span class="line"><span class="number">6</span> * z[<span class="number">0</span>] * z[<span class="number">1</span>] * z[<span class="number">2</span>] - <span class="number">4</span> * z[<span class="number">3</span>] - <span class="number">5</span> * z[<span class="number">4</span>]</span><br><span class="line">- <span class="number">30</span> * z[<span class="number">5</span>] - <span class="number">7</span> * z[<span class="number">6</span>] + <span class="number">72</span> * z[<span class="number">7</span>] * z[<span class="number">8</span>]</span><br><span class="line">+ <span class="number">10</span> * z[<span class="number">9</span>] - <span class="number">11</span> * z[<span class="number">10</span>] + <span class="number">156</span> * z[<span class="number">11</span>] * z[<span class="number">12</span>]</span><br><span class="line">- <span class="number">14</span> * z[<span class="number">13</span>] + <span class="number">15</span> * z[<span class="number">14</span>] - <span class="number">16</span> * z[<span class="number">15</span>]</span><br><span class="line">+ <span class="number">17</span> * z[<span class="number">16</span>] + <span class="number">18</span> * z[<span class="number">17</span>] - <span class="number">19</span> * z[<span class="number">18</span>]</span><br><span class="line">- <span class="number">20</span> * z[<span class="number">19</span>] == <span class="number">0x87DF8B</span>,</span><br><span class="line"></span><br><span class="line">z[<span class="number">0</span>] - <span class="number">2</span> * z[<span class="number">1</span>] - <span class="number">3</span> * z[<span class="number">2</span>] + <span class="number">4</span> * z[<span class="number">3</span>]</span><br><span class="line">+ <span class="number">1050</span> * z[<span class="number">4</span>] * z[<span class="number">5</span>] * z[<span class="number">6</span>] + <span class="number">8</span> * z[<span class="number">7</span>] - <span class="number">9</span> * z[<span class="number">8</span>]</span><br><span class="line">- <span class="number">110</span> * z[<span class="number">9</span>] * z[<span class="number">10</span>] - <span class="number">192</span> * z[<span class="number">11</span>] * z[<span class="number">15</span>]</span><br><span class="line">- <span class="number">208</span> * z[<span class="number">12</span>] * z[<span class="number">15</span>] + <span class="number">224</span> * z[<span class="number">13</span>] * z[<span class="number">15</span>]</span><br><span class="line">+ <span class="number">240</span> * z[<span class="number">14</span>] * z[<span class="number">15</span>] - <span class="number">17</span> * z[<span class="number">16</span>] + <span class="number">18</span> * z[<span class="number">17</span>]</span><br><span class="line">- <span class="number">19</span> * z[<span class="number">18</span>] - <span class="number">20</span> * z[<span class="number">19</span>] == <span class="number">0x492C020A</span>,</span><br><span class="line"></span><br><span class="line">z[<span class="number">0</span>] + <span class="number">2</span> * z[<span class="number">1</span>] + <span class="number">3</span> * z[<span class="number">2</span>] + <span class="number">4</span> * z[<span class="number">3</span>] + <span class="number">5</span> * z[<span class="number">4</span>]</span><br><span class="line">+ <span class="number">210</span> * z[<span class="number">5</span>] * z[<span class="number">6</span>] + <span class="number">8</span> * z[<span class="number">7</span>] - <span class="number">9</span> * z[<span class="number">8</span>]</span><br><span class="line">+ <span class="number">1320</span> * z[<span class="number">9</span>] * z[<span class="number">10</span>] * z[<span class="number">11</span>] + <span class="number">13</span> * z[<span class="number">12</span>]</span><br><span class="line">+ <span class="number">14</span> * z[<span class="number">13</span>] - <span class="number">240</span> * z[<span class="number">14</span>] * z[<span class="number">15</span>] + <span class="number">17</span> * z[<span class="number">16</span>]</span><br><span class="line">- <span class="number">18</span> * z[<span class="number">17</span>] + <span class="number">380</span> * z[<span class="number">18</span>] * z[<span class="number">19</span>] == <span class="number">0x6D78626B</span>,</span><br><span class="line"></span><br><span class="line"><span class="number">2</span> * z[<span class="number">0</span>] * z[<span class="number">1</span>] - <span class="number">3</span> * z[<span class="number">2</span>] + <span class="number">4</span> * z[<span class="number">3</span>] + <span class="number">5</span> * z[<span class="number">4</span>]</span><br><span class="line">+ <span class="number">210</span> * z[<span class="number">5</span>] * z[<span class="number">6</span>] + <span class="number">8</span> * z[<span class="number">7</span>] - <span class="number">9</span> * z[<span class="number">8</span>]</span><br><span class="line">- <span class="number">10</span> * z[<span class="number">9</span>] - <span class="number">11</span> * z[<span class="number">10</span>] + <span class="number">12</span> * z[<span class="number">11</span>]</span><br><span class="line">+ <span class="number">13</span> * z[<span class="number">12</span>] + <span class="number">14</span> * z[<span class="number">13</span>] + <span class="number">240</span> * z[<span class="number">14</span>] * z[<span class="number">15</span>]</span><br><span class="line">- <span class="number">17</span> * z[<span class="number">16</span>] - <span class="number">18</span> * z[<span class="number">17</span>] + <span class="number">380</span> * z[<span class="number">18</span>] * z[<span class="number">19</span>]</span><br><span class="line">== <span class="number">0x8510B0</span>,</span><br><span class="line"></span><br><span class="line">z[<span class="number">0</span>] + <span class="number">2</span> * z[<span class="number">1</span>] - <span class="number">3</span> * z[<span class="number">2</span>]</span><br><span class="line">+ <span class="number">44</span> * z[<span class="number">3</span>] * z[<span class="number">10</span>] + <span class="number">55</span> * z[<span class="number">4</span>] * z[<span class="number">10</span>]</span><br><span class="line">+ <span class="number">330</span> * z[<span class="number">5</span>] * z[<span class="number">10</span>] - <span class="number">77</span> * z[<span class="number">6</span>] * z[<span class="number">10</span>]</span><br><span class="line">+ <span class="number">88</span> * z[<span class="number">7</span>] * z[<span class="number">10</span>] - <span class="number">99</span> * z[<span class="number">8</span>] * z[<span class="number">10</span>]</span><br><span class="line">+ <span class="number">110</span> * z[<span class="number">9</span>] * z[<span class="number">10</span>] - <span class="number">12</span> * z[<span class="number">11</span>]</span><br><span class="line">+ <span class="number">13</span> * z[<span class="number">12</span>] + <span class="number">14</span> * z[<span class="number">13</span>]</span><br><span class="line">- <span class="number">240</span> * z[<span class="number">14</span>] * z[<span class="number">15</span>] + <span class="number">255</span> * z[<span class="number">14</span>] * z[<span class="number">16</span>]</span><br><span class="line">+ <span class="number">270</span> * z[<span class="number">14</span>] * z[<span class="number">17</span>] + <span class="number">380</span> * z[<span class="number">18</span>] * z[<span class="number">19</span>]</span><br><span class="line">== <span class="number">0xADC0A5</span>,</span><br><span class="line"></span><br><span class="line">z[<span class="number">0</span>] - <span class="number">2</span> * z[<span class="number">1</span>] + <span class="number">3</span> * z[<span class="number">2</span>] + <span class="number">4</span> * z[<span class="number">3</span>] - <span class="number">5</span> * z[<span class="number">4</span>]</span><br><span class="line">- <span class="number">30</span> * z[<span class="number">5</span>] - <span class="number">7</span> * z[<span class="number">6</span>] + <span class="number">8</span> * z[<span class="number">7</span>] + <span class="number">9</span> * z[<span class="number">8</span>]</span><br><span class="line">+ <span class="number">110</span> * z[<span class="number">9</span>] * z[<span class="number">10</span>] - <span class="number">12</span> * z[<span class="number">11</span>] - <span class="number">13</span> * z[<span class="number">12</span>]</span><br><span class="line">+ <span class="number">14</span> * z[<span class="number">13</span>] + <span class="number">240</span> * z[<span class="number">14</span>] * z[<span class="number">15</span>]</span><br><span class="line">- <span class="number">17</span> * z[<span class="number">16</span>] - <span class="number">18</span> * z[<span class="number">17</span>]</span><br><span class="line">+ <span class="number">380</span> * z[<span class="number">18</span>] * z[<span class="number">19</span>] == <span class="number">0x74E2ED</span>,</span><br><span class="line"></span><br><span class="line">z[<span class="number">0</span>] + <span class="number">2</span> * z[<span class="number">1</span>] - <span class="number">12</span> * z[<span class="number">2</span>] * z[<span class="number">3</span>] + <span class="number">5</span> * z[<span class="number">4</span>]</span><br><span class="line">+ <span class="number">30</span> * z[<span class="number">5</span>] - <span class="number">7</span> * z[<span class="number">6</span>] + <span class="number">8</span> * z[<span class="number">7</span>] - <span class="number">9</span> * z[<span class="number">8</span>]</span><br><span class="line">+ <span class="number">110</span> * z[<span class="number">9</span>] * z[<span class="number">10</span>] - <span class="number">12</span> * z[<span class="number">11</span>]</span><br><span class="line">+ <span class="number">13</span> * z[<span class="number">12</span>] + <span class="number">14</span> * z[<span class="number">13</span>]</span><br><span class="line">- <span class="number">240</span> * z[<span class="number">14</span>] * z[<span class="number">15</span>] - <span class="number">17</span> * z[<span class="number">16</span>] - <span class="number">18</span> * z[<span class="number">17</span>]</span><br><span class="line">+ <span class="number">380</span> * z[<span class="number">18</span>] * z[<span class="number">19</span>] == <span class="number">0x2590BB</span>,</span><br><span class="line"></span><br><span class="line"><span class="number">2</span> * z[<span class="number">0</span>] * z[<span class="number">1</span>] - <span class="number">12</span> * z[<span class="number">2</span>] * z[<span class="number">3</span>] - <span class="number">5</span> * z[<span class="number">4</span>]</span><br><span class="line">- <span class="number">30</span> * z[<span class="number">5</span>] + <span class="number">7</span> * z[<span class="number">6</span>] + <span class="number">72</span> * z[<span class="number">7</span>] * z[<span class="number">8</span>]</span><br><span class="line">+ <span class="number">110</span> * z[<span class="number">9</span>] * z[<span class="number">10</span>] - <span class="number">12</span> * z[<span class="number">11</span>] - <span class="number">13</span> * z[<span class="number">12</span>]</span><br><span class="line">+ <span class="number">14</span> * z[<span class="number">13</span>] - <span class="number">15</span> * z[<span class="number">14</span>] - <span class="number">272</span> * z[<span class="number">15</span>] * z[<span class="number">16</span>]</span><br><span class="line">- <span class="number">18</span> * z[<span class="number">17</span>] - <span class="number">19</span> * z[<span class="number">18</span>] - <span class="number">20</span> * z[<span class="number">19</span>]</span><br><span class="line">== <span class="number">0xFFF14168</span>,</span><br><span class="line"></span><br><span class="line">z[<span class="number">0</span>] + <span class="number">6</span> * z[<span class="number">1</span>] * z[<span class="number">2</span>] + <span class="number">8</span> * z[<span class="number">1</span>] * z[<span class="number">3</span>]</span><br><span class="line">+ <span class="number">10</span> * z[<span class="number">1</span>] * z[<span class="number">4</span>] + <span class="number">60</span> * z[<span class="number">1</span>] * z[<span class="number">5</span>]</span><br><span class="line">- <span class="number">14</span> * z[<span class="number">1</span>] * z[<span class="number">6</span>] + <span class="number">16</span> * z[<span class="number">1</span>] * z[<span class="number">7</span>]</span><br><span class="line">- <span class="number">18</span> * z[<span class="number">1</span>] * z[<span class="number">8</span>] + <span class="number">220</span> * z[<span class="number">1</span>] * z[<span class="number">9</span>] * z[<span class="number">10</span>]</span><br><span class="line">- <span class="number">12</span> * z[<span class="number">11</span>] + <span class="number">13</span> * z[<span class="number">12</span>] + <span class="number">14</span> * z[<span class="number">13</span>]</span><br><span class="line">- <span class="number">15</span> * z[<span class="number">14</span>] - <span class="number">16</span> * z[<span class="number">15</span>] - <span class="number">17</span> * z[<span class="number">16</span>]</span><br><span class="line">- <span class="number">18</span> * z[<span class="number">17</span>] - <span class="number">380</span> * z[<span class="number">18</span>] * z[<span class="number">19</span>]</span><br><span class="line">== <span class="number">0x0F2B5D7F</span>,</span><br><span class="line"></span><br><span class="line">z[<span class="number">0</span>] - <span class="number">2</span> * z[<span class="number">1</span>] - <span class="number">3</span> * z[<span class="number">2</span>] - <span class="number">20</span> * z[<span class="number">3</span>] * z[<span class="number">4</span>]</span><br><span class="line">+ <span class="number">210</span> * z[<span class="number">5</span>] * z[<span class="number">6</span>] + <span class="number">8</span> * z[<span class="number">7</span>] - <span class="number">9</span> * z[<span class="number">8</span>]</span><br><span class="line">+ <span class="number">110</span> * z[<span class="number">9</span>] * z[<span class="number">10</span>] - <span class="number">12</span> * z[<span class="number">11</span>] - <span class="number">13</span> * z[<span class="number">12</span>]</span><br><span class="line">+ <span class="number">14</span> * z[<span class="number">13</span>] + <span class="number">240</span> * z[<span class="number">14</span>] * z[<span class="number">15</span>]</span><br><span class="line">- <span class="number">17</span> * z[<span class="number">16</span>] - <span class="number">18</span> * z[<span class="number">17</span>] - <span class="number">19</span> * z[<span class="number">18</span>]</span><br><span class="line">- <span class="number">20</span> * z[<span class="number">19</span>] == <span class="number">0x5BE48E</span>,</span><br><span class="line"></span><br><span class="line"><span class="number">2</span> * z[<span class="number">0</span>] * z[<span class="number">1</span>] + <span class="number">12</span> * z[<span class="number">2</span>] * z[<span class="number">3</span>] + <span class="number">5</span> * z[<span class="number">4</span>]</span><br><span class="line">+ <span class="number">30</span> * z[<span class="number">5</span>] - <span class="number">504</span> * z[<span class="number">6</span>] * z[<span class="number">7</span>] * z[<span class="number">8</span>]</span><br><span class="line">+ <span class="number">110</span> * z[<span class="number">9</span>] * z[<span class="number">10</span>] + <span class="number">12</span> * z[<span class="number">11</span>] - <span class="number">13</span> * z[<span class="number">12</span>]</span><br><span class="line">+ <span class="number">14</span> * z[<span class="number">13</span>] - <span class="number">15</span> * z[<span class="number">14</span>] + <span class="number">16</span> * z[<span class="number">15</span>]</span><br><span class="line">- <span class="number">17</span> * z[<span class="number">16</span>] + <span class="number">18</span> * z[<span class="number">17</span>] - <span class="number">19</span> * z[<span class="number">18</span>]</span><br><span class="line">- <span class="number">20</span> * z[<span class="number">19</span>] == <span class="number">0xDA08D28A</span>,</span><br><span class="line"></span><br><span class="line"><span class="number">6</span> * z[<span class="number">0</span>] * z[<span class="number">1</span>] * z[<span class="number">2</span>] - <span class="number">4</span> * z[<span class="number">3</span>] + <span class="number">5</span> * z[<span class="number">4</span>]</span><br><span class="line">+ <span class="number">30</span> * z[<span class="number">5</span>] + <span class="number">7</span> * z[<span class="number">6</span>] - <span class="number">72</span> * z[<span class="number">7</span>] * z[<span class="number">8</span>]</span><br><span class="line">+ <span class="number">110</span> * z[<span class="number">9</span>] * z[<span class="number">10</span>] + <span class="number">12</span> * z[<span class="number">11</span>] + <span class="number">13</span> * z[<span class="number">12</span>]</span><br><span class="line">- <span class="number">14</span> * z[<span class="number">13</span>] - <span class="number">15</span> * z[<span class="number">14</span>] - <span class="number">16</span> * z[<span class="number">15</span>]</span><br><span class="line">- <span class="number">17</span> * z[<span class="number">16</span>] - <span class="number">18</span> * z[<span class="number">17</span>]</span><br><span class="line">+ <span class="number">380</span> * z[<span class="number">18</span>] * z[<span class="number">19</span>] == <span class="number">0xA23A95</span>,</span><br><span class="line"></span><br><span class="line">z[<span class="number">0</span>] + <span class="number">2</span> * z[<span class="number">1</span>] + <span class="number">12</span> * z[<span class="number">2</span>] * z[<span class="number">3</span>]</span><br><span class="line">- <span class="number">15</span> * z[<span class="number">2</span>] * z[<span class="number">4</span>] - <span class="number">90</span> * z[<span class="number">2</span>] * z[<span class="number">5</span>]</span><br><span class="line">+ <span class="number">7</span> * z[<span class="number">6</span>] + <span class="number">8</span> * z[<span class="number">7</span>] - <span class="number">9</span> * z[<span class="number">8</span>]</span><br><span class="line">+ <span class="number">110</span> * z[<span class="number">9</span>] * z[<span class="number">10</span>] - <span class="number">12</span> * z[<span class="number">11</span>] + <span class="number">13</span> * z[<span class="number">12</span>]</span><br><span class="line">+ <span class="number">210</span> * z[<span class="number">13</span>] * z[<span class="number">14</span>] + <span class="number">16</span> * z[<span class="number">15</span>]</span><br><span class="line">- <span class="number">17</span> * z[<span class="number">16</span>] - <span class="number">18</span> * z[<span class="number">17</span>]</span><br><span class="line">+ <span class="number">380</span> * z[<span class="number">18</span>] * z[<span class="number">19</span>] == <span class="number">0x5E78E5</span>,</span><br><span class="line"></span><br><span class="line"><span class="number">2</span> * z[<span class="number">0</span>] * z[<span class="number">1</span>] + <span class="number">12</span> * z[<span class="number">2</span>] * z[<span class="number">3</span>] + <span class="number">5</span> * z[<span class="number">4</span>]</span><br><span class="line">- <span class="number">210</span> * z[<span class="number">5</span>] * z[<span class="number">6</span>] + <span class="number">720</span> * z[<span class="number">7</span>] * z[<span class="number">8</span>] * z[<span class="number">9</span>]</span><br><span class="line">- <span class="number">11</span> * z[<span class="number">10</span>] - <span class="number">156</span> * z[<span class="number">11</span>] * z[<span class="number">12</span>]</span><br><span class="line">+ <span class="number">14</span> * z[<span class="number">13</span>] - <span class="number">240</span> * z[<span class="number">14</span>] * z[<span class="number">15</span>]</span><br><span class="line">- <span class="number">306</span> * z[<span class="number">16</span>] * z[<span class="number">17</span>] - <span class="number">380</span> * z[<span class="number">18</span>] * z[<span class="number">19</span>]</span><br><span class="line">== <span class="number">0x3512A8FF</span>,</span><br><span class="line"></span><br><span class="line">z[<span class="number">0</span>] + <span class="number">24</span> * z[<span class="number">1</span>] * z[<span class="number">2</span>] * z[<span class="number">3</span>] - <span class="number">5</span> * z[<span class="number">4</span>]</span><br><span class="line">+ <span class="number">30</span> * z[<span class="number">5</span>] - <span class="number">7</span> * z[<span class="number">6</span>] + <span class="number">8</span> * z[<span class="number">7</span>] + <span class="number">9</span> * z[<span class="number">8</span>]</span><br><span class="line">+ <span class="number">10</span> * z[<span class="number">9</span>] + <span class="number">11</span> * z[<span class="number">10</span>] + <span class="number">12</span> * z[<span class="number">11</span>]</span><br><span class="line">- <span class="number">13</span> * z[<span class="number">12</span>] - <span class="number">14</span> * z[<span class="number">13</span>] - <span class="number">15</span> * z[<span class="number">14</span>]</span><br><span class="line">+ <span class="number">16</span> * z[<span class="number">15</span>] - <span class="number">17</span> * z[<span class="number">16</span>] + <span class="number">18</span> * z[<span class="number">17</span>]</span><br><span class="line">+ <span class="number">19</span> * z[<span class="number">18</span>] + <span class="number">20</span> * z[<span class="number">19</span>] == <span class="number">0x1667C20</span>,</span><br><span class="line"></span><br><span class="line">z[<span class="number">0</span>] + <span class="number">6</span> * z[<span class="number">1</span>] * z[<span class="number">2</span>] - <span class="number">4</span> * z[<span class="number">3</span>] - <span class="number">5</span> * z[<span class="number">4</span>]</span><br><span class="line">+ <span class="number">1680</span> * z[<span class="number">5</span>] * z[<span class="number">6</span>] * z[<span class="number">7</span>] - <span class="number">9</span> * z[<span class="number">8</span>] + <span class="number">10</span> * z[<span class="number">9</span>]</span><br><span class="line">- <span class="number">11</span> * z[<span class="number">10</span>] + <span class="number">12</span> * z[<span class="number">11</span>] + <span class="number">13</span> * z[<span class="number">12</span>]</span><br><span class="line">- <span class="number">14</span> * z[<span class="number">13</span>] - <span class="number">240</span> * z[<span class="number">14</span>] * z[<span class="number">15</span>]</span><br><span class="line">- <span class="number">17</span> * z[<span class="number">16</span>] - <span class="number">18</span> * z[<span class="number">17</span>]</span><br><span class="line">+ <span class="number">380</span> * z[<span class="number">18</span>] * z[<span class="number">19</span>] == <span class="number">0x754201F0</span></span><br><span class="line">]</span><br><span class="line">solver.add(rule)</span><br><span class="line">result = solver.check()</span><br><span class="line"><span class="keyword">if</span> result == sat:</span><br><span class="line">    model = solver.model()</span><br><span class="line">    values = [</span><br><span class="line">        model.<span class="built_in">eval</span>(c[i], model_completion=<span class="literal">True</span>).as_long()</span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">20</span>)</span><br><span class="line">    ]</span><br><span class="line"></span><br><span class="line">    <span class="built_in">print</span>(values)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&#x27;&#x27;</span>.join(<span class="built_in">chr</span>(x) <span class="keyword">for</span> x <span class="keyword">in</span> values))</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>flag</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">z3 = <span class="string">&quot;hahahathisisfackflag&quot;</span></span><br><span class="line">flag = <span class="string">&quot;&quot;</span></span><br><span class="line"></span><br><span class="line">target = [</span><br><span class="line">    <span class="number">0x1207</span>,<span class="number">0x4ca0</span>,<span class="number">0x4f21</span>,<span class="number">0x39</span>,</span><br><span class="line">    <span class="number">0x1a523</span>,<span class="number">0x23a</span>,<span class="number">0x926</span>,<span class="number">0x4ca7</span>,</span><br><span class="line">    <span class="number">0x6560</span>,<span class="number">0x36</span>,<span class="number">0x1a99b</span>,<span class="number">0x4ca8</span>,</span><br><span class="line">    <span class="number">0x1bbe0</span>,<span class="number">0x3705</span>,<span class="number">0x926</span>,<span class="number">0x77d3</span>,</span><br><span class="line">    <span class="number">0x9a98</span>,<span class="number">0x657b</span>,<span class="number">0x18</span>,<span class="number">0xb11</span></span><br><span class="line">]</span><br><span class="line">key = [</span><br><span class="line">    <span class="number">7</span>,<span class="number">7</span>,<span class="number">7</span>,<span class="number">9</span>,<span class="number">5</span>,</span><br><span class="line">    <span class="number">6</span>,<span class="number">7</span>,<span class="number">7</span>,<span class="number">7</span>,<span class="number">9</span>,</span><br><span class="line">    <span class="number">7</span>,<span class="number">7</span>,<span class="number">5</span>,<span class="number">7</span>,<span class="number">7</span>,</span><br><span class="line">    <span class="number">7</span>,<span class="number">5</span>,<span class="number">7</span>,<span class="number">9</span>,<span class="number">7</span></span><br><span class="line">]</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">calc</span>(<span class="params">a, b</span>):</span><br><span class="line">    v3 = <span class="number">1</span></span><br><span class="line">    <span class="keyword">while</span> b:</span><br><span class="line">        <span class="keyword">if</span> b &amp; <span class="number">1</span>:</span><br><span class="line">            v3 *= a</span><br><span class="line">        a = a*a % <span class="number">1000</span></span><br><span class="line">        b &gt;&gt;= <span class="number">2</span></span><br><span class="line">    <span class="keyword">return</span> v3</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">20</span>):</span><br><span class="line"></span><br><span class="line">    need = target[i] ^ <span class="built_in">ord</span>(z3[<span class="number">19</span>-i])</span><br><span class="line">    <span class="keyword">for</span> c <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">32</span>,<span class="number">127</span>):</span><br><span class="line">        <span class="keyword">if</span> calc(c,key[i]) == need:</span><br><span class="line">            flag += <span class="built_in">chr</span>(c)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(flag)</span><br></pre></td></tr></table></figure>
+
+<h1 id="SWPUCTF-2023-秋季新生赛-IDA动态调试"><a href="#SWPUCTF-2023-秋季新生赛-IDA动态调试" class="headerlink" title="[SWPUCTF 2023 秋季新生赛]IDA动态调试"></a>[SWPUCTF 2023 秋季新生赛]IDA动态调试</h1><p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260714152318273.png" alt="image-20260714152318273"></p>
+<p>ff1应是生成flag的函数,下断点</p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260714152502620.png" alt="image-20260714152502620"></p>
+<p>运行即可</p>
+<h1 id="FSCTF-2023-Tea-apk"><a href="#FSCTF-2023-Tea-apk" class="headerlink" title="[FSCTF 2023]Tea_apk"></a>[FSCTF 2023]Tea_apk</h1><p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260716205652232.png" alt="image-20260716205652232"></p>
+<p>有个delta,tea系列的</p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260716210058560.png" alt="image-20260716210058560"></p>
+<p>check的参数是我们的输入即flag,key是ABvWW7hqwNvHUhfP</p>
+<p>vlgg9nNjUcYuWzBSSOwKxbMD2rhFgf4zuiyMpLxpNkM&#x3D;是最后比对的base64字符串</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> struct</span><br><span class="line"><span class="keyword">import</span> base64</span><br><span class="line"></span><br><span class="line">MASK = <span class="number">0xffffffff</span></span><br><span class="line">DELTA = <span class="number">0x9E3779B9</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">mx</span>(<span class="params">s, y, z, p, e, key</span>):</span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">        (((z &gt;&gt; <span class="number">5</span>) ^ (y &lt;&lt; <span class="number">2</span>)) + ((y &gt;&gt; <span class="number">3</span>) ^ (z &lt;&lt; <span class="number">4</span>)))</span><br><span class="line">        ^ ((s ^ y) + (key[(p &amp; <span class="number">3</span>) ^ e] ^ z))</span><br><span class="line">    ) &amp; MASK</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">xxtea_encrypt</span>(<span class="params">data, key</span>):</span><br><span class="line">    v = data[:]</span><br><span class="line">    n = <span class="built_in">len</span>(v)</span><br><span class="line">    <span class="keyword">if</span> n &lt; <span class="number">2</span>:</span><br><span class="line">        <span class="keyword">return</span> v</span><br><span class="line"></span><br><span class="line">    rounds = <span class="number">6</span> + <span class="number">52</span> // n</span><br><span class="line">    s = <span class="number">0</span></span><br><span class="line">    z = v[-<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(rounds):</span><br><span class="line">        s = (s + DELTA) &amp; MASK</span><br><span class="line">        e = (s &gt;&gt; <span class="number">2</span>) &amp; <span class="number">3</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> p <span class="keyword">in</span> <span class="built_in">range</span>(n - <span class="number">1</span>):</span><br><span class="line">            y = v[p + <span class="number">1</span>]</span><br><span class="line">            v[p] = (v[p] + mx(s, y, z, p, e, key)) &amp; MASK</span><br><span class="line">            z = v[p]</span><br><span class="line"></span><br><span class="line">        y = v[<span class="number">0</span>]</span><br><span class="line">        v[-<span class="number">1</span>] = (v[-<span class="number">1</span>] + mx(s, y, z, n - <span class="number">1</span>, e, key)) &amp; MASK</span><br><span class="line">        z = v[-<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> v</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">xxtea_decrypt</span>(<span class="params">data, key</span>):</span><br><span class="line">    v = data[:]</span><br><span class="line">    n = <span class="built_in">len</span>(v)</span><br><span class="line">    <span class="keyword">if</span> n &lt; <span class="number">2</span>:</span><br><span class="line">        <span class="keyword">return</span> v</span><br><span class="line"></span><br><span class="line">    rounds = <span class="number">6</span> + <span class="number">52</span> // n</span><br><span class="line">    s = (rounds * DELTA) &amp; MASK</span><br><span class="line">    y = v[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">    <span class="keyword">while</span> s:</span><br><span class="line">        e = (s &gt;&gt; <span class="number">2</span>) &amp; <span class="number">3</span></span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> p <span class="keyword">in</span> <span class="built_in">range</span>(n - <span class="number">1</span>, <span class="number">0</span>, -<span class="number">1</span>):</span><br><span class="line">            z = v[p - <span class="number">1</span>]</span><br><span class="line">            v[p] = (v[p] - mx(s, y, z, p, e, key)) &amp; MASK</span><br><span class="line">            y = v[p]</span><br><span class="line"></span><br><span class="line">        z = v[-<span class="number">1</span>]</span><br><span class="line">        v[<span class="number">0</span>] = (v[<span class="number">0</span>] - mx(s, y, z, <span class="number">0</span>, e, key)) &amp; MASK</span><br><span class="line">        y = v[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">        s = (s - DELTA) &amp; MASK</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> v</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">bytes_to_dwords</span>(<span class="params">data</span>):</span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">list</span>(struct.unpack(<span class="string">&quot;&lt;%dI&quot;</span> % (<span class="built_in">len</span>(data) // <span class="number">4</span>), data))</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">dwords_to_bytes</span>(<span class="params">data</span>):</span><br><span class="line">    <span class="keyword">return</span> struct.pack(<span class="string">&quot;&lt;%dI&quot;</span> % <span class="built_in">len</span>(data), *data)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment"># key = [0x37, 0x42, 0x4D, 0x58]</span></span><br><span class="line">key = bytes_to_dwords(<span class="string">b&quot;ABvWW7hqwNvHUhfP&quot;</span>)</span><br><span class="line"></span><br><span class="line">cipher = base64.b64decode(<span class="string">&quot;vlgg9nNjUcYuWzBSSOwKxbMD2rhFgf4zuiyMpLxpNkM=&quot;</span>)</span><br><span class="line"></span><br><span class="line">enc = bytes_to_dwords(cipher)</span><br><span class="line"></span><br><span class="line">plain = xxtea_decrypt(enc, key)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;DWORD：&quot;</span>, [<span class="built_in">hex</span>(x) <span class="keyword">for</span> x <span class="keyword">in</span> plain])</span><br><span class="line"><span class="built_in">print</span>(<span class="string">&quot;plain：&quot;</span>, dwords_to_bytes(plain))</span><br></pre></td></tr></table></figure>
+
+<h1 id="强网杯-2022-GameMaster"><a href="#强网杯-2022-GameMaster" class="headerlink" title="[强网杯 2022]GameMaster"></a>[强网杯 2022]GameMaster</h1><p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260719142340805.png" alt="image-20260719142340805"></p>
+<h1 id="HZNUCTF-2023-final-signin"><a href="#HZNUCTF-2023-final-signin" class="headerlink" title="[HZNUCTF 2023 final]signin"></a>[HZNUCTF 2023 final]signin</h1><p>改特征码脱壳,RC4</p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260720084320777.png" alt="image-20260720084320777"></p>
+<h1 id="SWPUCTF-2025-秋季新生赛-一种很新的签到"><a href="#SWPUCTF-2025-秋季新生赛-一种很新的签到" class="headerlink" title="[SWPUCTF 2025 秋季新生赛]一种很新的签到"></a>[SWPUCTF 2025 秋季新生赛]一种很新的签到</h1><p>shift+F12</p>
+<h1 id="HGAME-2023-week4-vm"><a href="#HGAME-2023-week4-vm" class="headerlink" title="[HGAME 2023 week4]vm"></a>[HGAME 2023 week4]vm</h1><h1 id="LitCTF-2025-easy-rc4"><a href="#LitCTF-2025-easy-rc4" class="headerlink" title="[LitCTF 2025]easy_rc4"></a>[LitCTF 2025]easy_rc4</h1><p>没壳进IDA</p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260716120901791.png" alt="image-20260716120901791"></p>
+<p>给了cipher和key</p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260716120939973.png" alt="image-20260716120939973"></p>
+<p>多了个异或</p>
+<p><img src="C:\Users\Petrichor\AppData\Roaming\Typora\typora-user-images\image-20260716121807024.png" alt="image-20260716121807024"></p>
+
+		</div>
+		<div class="meta split">
+			<time class="post-date" datetime="2026-08-11T02:47:22.832Z" itemprop="datePublished">2026-08-11</time>
+		</div>
+	</div>
+	
+		<aside class="post-toc">
+			<div class="post-toc-title">&#30446;&#24405;</div>
+			<a class="toc-link level-1" href="#MoeCTF-2022-EquationPy">[MoeCTF 2022]EquationPy</a><a class="toc-link level-1" href="#LitCTF-2024-ezrc4">[LitCTF 2024]ezrc4</a><a class="toc-link level-1" href="#HNCTF-2022-WEEK3-What’s-1n-DLL">[HNCTF 2022 WEEK3]What’s 1n DLL?</a><a class="toc-link level-1" href="#SWPUCTF-2021-新生赛-简单的逻辑">[SWPUCTF 2021 新生赛]简单的逻辑</a><a class="toc-link level-1" href="#NSSRound-16-Basic-test-your-Debugger">[NSSRound#16 Basic]test your Debugger</a><a class="toc-link level-1" href="#长城杯-2021-院校组-Just-cmp-re">[长城杯 2021 院校组]Just_cmp-re</a><a class="toc-link level-1" href="#HNCTF-2022-WEEK4-ez-maze">[HNCTF 2022 WEEK4]ez_maze</a><a class="toc-link level-1" href="#NSSRound-X-Basic-ez-z3">[NSSRound#X Basic]ez_z3</a><a class="toc-link level-1" href="#SWPUCTF-2023-秋季新生赛-IDA动态调试">[SWPUCTF 2023 秋季新生赛]IDA动态调试</a><a class="toc-link level-1" href="#FSCTF-2023-Tea-apk">[FSCTF 2023]Tea_apk</a><a class="toc-link level-1" href="#强网杯-2022-GameMaster">[强网杯 2022]GameMaster</a><a class="toc-link level-1" href="#HZNUCTF-2023-final-signin">[HZNUCTF 2023 final]signin</a><a class="toc-link level-1" href="#SWPUCTF-2025-秋季新生赛-一种很新的签到">[SWPUCTF 2025 秋季新生赛]一种很新的签到</a><a class="toc-link level-1" href="#HGAME-2023-week4-vm">[HGAME 2023 week4]vm</a><a class="toc-link level-1" href="#LitCTF-2025-easy-rc4">[LitCTF 2025]easy_rc4</a>
+		</aside>
+	
+</article>
+
+<!-- comments -->
+
+
+  
+</div>
+
+
+  <svg id="bigTriangleColor" width="100%" height="40" viewBox="0 0 100 102" preserveAspectRatio="none">
+    <path d="M0 0 L50 100 L100 0 Z"></path>
+  </svg>
+
+  
+
+
+  <div class="wrapper"></div>
+
+
+
+
+
+
+
+<footer class="footer" role="contentinfo">
+	<div class="footer-inner">
+		<span>&copy; 2026 ksenr</span>
+	</div>
+</footer>
+
+	
+	
+<script src="/js/lib.js"></script>
+
+	
+<script src="/js/module.js"></script>
+
+	
+<script src="/js/script.js"></script>
+
+	
+	<!-- hexo injector body_end start -->
+<script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+<script>
+(function () {
+  var progress = document.createElement("div");
+  progress.className = "reading-progress";
+  document.body.appendChild(progress);
+
+  function updateProgress() {
+    var doc = document.documentElement;
+    var max = doc.scrollHeight - window.innerHeight;
+    var value = max > 0 ? window.scrollY / max : 0;
+    progress.style.transform = "scaleX(" + Math.max(0, Math.min(1, value)) + ")";
+  }
+
+  window.addEventListener("scroll", updateProgress, { passive: true });
+  window.addEventListener("resize", updateProgress);
+  updateProgress();
+
+  function createClickEffect(x, y) {
+    var colors = ["#35bfab", "#1fc9e7", "#f3b95f", "#ff7b9c"];
+    var ripple = document.createElement("span");
+    ripple.className = "click-ripple";
+    ripple.style.setProperty("--x", x + "px");
+    ripple.style.setProperty("--y", y + "px");
+    document.body.appendChild(ripple);
+    setTimeout(function () {
+      ripple.remove();
+    }, 620);
+
+    for (var i = 0; i < 10; i += 1) {
+      var particle = document.createElement("span");
+      var angle = (Math.PI * 2 * i) / 10;
+      var distance = 24 + Math.random() * 28;
+      particle.className = "click-particle";
+      particle.style.setProperty("--x", x + "px");
+      particle.style.setProperty("--y", y + "px");
+      particle.style.setProperty("--dx", Math.cos(angle) * distance + "px");
+      particle.style.setProperty("--dy", Math.sin(angle) * distance + "px");
+      particle.style.setProperty("--particle-color", colors[i % colors.length]);
+      document.body.appendChild(particle);
+      setTimeout(function (node) {
+        node.remove();
+      }, 720, particle);
+    }
+  }
+
+  document.addEventListener("pointerdown", function (event) {
+    if (event.button !== 0 && event.pointerType === "mouse") return;
+    createClickEffect(event.clientX, event.clientY);
+  });
+
+  function getCodeText(block) {
+    var code = block.querySelector(".code pre") || block.querySelector("pre");
+    return code ? code.innerText.replace(/\n$/, "") : "";
+  }
+
+  document.querySelectorAll(".post-body figure.highlight").forEach(function (block) {
+    if (block.querySelector(".code-toolbar")) return;
+
+    var language = Array.from(block.classList).filter(function (name) {
+      return name !== "highlight";
+    })[0] || "code";
+
+    var toolbar = document.createElement("div");
+    toolbar.className = "code-toolbar";
+    toolbar.innerHTML = "<span>" + language.toUpperCase() + "</span><button class=\"code-copy-button\" type=\"button\">Copy</button>";
+    block.insertBefore(toolbar, block.firstChild);
+
+    toolbar.querySelector("button").addEventListener("click", function () {
+      var button = this;
+      var text = getCodeText(block);
+      var copied = function () {
+        button.textContent = "Copied";
+        setTimeout(function () {
+          button.textContent = "Copy";
+        }, 1500);
+      };
+
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(copied);
+      } else {
+        var textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute("readonly", "");
+        textarea.style.position = "fixed";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        textarea.remove();
+        copied();
+      }
+    });
+  });
+
+  var searchForm = document.querySelector(".js-search");
+  var searchInput = searchForm && searchForm.querySelector(".text-input");
+  var searchResults = searchForm && searchForm.querySelector(".search-results");
+  var searchIndex = [];
+
+  function renderSearch(query) {
+    if (!searchResults) return;
+    var q = query.trim().toLowerCase();
+    if (!q) {
+      searchResults.innerHTML = '<p class="search-empty">Type to search posts.</p>';
+      return;
+    }
+
+    var results = searchIndex.filter(function (item) {
+      return (item.title + " " + item.text).toLowerCase().indexOf(q) !== -1;
+    }).slice(0, 12);
+
+    if (!results.length) {
+      searchResults.innerHTML = '<p class="search-empty">No matching posts.</p>';
+      return;
+    }
+
+    searchResults.innerHTML = results.map(function (item) {
+      return '<a class="search-result" href="' + item.path + '"><strong>' + item.title + '</strong><span>' + item.date + '</span></a>';
+    }).join("");
+  }
+
+  if (searchForm && searchInput) {
+    fetch("/search.json")
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        searchIndex = Array.isArray(data) ? data : [];
+        renderSearch(searchInput.value || "");
+      })
+      .catch(function () {
+        if (searchResults) searchResults.innerHTML = '<p class="search-empty">Search index is not ready.</p>';
+      });
+
+    searchForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      renderSearch(searchInput.value || "");
+    });
+
+    searchInput.addEventListener("keydown", function (event) {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        event.stopPropagation();
+        renderSearch(searchInput.value || "");
+      }
+    }, true);
+
+    searchInput.addEventListener("input", function () {
+      renderSearch(searchInput.value || "");
+    });
+  }
+
+  var links = Array.from(document.querySelectorAll(".post-toc a[href^='#']"));
+  if (links.length) {
+    var headings = links.map(function (link) {
+      return document.getElementById(decodeURIComponent(link.getAttribute("href").slice(1)));
+    }).filter(Boolean);
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        links.forEach(function (link) {
+          var active = decodeURIComponent(link.getAttribute("href").slice(1)) === entry.target.id;
+          link.classList.toggle("is-active", active);
+          if (active) {
+            var parent = link.closest("details");
+            while (parent) {
+              parent.open = true;
+              parent = parent.parentElement && parent.parentElement.closest("details");
+            }
+          }
+        });
+      });
+    }, { rootMargin: "-20% 0px -70% 0px", threshold: 0 });
+
+    headings.forEach(function (heading) {
+      observer.observe(heading);
+    });
+  }
+})();
+</script><!-- hexo injector body_end end --></body>
+</html>

@@ -874,15 +874,6 @@ K = g^{ab} \mod p
 <p>如果只想看证书链，可以这样：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl s_client -connect example.com:443 -servername example.com -showcerts</span><br></pre></td></tr></table></figure>
 
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>TLS 的核心不是“用了某个加密算法”，而是把身份认证、密钥交换和对称加密组合成一条安全信道。</p>
-<p>简单来说：</p>
-<ul>
-<li>证书解决“我连的是谁”</li>
-<li>密钥交换解决“双方如何得到共享密钥”</li>
-<li>对称加密解决“后续数据如何高效加密”</li>
-<li>完整性校验解决“数据有没有被改”</li>
-</ul>
-<p>理解 TLS 时，不必一开始就陷进所有报文字段里。先抓住握手、证书、密钥交换、会话密钥这条主线，后面再看 TLS 1.2 和 TLS 1.3 的具体差异会清楚很多。</p>
 
 		</div>
 		<div class="meta split">
@@ -892,7 +883,7 @@ K = g^{ab} \mod p
 	
 		<aside class="post-toc">
 			<div class="post-toc-title">&#30446;&#24405;</div>
-			<details class="toc-node level-1"><summary><span>TLS</span><a href="#TLS" aria-label="Jump to TLS">#</a></summary><div class="toc-children"><a class="toc-link level-2" href="#概述">概述</a><details class="toc-node level-2"><summary><span>握手流程</span><a href="#握手流程" aria-label="Jump to 握手流程">#</a></summary><div class="toc-children"><a class="toc-link level-3" href="#ClientHello">ClientHello</a><a class="toc-link level-3" href="#ServerHello">ServerHello</a></div></details><a class="toc-link level-2" href="#证书">证书</a><a class="toc-link level-2" href="#密钥交换">密钥交换</a><a class="toc-link level-2" href="#会话密钥">会话密钥</a><a class="toc-link level-2" href="#记录协议">记录协议</a><a class="toc-link level-2" href="#TLS-1-2-和-TLS-1-3">TLS 1.2 和 TLS 1.3</a><a class="toc-link level-2" href="#OpenSSL-查看证书">OpenSSL 查看证书</a><a class="toc-link level-2" href="#总结">总结</a></div></details>
+			<details class="toc-node level-1"><summary><span>TLS</span><a href="#TLS" aria-label="Jump to TLS">#</a></summary><div class="toc-children"><a class="toc-link level-2" href="#概述">概述</a><details class="toc-node level-2"><summary><span>握手流程</span><a href="#握手流程" aria-label="Jump to 握手流程">#</a></summary><div class="toc-children"><a class="toc-link level-3" href="#ClientHello">ClientHello</a><a class="toc-link level-3" href="#ServerHello">ServerHello</a></div></details><a class="toc-link level-2" href="#证书">证书</a><a class="toc-link level-2" href="#密钥交换">密钥交换</a><a class="toc-link level-2" href="#会话密钥">会话密钥</a><a class="toc-link level-2" href="#记录协议">记录协议</a><a class="toc-link level-2" href="#TLS-1-2-和-TLS-1-3">TLS 1.2 和 TLS 1.3</a><a class="toc-link level-2" href="#OpenSSL-查看证书">OpenSSL 查看证书</a></div></details>
 		</aside>
 	
 </article>

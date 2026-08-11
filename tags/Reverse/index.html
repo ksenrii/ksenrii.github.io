@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     
-    <title>线程局部存储（TLS）与 TLS 回调函数 | ksenr&#39;s blog</title>
+    <title>tag: Reverse | ksenr&#39;s blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
     
@@ -707,165 +707,194 @@ article {
 
 
 
-<!--文章列表-->
-<div class="wrapper">
+
+<style>
+  body.page-home {
+    --home-safe-left: 55.00000000000001%;
+    --home-bg-url: url('/images/liz.png');
+    background-image: var(--home-bg-url) !important;
+    background-repeat: no-repeat !important;
+    background-size: cover !important;
+    background-position: left center !important;
+    background-attachment: fixed !important;
+  }
+</style>
+
+<script>
+  window.HOME_CONFIG = {
+    displayStart: '',
+    heatmapWeeks: 26,
+    statsSource: 'posts',
+    apiUrl: '/api/nodeCount/list'
+  };
+  window.HOME_POST_STATS = [["2026-02-05",1,39160],["2026-02-06",1,2358],["2026-02-17",1,3869],["2026-02-24",1,1553],["2026-03-01",1,1839],["2026-03-03",1,5029],["2026-03-16",1,2320],["2026-03-19",2,20262],["2026-03-23",2,6651],["2026-05-29",1,2826],["2026-07-13",1,18231],["2026-07-27",1,1822]];
+</script>
+
+<div class="home-bg" aria-hidden="true">
+  <img class="home-bg__photo" src="/images/liz.png" alt="" decoding="async">
+  <div class="home-bg__overlay"></div>
+</div>
+
+<div class="home-shell">
+  <section class="home-panel glass-card" aria-label="笔记统计">
+    <div class="home-stats">
+      <p class="home-stats__label">YESTERDAY'S GROWTH</p>
+      <div class="home-stats__block">
+        <div class="home-stats__value" id="home-yesterday-count">0</div>
+        <div class="home-stats__unit">新增笔记（篇）</div>
+      </div>
+      <div class="home-stats__block">
+        <div class="home-stats__value" id="home-yesterday-words">0</div>
+        <div class="home-stats__unit">新增字数</div>
+      </div>
+      <p class="home-stats__date" id="home-yesterday-date">统计日期：2026-08-10</p>
+    </div>
+
+    <div class="home-heatmap-wrap">
+      <div class="home-heatmap" id="home-heatmap-grid" role="img" aria-label="笔记活跃度"></div>
+    </div>
+  </section>
+
+  <section class="home-articles glass-card" aria-label="最近文章">
+    <h2 class="home-articles__title">最近文章</h2>
+    <ul class="home-articles__list">
+      
+        
+        <li class="home-articles__item">
+          <a class="home-articles__link" href="/2026/07/13/%E4%BB%A3%E7%A0%81%E9%80%86%E5%90%91%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80/">
+            <span class="home-articles__name">代码逆向技术基础</span>
+            <time class="home-articles__time" datetime="2026-07-13">
+              2026-07-13
+            </time>
+          </a>
+        </li>
+      
+    </ul>
+    
+  </section>
+
   
-    <!-- article -->
-<article class="post-article">
-	
-	<div class="post-main-panel">
-		
-  
-    <h1 class="post-title" itemprop="name">
-      线程局部存储（TLS）与 TLS 回调函数
-    </h1>
-  
+    <section class="home-anime glass-card" aria-label="动漫星图">
+      <div class="home-anime__header">
+        <div>
+          <h2 class="home-anime__title">ANIME ORBIT</h2>
+        </div>
+      </div>
 
-		<div class='post-body mb'>
-			<h1 id="线程局部存储（TLS）与-TLS-回调函数"><a href="#线程局部存储（TLS）与-TLS-回调函数" class="headerlink" title="线程局部存储（TLS）与 TLS 回调函数"></a>线程局部存储（TLS）与 TLS 回调函数</h1><p>这里的 TLS 不是 Transport Layer Security，而是 <strong>Thread Local Storage</strong>，也就是线程局部存储。它本来是 Windows 用来解决多线程数据隔离的机制，但在逆向里经常和反调试联系在一起，因为 TLS 回调函数会在程序入口点之前执行。</p>
-<span id="more"></span>
+      <div class="home-anime__body">
+        <div class="home-anime__orbit" aria-label="看过的动漫作品">
+          <div class="home-anime__ring home-anime__ring--outer"></div>
+          <div class="home-anime__ring home-anime__ring--middle"></div>
+          <div class="home-anime__ring home-anime__ring--inner"></div>
 
-<h2 id="线程局部存储"><a href="#线程局部存储" class="headerlink" title="线程局部存储"></a>线程局部存储</h2><p>在多线程程序里，普通全局变量是所有线程共享的。如果多个线程同时读写同一个全局变量，就可能互相覆盖。</p>
-<p>TLS 的思路很直接：让每个线程都拥有同一个变量的独立副本。</p>
-<p>也就是说，变量名看起来一样，但不同线程访问到的是不同数据。</p>
-<p>例如：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__declspec(thread) <span class="type">int</span> last_error = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
+          
+            <button
+              class="home-anime__node home-anime__node--green is-active"
+              type="button"
+              style="--anime-x: 50%; --anime-y: 50%; --anime-size: 88px;"
+              aria-label="莉兹与青鸟"
+            >
+              <img src="/images/anime/liz-and-the-blue-bird.jpg" alt="莉兹与青鸟" loading="lazy" decoding="async">
+            </button>
+          
+            <button
+              class="home-anime__node home-anime__node--sky "
+              type="button"
+              style="--anime-x: 78%; --anime-y: 24%; --anime-size: 58px;"
+              aria-label="四月是你的谎言"
+            >
+              <img src="/images/anime/your-lie-in-april.jpg" alt="四月是你的谎言" loading="lazy" decoding="async">
+            </button>
+          
+            <button
+              class="home-anime__node home-anime__node--pink "
+              type="button"
+              style="--anime-x: 77%; --anime-y: 69%; --anime-size: 56px;"
+              aria-label="龙与虎"
+            >
+              <img src="/images/anime/toradora.jpg" alt="龙与虎" loading="lazy" decoding="async">
+            </button>
+          
+            <button
+              class="home-anime__node home-anime__node--violet "
+              type="button"
+              style="--anime-x: 24%; --anime-y: 28%; --anime-size: 58px;"
+              aria-label="我的青春恋爱物语果然有问题"
+            >
+              <img src="/images/anime/oregairu.jpg" alt="我的青春恋爱物语果然有问题" loading="lazy" decoding="async">
+            </button>
+          
+            <button
+              class="home-anime__node home-anime__node--amber "
+              type="button"
+              style="--anime-x: 22%; --anime-y: 66%; --anime-size: 54px;"
+              aria-label="跃动青春"
+            >
+              <img src="/images/anime/skip-and-loafer.jpg" alt="跃动青春" loading="lazy" decoding="async">
+            </button>
+          
+            <button
+              class="home-anime__node home-anime__node--violet "
+              type="button"
+              style="--anime-x: 46%; --anime-y: 18%; --anime-size: 52px;"
+              aria-label="中二病也要谈恋爱"
+            >
+              <img src="/images/anime/chuunibyou.jpg" alt="中二病也要谈恋爱" loading="lazy" decoding="async">
+            </button>
+          
+            <button
+              class="home-anime__node home-anime__node--sky "
+              type="button"
+              style="--anime-x: 58%; --anime-y: 82%; --anime-size: 54px;"
+              aria-label="白沙的水族馆"
+            >
+              <img src="/images/anime/aquatope.jpg" alt="白沙的水族馆" loading="lazy" decoding="async">
+            </button>
+          
+            <button
+              class="home-anime__node home-anime__node--green "
+              type="button"
+              style="--anime-x: 34%; --anime-y: 82%; --anime-size: 52px;"
+              aria-label="花开伊吕波"
+            >
+              <img src="/images/anime/hanasaku-iroha.jpg" alt="花开伊吕波" loading="lazy" decoding="async">
+            </button>
+          
+            <button
+              class="home-anime__node home-anime__node--pink "
+              type="button"
+              style="--anime-x: 88%; --anime-y: 48%; --anime-size: 52px;"
+              aria-label="堀与宫村"
+            >
+              <img src="/images/anime/horimiya.jpg" alt="堀与宫村" loading="lazy" decoding="async">
+            </button>
+          
+            <button
+              class="home-anime__node home-anime__node--amber "
+              type="button"
+              style="--anime-x: 12%; --anime-y: 48%; --anime-size: 52px;"
+              aria-label="月色真美"
+            >
+              <img src="/images/anime/tsuki-ga-kirei.jpg" alt="月色真美" loading="lazy" decoding="async">
+            </button>
+          
+        </div>
 
-<p>此时每个线程都有自己的 <code>last_error</code>。A 线程写入 <code>1001</code>，B 线程写入 <code>2002</code>，它们互不影响。</p>
-<p>这和 <code>GetLastError()</code> 的行为很像。每个线程都有自己的错误码，所以 A 线程的错误不会覆盖 B 线程。</p>
-<h2 id="使用方式"><a href="#使用方式" class="headerlink" title="使用方式"></a>使用方式</h2><p>Windows 中 TLS 常见有两种使用方式。</p>
-<h3 id="静态-TLS"><a href="#静态-TLS" class="headerlink" title="静态 TLS"></a>静态 TLS</h3><p>静态 TLS 在编译期就确定，常见写法是：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">__declspec(thread) <span class="type">int</span> value = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
-
-<p>C++11 之后也可以写成：</p>
-<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">thread_local</span> <span class="type">int</span> value = <span class="number">0</span>;</span><br></pre></td></tr></table></figure>
-
-<p>这种方式简单，但变量数量和位置在编译期就固定了，灵活性不如动态 TLS。</p>
-<h3 id="动态-TLS"><a href="#动态-TLS" class="headerlink" title="动态 TLS"></a>动态 TLS</h3><p>动态 TLS 通过 Windows API 在运行时分配槽位：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">DWORD idx = TlsAlloc();</span><br><span class="line">TlsSetValue(idx, ptr);</span><br><span class="line"><span class="type">void</span> *p = TlsGetValue(idx);</span><br><span class="line">TlsFree(idx);</span><br></pre></td></tr></table></figure>
-
-<p>可以把 <code>idx</code> 理解成当前线程 TLS 数组里的下标。不同线程用同一个下标取值，但取到的是各自线程里的数据。</p>
-<h2 id="一个例子"><a href="#一个例子" class="headerlink" title="一个例子"></a>一个例子</h2><p>下面这个例子可以直观看到 TLS 变量不会被其他线程覆盖：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line">__declspec(thread) DWORD code = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">DWORD WINAPI <span class="title function_">worker</span><span class="params">(LPVOID arg)</span> &#123;</span><br><span class="line">    DWORD tid = GetCurrentThreadId();</span><br><span class="line">    code = (DWORD)(ULONG_PTR)arg;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[tid %lu] write = %lu\n&quot;</span>, tid, code);</span><br><span class="line">    Sleep(<span class="number">200</span>);</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[tid %lu] read  = %lu\n&quot;</span>, tid, code);</span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    HANDLE t1 = CreateThread(<span class="literal">NULL</span>, <span class="number">0</span>, worker, (LPVOID)<span class="number">1001</span>, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line">    HANDLE t2 = CreateThread(<span class="literal">NULL</span>, <span class="number">0</span>, worker, (LPVOID)<span class="number">2002</span>, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    WaitForSingleObject(t1, INFINITE);</span><br><span class="line">    WaitForSingleObject(t2, INFINITE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>输出大概是：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[tid 1234] write = 1001</span><br><span class="line">[tid 5678] write = 2002</span><br><span class="line">[tid 1234] read  = 1001</span><br><span class="line">[tid 5678] read  = 2002</span><br></pre></td></tr></table></figure>
-
-<p>如果 <code>code</code> 是普通全局变量，那么后写入的值就可能把前一个线程的值冲掉。</p>
-<h2 id="TLS-回调函数"><a href="#TLS-回调函数" class="headerlink" title="TLS 回调函数"></a>TLS 回调函数</h2><p>TLS 另一个更关键的点是 <strong>TLS 回调函数</strong>。</p>
-<p>PE 文件可以注册一组 TLS callback。系统加载程序时，会在进入 <code>main</code> &#x2F; <code>WinMain</code> 之前调用这些回调函数。</p>
-<p>函数原型和 <code>DllMain</code> 类似：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="title function_">VOID</span> <span class="params">(NTAPI *PIMAGE_TLS_CALLBACK)</span><span class="params">(</span></span><br><span class="line"><span class="params">    PVOID DllHandle,</span></span><br><span class="line"><span class="params">    DWORD Reason,</span></span><br><span class="line"><span class="params">    PVOID Reserved</span></span><br><span class="line"><span class="params">)</span>;</span><br></pre></td></tr></table></figure>
-
-<p>常见 <code>Reason</code> 有：</p>
-<table>
-<thead>
-<tr>
-<th>Reason</th>
-<th>含义</th>
-</tr>
-</thead>
-<tbody><tr>
-<td><code>DLL_PROCESS_ATTACH</code></td>
-<td>进程启动</td>
-</tr>
-<tr>
-<td><code>DLL_THREAD_ATTACH</code></td>
-<td>新线程创建</td>
-</tr>
-<tr>
-<td><code>DLL_THREAD_DETACH</code></td>
-<td>线程退出</td>
-</tr>
-<tr>
-<td><code>DLL_PROCESS_DETACH</code></td>
-<td>进程退出</td>
-</tr>
-</tbody></table>
-<p>重点在第一项：进程启动时，TLS callback 会比入口点更早执行。</p>
-<p>这也是它常用于反调试的原因。</p>
-<h2 id="注册回调"><a href="#注册回调" class="headerlink" title="注册回调"></a>注册回调</h2><p>MSVC 下可以用 <code>.CRT$XL*</code> 段注册 TLS 回调。</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> _WIN64</span></span><br><span class="line">    <span class="meta">#<span class="keyword">pragma</span> comment(linker, <span class="string">&quot;/INCLUDE:_tls_used&quot;</span>)</span></span><br><span class="line"><span class="meta">#<span class="keyword">else</span></span></span><br><span class="line">    <span class="meta">#<span class="keyword">pragma</span> comment(linker, <span class="string">&quot;/INCLUDE:__tls_used&quot;</span>)</span></span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line"></span><br><span class="line"><span class="type">void</span> NTAPI <span class="title function_">tls_callback</span><span class="params">(PVOID mod, DWORD reason, PVOID reserved)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (reason == DLL_PROCESS_ATTACH) &#123;</span><br><span class="line">        <span class="built_in">printf</span>(<span class="string">&quot;[TLS] before main\n&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> data_seg(<span class="string">&quot;.CRT$XLB&quot;</span>)</span></span><br><span class="line">PIMAGE_TLS_CALLBACK g_tls[] = &#123; tls_callback, <span class="literal">NULL</span> &#125;;</span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> data_seg()</span></span><br><span class="line"></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;[main]\n&quot;</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>运行时会先看到：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[TLS] before main</span><br><span class="line">[main]</span><br></pre></td></tr></table></figure>
-
-<p>也就是说，调试器如果只断在 <code>main</code>，这时 TLS 回调已经执行过了。</p>
-<p><code>.CRT&lt;span class=&quot;math-inline&quot;&gt;\(XLB</code> 里的 <code>B</code> 决定了链接时的排序。链接器会把 <code>.CRT\)&lt;/span&gt;XL*</code> 这类段按字母顺序合并，所以不同字母会影响回调的执行顺序。</p>
-<h2 id="PE-中的位置"><a href="#PE-中的位置" class="headerlink" title="PE 中的位置"></a>PE 中的位置</h2><p>TLS 信息在 PE 的 DataDirectory 里，对应：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">IMAGE_DIRECTORY_ENTRY_TLS = 9</span><br></pre></td></tr></table></figure>
-
-<p>里面有一个 <code>IMAGE_TLS_DIRECTORY</code> 结构，比较重要的字段是：</p>
-<ul>
-<li><code>StartAddressOfRawData</code></li>
-<li><code>EndAddressOfRawData</code></li>
-<li><code>AddressOfIndex</code></li>
-<li><code>AddressOfCallBacks</code></li>
-</ul>
-<p>其中 <code>AddressOfCallBacks</code> 指向 TLS 回调函数指针数组，并且数组以 NULL 结尾。</p>
-<p>逆向时可以直接用 CFF Explorer、PE-bear 或者 IDA 看 TLS Directory。如果 <code>AddressOfCallBacks</code> 非空，就说明程序注册了 TLS 回调。</p>
-<h2 id="反调试"><a href="#反调试" class="headerlink" title="反调试"></a>反调试</h2><p>TLS 回调用于反调试的思路很简单：</p>
-<ol>
-<li>在入口点之前执行</li>
-<li>先检查有没有调试器</li>
-<li>如果发现调试器，直接退出</li>
-</ol>
-<p>例如：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">void</span> NTAPI <span class="title function_">antidebug_tls</span><span class="params">(PVOID mod, DWORD reason, PVOID reserved)</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (reason != DLL_PROCESS_ATTACH) <span class="keyword">return</span>;</span><br><span class="line"></span><br><span class="line">    BOOL debugged = FALSE;</span><br><span class="line">    CheckRemoteDebuggerPresent(GetCurrentProcess(), &amp;debugged);</span><br><span class="line">    <span class="keyword">if</span> (debugged) &#123;</span><br><span class="line">        ExitProcess(<span class="number">0</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>这样调试器如果默认断在入口点，可能看到的只是程序一闪而过，因为检查早就完成了。</p>
-<p><code>CheckRemoteDebuggerPresent</code> 和 <code>IsDebuggerPresent</code> 都会涉及 PEB 中的调试标志，例如 <code>BeingDebugged</code> 字段。</p>
-<h2 id="绕过"><a href="#绕过" class="headerlink" title="绕过"></a>绕过</h2><p>知道它在哪里执行，绕过思路也就清楚了。</p>
-<p>常见方法：</p>
-<ol>
-<li>在系统断点停下，不要等到程序入口点</li>
-<li>找到 TLS Directory，看 <code>AddressOfCallBacks</code></li>
-<li>在回调地址下断点，单步分析</li>
-<li>Patch 回调数组，把第一项改成 NULL</li>
-<li>Patch 检测逻辑，让它不退出</li>
-<li>修改 PEB 中的调试标志</li>
-</ol>
-<p>如果只是想让样本先跑起来，最直接的方法就是把 TLS 回调表清空。</p>
-<p>也就是让：</p>
-<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AddressOfCallBacks -&gt; NULL</span><br></pre></td></tr></table></figure>
-
-<p>或者把回调数组第一项改为 <code>0</code>。</p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>线程局部存储本身是一个多线程机制，用来让不同线程拥有独立数据。</p>
-<p>但 TLS 回调函数会在入口点之前执行，这就给反调试提供了一个很好的时间点。逆向时如果程序还没进 <code>main</code> 就退出，或者入口点前已经发生了异常行为，就应该先看 PE 的 TLS Directory。</p>
-<p>看到 <code>AddressOfCallBacks</code> 非空，就要意识到：真正的逻辑可能在入口点之前就已经开始了。</p>
-
-		</div>
-		<div class="meta split">
-			<time class="post-date" datetime="2026-06-12T02:00:00.000Z" itemprop="datePublished">2026-06-12</time>
-		</div>
-	</div>
-	
-		<aside class="post-toc">
-			<div class="post-toc-title">&#30446;&#24405;</div>
-			<details class="toc-node level-1"><summary><span>线程局部存储（TLS）与 TLS 回调函数</span><a href="#线程局部存储（TLS）与-TLS-回调函数" aria-label="Jump to 线程局部存储（TLS）与 TLS 回调函数">#</a></summary><div class="toc-children"><a class="toc-link level-2" href="#线程局部存储">线程局部存储</a><details class="toc-node level-2"><summary><span>使用方式</span><a href="#使用方式" aria-label="Jump to 使用方式">#</a></summary><div class="toc-children"><a class="toc-link level-3" href="#静态-TLS">静态 TLS</a><a class="toc-link level-3" href="#动态-TLS">动态 TLS</a></div></details><a class="toc-link level-2" href="#一个例子">一个例子</a><a class="toc-link level-2" href="#TLS-回调函数">TLS 回调函数</a><a class="toc-link level-2" href="#注册回调">注册回调</a><a class="toc-link level-2" href="#PE-中的位置">PE 中的位置</a><a class="toc-link level-2" href="#反调试">反调试</a><a class="toc-link level-2" href="#绕过">绕过</a><a class="toc-link level-2" href="#总结">总结</a></div></details>
-		</aside>
-	
-</article>
-
-<!-- comments -->
-
-
+        <div class="home-anime__detail">
+          <img class="home-anime__poster" id="home-anime-poster" src="/images/anime/liz-and-the-blue-bird.jpg" alt="莉兹与青鸟" loading="lazy" decoding="async">
+          <div class="home-anime__copy">
+            <h3 class="home-anime__name" id="home-anime-name">莉兹与青鸟</h3>
+          </div>
+        </div>
+      </div>
+    </section>
   
 </div>
 
-
-  <svg id="bigTriangleColor" width="100%" height="40" viewBox="0 0 100 102" preserveAspectRatio="none">
-    <path d="M0 0 L50 100 L100 0 Z"></path>
-  </svg>
-
-  
+<div class="home-tooltip" id="home-tooltip" role="tooltip"></div>
 
 
-  <div class="wrapper"></div>
-
-
-
-
+<script src="/js/home-dashboard.js"></script>
 
 
 

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     
-    <title>category: 逆向 | ksenr&#39;s blog</title>
+    <title>ksenr&#39;s blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     
     
@@ -707,194 +707,57 @@ article {
 
 
 
-
-<style>
-  body.page-home {
-    --home-safe-left: 55.00000000000001%;
-    --home-bg-url: url('/images/liz.png');
-    background-image: var(--home-bg-url) !important;
-    background-repeat: no-repeat !important;
-    background-size: cover !important;
-    background-position: left center !important;
-    background-attachment: fixed !important;
-  }
-</style>
-
-<script>
-  window.HOME_CONFIG = {
-    displayStart: '',
-    heatmapWeeks: 26,
-    statsSource: 'posts',
-    apiUrl: '/api/nodeCount/list'
-  };
-  window.HOME_POST_STATS = [["2026-02-05",1,39160],["2026-02-06",1,2358],["2026-02-17",1,3869],["2026-02-24",1,1553],["2026-03-01",1,1839],["2026-03-03",1,5029],["2026-03-16",1,2320],["2026-03-19",2,20411],["2026-03-23",2,6841],["2026-05-29",1,2826],["2026-06-12",1,3370]];
-</script>
-
-<div class="home-bg" aria-hidden="true">
-  <img class="home-bg__photo" src="/images/liz.png" alt="" decoding="async">
-  <div class="home-bg__overlay"></div>
-</div>
-
-<div class="home-shell">
-  <section class="home-panel glass-card" aria-label="笔记统计">
-    <div class="home-stats">
-      <p class="home-stats__label">YESTERDAY'S GROWTH</p>
-      <div class="home-stats__block">
-        <div class="home-stats__value" id="home-yesterday-count">0</div>
-        <div class="home-stats__unit">新增笔记（篇）</div>
-      </div>
-      <div class="home-stats__block">
-        <div class="home-stats__value" id="home-yesterday-words">0</div>
-        <div class="home-stats__unit">新增字数</div>
-      </div>
-      <p class="home-stats__date" id="home-yesterday-date">统计日期：2026-06-27</p>
-    </div>
-
-    <div class="home-heatmap-wrap">
-      <div class="home-heatmap" id="home-heatmap-grid" role="img" aria-label="笔记活跃度"></div>
-    </div>
-  </section>
-
-  <section class="home-articles glass-card" aria-label="最近文章">
-    <h2 class="home-articles__title">最近文章</h2>
-    <ul class="home-articles__list">
-      
-        
-        <li class="home-articles__item">
-          <a class="home-articles__link" href="/2026/06/12/Thread-Local-Storage/">
-            <span class="home-articles__name">线程局部存储（TLS）与 TLS 回调函数</span>
-            <time class="home-articles__time" datetime="2026-06-12">
-              2026-06-12
-            </time>
-          </a>
-        </li>
-      
-    </ul>
-    
-  </section>
-
+<!--文章列表-->
+<div class="wrapper">
   
-    <section class="home-anime glass-card" aria-label="动漫星图">
-      <div class="home-anime__header">
-        <div>
-          <h2 class="home-anime__title">ANIME ORBIT</h2>
-        </div>
-      </div>
+    <!-- article -->
+<article class="post-article">
+	
+	<div class="post-main-panel">
+		
+		<div class='post-body mb'>
+			<h1 id="BF6-rebuild"><a href="#BF6-rebuild" class="headerlink" title="BF6 rebuild"></a>BF6 rebuild</h1><p>这是根据题解记录重建的 BF6 附件，不是原始文件的逐字节还原。</p>
+<p>保留的特征：</p>
+<ul>
+<li>Windows PE64 console 程序</li>
+<li>使用 <code>AddVectoredExceptionHandler</code> 和 <code>RaiseException</code> 触发 VEH</li>
+<li>明文字符串 <code>I wanna play BF6</code></li>
+<li>40 字节密文数据</li>
+<li>XTEA 变种解密，<code>delta = 0x9E3779B9</code>，32 轮</li>
+</ul>
+<p>正确 flag：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CBCTF&#123;I_R3@L1Y_WAnT_T0_PLAYY_BF6&#125;</span><br></pre></td></tr></table></figure>
 
-      <div class="home-anime__body">
-        <div class="home-anime__orbit" aria-label="看过的动漫作品">
-          <div class="home-anime__ring home-anime__ring--outer"></div>
-          <div class="home-anime__ring home-anime__ring--middle"></div>
-          <div class="home-anime__ring home-anime__ring--inner"></div>
+<p>编译命令：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&amp; <span class="string">&quot;D:\CLion 2025.2.4\bin\mingw\bin\gcc.exe&quot;</span> <span class="literal">-Wall</span> <span class="literal">-Wextra</span> <span class="literal">-O0</span> <span class="literal">-s</span> <span class="literal">-mconsole</span> <span class="string">&quot;source\bf6_rebuild\bf6_rebuild.c&quot;</span> <span class="literal">-o</span> <span class="string">&quot;source\bf6_rebuild\BF6_rebuild.exe&quot;</span></span><br></pre></td></tr></table></figure>
 
-          
-            <button
-              class="home-anime__node home-anime__node--green is-active"
-              type="button"
-              style="--anime-x: 50%; --anime-y: 50%; --anime-size: 88px;"
-              aria-label="莉兹与青鸟"
-            >
-              <img src="/images/anime/liz-and-the-blue-bird.jpg" alt="莉兹与青鸟" loading="lazy" decoding="async">
-            </button>
-          
-            <button
-              class="home-anime__node home-anime__node--sky "
-              type="button"
-              style="--anime-x: 78%; --anime-y: 24%; --anime-size: 58px;"
-              aria-label="四月是你的谎言"
-            >
-              <img src="/images/anime/your-lie-in-april.jpg" alt="四月是你的谎言" loading="lazy" decoding="async">
-            </button>
-          
-            <button
-              class="home-anime__node home-anime__node--pink "
-              type="button"
-              style="--anime-x: 77%; --anime-y: 69%; --anime-size: 56px;"
-              aria-label="龙与虎"
-            >
-              <img src="/images/anime/toradora.jpg" alt="龙与虎" loading="lazy" decoding="async">
-            </button>
-          
-            <button
-              class="home-anime__node home-anime__node--violet "
-              type="button"
-              style="--anime-x: 24%; --anime-y: 28%; --anime-size: 58px;"
-              aria-label="我的青春恋爱物语果然有问题"
-            >
-              <img src="/images/anime/oregairu.jpg" alt="我的青春恋爱物语果然有问题" loading="lazy" decoding="async">
-            </button>
-          
-            <button
-              class="home-anime__node home-anime__node--amber "
-              type="button"
-              style="--anime-x: 22%; --anime-y: 66%; --anime-size: 54px;"
-              aria-label="跃动青春"
-            >
-              <img src="/images/anime/skip-and-loafer.jpg" alt="跃动青春" loading="lazy" decoding="async">
-            </button>
-          
-            <button
-              class="home-anime__node home-anime__node--violet "
-              type="button"
-              style="--anime-x: 46%; --anime-y: 18%; --anime-size: 52px;"
-              aria-label="中二病也要谈恋爱"
-            >
-              <img src="/images/anime/chuunibyou.jpg" alt="中二病也要谈恋爱" loading="lazy" decoding="async">
-            </button>
-          
-            <button
-              class="home-anime__node home-anime__node--sky "
-              type="button"
-              style="--anime-x: 58%; --anime-y: 82%; --anime-size: 54px;"
-              aria-label="白沙的水族馆"
-            >
-              <img src="/images/anime/aquatope.jpg" alt="白沙的水族馆" loading="lazy" decoding="async">
-            </button>
-          
-            <button
-              class="home-anime__node home-anime__node--green "
-              type="button"
-              style="--anime-x: 34%; --anime-y: 82%; --anime-size: 52px;"
-              aria-label="花开伊吕波"
-            >
-              <img src="/images/anime/hanasaku-iroha.jpg" alt="花开伊吕波" loading="lazy" decoding="async">
-            </button>
-          
-            <button
-              class="home-anime__node home-anime__node--pink "
-              type="button"
-              style="--anime-x: 88%; --anime-y: 48%; --anime-size: 52px;"
-              aria-label="堀与宫村"
-            >
-              <img src="/images/anime/horimiya.jpg" alt="堀与宫村" loading="lazy" decoding="async">
-            </button>
-          
-            <button
-              class="home-anime__node home-anime__node--amber "
-              type="button"
-              style="--anime-x: 12%; --anime-y: 48%; --anime-size: 52px;"
-              aria-label="月色真美"
-            >
-              <img src="/images/anime/tsuki-ga-kirei.jpg" alt="月色真美" loading="lazy" decoding="async">
-            </button>
-          
-        </div>
+		</div>
+		<div class="meta split">
+			<time class="post-date" datetime="2026-06-28T05:26:51.226Z" itemprop="datePublished">2026-06-28</time>
+		</div>
+	</div>
+	
+</article>
 
-        <div class="home-anime__detail">
-          <img class="home-anime__poster" id="home-anime-poster" src="/images/anime/liz-and-the-blue-bird.jpg" alt="莉兹与青鸟" loading="lazy" decoding="async">
-          <div class="home-anime__copy">
-            <h3 class="home-anime__name" id="home-anime-name">莉兹与青鸟</h3>
-          </div>
-        </div>
-      </div>
-    </section>
+<!-- comments -->
+
+
   
 </div>
 
-<div class="home-tooltip" id="home-tooltip" role="tooltip"></div>
+
+  <svg id="bigTriangleColor" width="100%" height="40" viewBox="0 0 100 102" preserveAspectRatio="none">
+    <path d="M0 0 L50 100 L100 0 Z"></path>
+  </svg>
+
+  
 
 
-<script src="/js/home-dashboard.js"></script>
+  <div class="wrapper"></div>
+
+
+
+
 
 
 

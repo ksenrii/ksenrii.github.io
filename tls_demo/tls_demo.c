@@ -1,14 +1,26 @@
 #include <windows.h>
+#include <stdio.h>
 
-void NTAPI tls_cb(PVOID a, DWORD r, PVOID b) {
-    if (r == 1) MessageBoxA(0, "TLS callback!", "TLS", 0);
+static void NTAPI tls_callback(PVOID module, DWORD reason, PVOID reserved) {
+    (void)module;
+    (void)reserved;
+
+    if (reason == DLL_PROCESS_ATTACH) {
+        MessageBoxA(NULL, "[TLS] before main", "tls_demo", MB_OK);
+    }
 }
 
-#pragma comment(linker, "/INCLUDE:_tls_used")
-#pragma const_seg(".CRT$XLB")
-EXTERN_C const PIMAGE_TLS_CALLBACK g_tls[] = { tls_cb, 0 };
-#pragma const_seg()
+#ifdef _MSC_VER
+#pragma section(".CRT$XLB", long, read)
+__declspec(allocate(".CRT$XLB"))
+PIMAGE_TLS_CALLBACK tls_callbacks[] = { tls_callback, NULL };
+#else
+PIMAGE_TLS_CALLBACK tls_callbacks[]
+    __attribute__((section(".CRT$XLB"), used)) = { tls_callback, NULL };
+#endif
 
-int main() {
-    MessageBoxA(0, "main()", "TLS", 0);
+int main(void) {
+    MessageBoxA(NULL, "[main] entry point", "tls_demo", MB_OK);
+    puts("[main] entry point");
+    return 0;
 }
