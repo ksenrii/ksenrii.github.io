@@ -3,8 +3,8 @@
 // The script picks one based on current hour, changes every hour
 (() => {
   const backgrounds = [
-    '/images/bg/liz-wallpaper.png',
-    '/images/bg/53d8b2231dff1a42c97ff50d763c4f1f.png'
+    '/images/bg/liz-wallpaper.jpg',
+    '/images/bg/53d8b2231dff1a42c97ff50d763c4f1f.jpg'
   ]
 
   const header = document.getElementById('page-header')
