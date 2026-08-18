@@ -52,3 +52,23 @@ mjx-container svg {
 .card-info .author-info__description {
   display: none;
 }
+
+/* Global floating playlist */
+.aplayer.aplayer-fixed {
+  z-index: 1000;
+  max-width: calc(100vw - 16px);
+}
+
+.aplayer.aplayer-fixed .aplayer-list {
+  max-height: min(340px, 55vh) !important;
+}
+
+@media (max-width: 480px) {
+  .aplayer.aplayer-fixed.aplayer-narrow {
+    max-width: 66px;
+  }
+
+  .aplayer.aplayer-fixed:not(.aplayer-narrow) {
+    width: calc(100vw - 16px);
+  }
+}
