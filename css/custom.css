@@ -63,6 +63,10 @@ mjx-container svg {
   max-height: min(340px, 55vh) !important;
 }
 
+.aplayer .aplayer-lrc p.music-placeholder-hidden {
+  display: none !important;
+}
+
 @media (max-width: 480px) {
   .aplayer.aplayer-fixed.aplayer-narrow {
     max-width: 66px;
