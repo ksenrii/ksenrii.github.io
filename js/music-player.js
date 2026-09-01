@@ -15,11 +15,19 @@
 
   const usePlayableUrl = track => {
     const songId = getNetEaseSongId(track.url)
-    if (!songId) return track
+    const url = songId
+      ? `https://music.163.com/song/media/outer/url?id=${encodeURIComponent(songId)}.mp3`
+      : track.url
 
+    // Meting returns title/author/pic, while APlayer expects
+    // name/artist/cover. Normalize every track before handing it over.
     return {
-      ...track,
-      url: `https://music.163.com/song/media/outer/url?id=${encodeURIComponent(songId)}.mp3`
+      name: track.name || track.title || '未知歌曲',
+      artist: track.artist || track.author || '未知歌手',
+      url,
+      cover: track.cover || track.pic || '',
+      lrc: track.lrc || '',
+      type: 'normal'
     }
   }
 
