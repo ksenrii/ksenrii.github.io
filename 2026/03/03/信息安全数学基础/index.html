@@ -1314,7 +1314,7 @@ f(x)g(x)=\sum_{k=0}^{n+m} c_k x^k,\quad c_k=\sum_{i+j=k} a_i b_j
 
   btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
   window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
-})()</script></div><div class="aplayer no-destroy" data-id="18342059095" data-server="netease" data-type="playlist" data-fixed="true" data-mini="true" data-listfolded="false" data-order="random" data-preload="none" data-autoplay="false" data-volume="0.5" data-storagename="ksenr-blog-player"></div><script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/gh/metowolf/MetingJS@1.2/dist/Meting.min.js"></script><script src="/js/music-player.js"></script><script src="/js/bg-rotate.js"></script><script src="https://unpkg.com/pjax@0.2.8/pjax.min.js" defer="defer"></script><script>document.addEventListener('DOMContentLoaded', () => {
+})()</script></div><div id="global-music-player" data-server="netease" data-type="playlist" data-id="18342059095"></div><script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script><script src="/js/music-player.js"></script><script src="/js/bg-rotate.js"></script><script src="https://unpkg.com/pjax@0.2.8/pjax.min.js" defer="defer"></script><script>document.addEventListener('DOMContentLoaded', () => {
   const pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
 
   window.pjax = new Pjax({
