@@ -1,0 +1,613 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>基址重定位表 | ksenr's blog</title><meta name="author" content="ksenr"><meta name="copyright" content="ksenr"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="基址重定位表PE文件在重定位过程中会用到基址重定位表（Base Relocation Table）。 PE 重定位向进程的虚拟内存加载PE文件（EXE&#x2F;DLL&#x2F;SYS）时，文件会被加载到PE头的ImageBase所指的地址处。若加载的是DLL（SYS）文件，且在ImageBase位置处已经加载了其他DLL（SYS）文件，那么PE装载器就会将其加载到其他未被占用的空间。 这就涉及">
+<meta property="og:type" content="article">
+<meta property="og:title" content="基址重定位表">
+<meta property="og:url" content="https://ksenrii.github.io/2026/08/03/%E5%9F%BA%E5%9D%80%E9%87%8D%E5%AE%9A%E4%BD%8D%E8%A1%A8/index.html">
+<meta property="og:site_name" content="ksenr&#39;s blog">
+<meta property="og:description" content="基址重定位表PE文件在重定位过程中会用到基址重定位表（Base Relocation Table）。 PE 重定位向进程的虚拟内存加载PE文件（EXE&#x2F;DLL&#x2F;SYS）时，文件会被加载到PE头的ImageBase所指的地址处。若加载的是DLL（SYS）文件，且在ImageBase位置处已经加载了其他DLL（SYS）文件，那么PE装载器就会将其加载到其他未被占用的空间。 这就涉及">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ksenrii.github.io/images/15.jpg">
+<meta property="article:published_time" content="2026-08-03T05:32:54.000Z">
+<meta property="article:modified_time" content="2026-09-01T04:51:00.831Z">
+<meta property="article:author" content="ksenr">
+<meta property="article:tag" content="Reverse">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ksenrii.github.io/images/15.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "基址重定位表",
+  "url": "https://ksenrii.github.io/2026/08/03/%E5%9F%BA%E5%9D%80%E9%87%8D%E5%AE%9A%E4%BD%8D%E8%A1%A8/",
+  "image": "https://ksenrii.github.io/images/15.jpg",
+  "datePublished": "2026-08-03T05:32:54.000Z",
+  "dateModified": "2026-09-01T04:51:00.831Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "ksenr",
+      "url": "https://ksenrii.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/images/to.png"><link rel="canonical" href="https://ksenrii.github.io/2026/08/03/%E5%9F%BA%E5%9D%80%E9%87%8D%E5%AE%9A%E4%BD%8D%E8%A1%A8/index.html"><link rel="preconnect" href="//unpkg.com"/><link rel="stylesheet" href="/css/index.css?v=5.7.0"><link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@7.3.1/css/all.min.css"><link rel="stylesheet" href="https://unpkg.com/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://unpkg.com/@fancyapps/ui@6.1.14/dist/fancybox/fancybox.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!true && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const start = 6
+              const end = 18
+              const isNight =
+                start < end
+                    ? hour < start || hour >= end
+                    : hour >= start || hour < end
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', e => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#425aef","bgDark":"#1f1f1f","position":"bottom-left"},
+  infinitegrid: {
+    js: 'https://unpkg.com/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '基址重定位表',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css"><meta name="generator" content="Hexo 8.1.1"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      if ($loadingBox.classList.contains('loaded')) return
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+
+  if (document.readyState === 'complete') {
+    preloader.endLoading()
+  } else {
+    window.addEventListener('load', preloader.endLoading)
+    document.addEventListener('DOMContentLoaded', preloader.endLoading)
+    // Add timeout protection: force end after 7 seconds
+    setTimeout(preloader.endLoading, 7000)
+  }
+
+  if (true) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/avatar-jointed.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/ loading='lazy'></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/images/15.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ksenr's blog</span></a><a class="nav-page-title" href="/"><span class="site-name">基址重定位表</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">基址重定位表</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-08-03T05:32:54.000Z" title="发表于 2026-08-03 13:32:54">2026-08-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-09-01T04:51:00.831Z" title="更新于 2026-09-01 12:51:00">2026-09-01</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">3.4k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>11分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="基址重定位表"><a href="#基址重定位表" class="headerlink" title="基址重定位表"></a>基址重定位表</h1><p>PE文件在重定位过程中会用到基址重定位表（Base Relocation Table）。</p>
+<h2 id="PE-重定位"><a href="#PE-重定位" class="headerlink" title="PE 重定位"></a>PE 重定位</h2><p>向进程的虚拟内存加载PE文件（EXE&#x2F;DLL&#x2F;SYS）时，文件会被加载到PE头的ImageBase所指的地址处。若加载的是DLL（SYS）文件，且在ImageBase位置处已经加载了其他DLL（SYS）文件，那么PE装载器就会将其加载到其他未被占用的空间。</p>
+<p>这就涉及PE文件重定位的问题。PE重定位是指PE文件无法加载到ImageBase所指位置，而是被加载到其他地址时发生的一系列处理行为。</p>
+<p><strong>提示</strong></p>
+<p>使用SDK（Software Development Kit，软件开发工具包）或Visual C++创建PE文件时，EXE默认的ImageBase为<code>00400000</code>，DLL默认的ImageBase为<code>10000000</code>。此外，使用DDK（Driver Development Kit，驱动开发工具包）创建的SYS文件默认的ImageBase为<code>10000</code>。</p>
+<h3 id="DLL-SYS"><a href="#DLL-SYS" class="headerlink" title="DLL&#x2F;SYS"></a>DLL&#x2F;SYS</h3><p>例如,A.DLL被加载到TEST.EXE进程的<code>10000000</code>地址处。此后，B.DLL试图加载到相同地址（<code>10000000</code>）时，PE装载器将B.DLL加载到另一个尚未被占用的地址（<code>3C000000</code>）处</p>
+<p><img src="/images/image-20260824182031411.png" alt="image-20260824182031411" loading='lazy'></p>
+<h3 id="EXE"><a href="#EXE" class="headerlink" title="EXE"></a>EXE</h3><p>创建好进程后，EXE文件会首先加载到内存(主 EXE 通常最先占自己的首选 ImageBase，所以一般不会因为“地址冲突”而被迫重定位)，所以在EXE中无须考虑重定位的问题。</p>
+<p>但是Windows Vista之后的版本引入了ASLR安全机制，每次运行EXE文件都会被加载到随机地址，这样大大增强了系统安全性。</p>
+<p>下图是分别运行3次notepad.exe时的截图，可以明显发现，每次运行时程序都被加载到不同地址。</p>
+<p><img src="/images/image-20260824183105728.png" alt="image-20260824183105728" loading='lazy'></p>
+<p><strong>提示</strong></p>
+<p>ASLR机制也适用于DLL（SYS）文件。对于各OS的主要系统DLL，虽然会根据不同版本分别赋予不同的ImageBase地址，同一系统的kernel32.dll、user32.dll等会被加载到各自固有的ImageBase，所以系统的DLL实际上不会发生重定位问题。</p>
+<p>Windows Vista&#x2F;7的系统DLL虽然也拥有各自固有的ImageBase，但是<strong>ASLR机制使每次启动时加载的地址都不尽相同。</strong></p>
+<h2 id="PE重定位时执行的操作"><a href="#PE重定位时执行的操作" class="headerlink" title="PE重定位时执行的操作"></a>PE重定位时执行的操作</h2><p>下面以notepad.exe 程序为例，看看 PE 重定位时都发生了什么。先看下图,notepad.exe 的 ImageBase 为 01000000。Address of Entry Point为3689,那么对应的程序入口应该是01003689</p>
+<p><img src="/images/image-20260826123614548.png" alt="image-20260826123614548" loading='lazy'></p>
+<p>接下来，使用Dbg 运行 notepad.exe 程序。</p>
+<p>下图为 notepad.exe 的 EP 代码部分。</p>
+<p><img src="/images/image-20260825151651117.png" alt="image-20260825151651117" loading='lazy'></p>
+<p>可以看到,很明显不是01003689,但后最后3689却一样,这是因为</p>
+<p>在 ASLR 机制作用下，程序被加载到 005A0000 地址处。从图中指令可以看到，方框中进程的内存地址以硬编码形式存在。地址 5A10FC、5A1100 是 .text 节区的 IAT 区域，地址 5AC0A4 是 .data 节区的全局变量。每当在Dbg 中重启 notepad.exe（Restart&#x2F;Ctrl+F2），地址值就随加载地址的不同而改变。像这样，<strong>使硬编码在程序中的内存地址随着加载地址变化而改变的处理过程就是 PE 重定位。</strong></p>
+<p>我在学习的时候感觉这样讲解不是更侧重ASLR使地址随机化了吗,而不是重定位,但其实不是这样</p>
+<p>我们拿原著的图片来说明</p>
+<p><img src="/images/image-20260826125343578.png" alt="image-20260826125343578" loading='lazy'></p>
+<p>Image Base和 EP都是一样的,理应也是加载到01003689</p>
+<p><img src="/images/image-20260826125450844.png" alt="image-20260826125450844" loading='lazy'></p>
+<p>实际加载到00283689,这是因为ASLR,相当于ImageBase变成了00280000</p>
+<p>我们注意上面框出的地址</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">002836AC  FF15 FC102800   CALL DWORD PTR DS:[2810FC]</span><br><span class="line"></span><br><span class="line">002836CC  FF15 00112800   CALL DWORD PTR DS:[281100]</span><br><span class="line"></span><br><span class="line">002836DD  A1 A4C02800     MOV EAX,DWORD PTR DS:[28C0A4]</span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">002836EF  A1 A4C02800     MOV EAX,DWORD PTR DS:[28C0A4]</span><br></pre></td></tr></table></figure>
+
+<p>其中002810FC,00281100,0028C0A4都是当前运行时的绝对VA</p>
+<p>先来看实际基址28C0A4,这个地址减去00280000,得到RVA&#x3D; C0A4</p>
+<p>如果程序按照 PE 文件原来的首选基址：01000000加载，那么它原来的绝对地址应该是：0100C0A4</p>
+<p>总的来说就是</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">重定位前：0100C0A4</span><br><span class="line">              ↓</span><br><span class="line">ASLR 把模块搬到 00280000</span><br><span class="line">              ↓</span><br><span class="line">重定位后：0028C0A4</span><br></pre></td></tr></table></figure>
+
+
+
+<p>这就是 <strong>PE Loader 完成重定位后的结果</strong>。</p>
+<p>无法加载到 ImageBase 地址时，若未进行过 PE 重定位处理，应用程序就不能正常运行（因发生“内存地址引用错误”，程序异常终止）。</p>
+<h2 id="PE重定位操作原理"><a href="#PE重定位操作原理" class="headerlink" title="PE重定位操作原理"></a>PE重定位操作原理</h2><p>Windows 的 PE 装载器进行 PE 重定位处理时，基本的操作原理很简单。</p>
+<p><strong>PE 重定位的基本操作原理</strong></p>
+<ul>
+<li>在应用程序中查找硬编码的地址位置。</li>
+<li>读取值 后，减去 ImageBase（VA -&gt; RVA）。</li>
+<li>加上实际加载地址（RVA -&gt; VA）。</li>
+</ul>
+<p>其中最关键的是查找硬编码地址的位置。查找过程中会用到 PE 文件内部的 Relocation Table（重定位表），它是记录硬编码地址偏移（位置）的列表（重定位表是在 PE 文件构建过程（编译&#x2F;链接）中提供的）。通过重定位表查找，其实就是指根据 PE 头的“基址重定位表”项进行的查找。</p>
+<h3 id="基址重定位表-1"><a href="#基址重定位表-1" class="headerlink" title="基址重定位表"></a>基址重定位表</h3><p>基址重定位表地址位于 PE 头的 DataDirectory 数组的第六个元素（数组索引为 5），如图所示。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">IMAGE_NT_HEADERS\IMAGE_OPTION_HEADER\IMAGE_DATA_DIRECTORY[<span class="number">5</span>]</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/image-20260825150757613.png" alt="image-20260825150757613" loading='lazy'></p>
+<p>可以看见基址重定位表的地址为RVA 2F000,接着用PEView查看该地址</p>
+<p><img src="/images/image-20260825152148835.png" alt="image-20260825152148835" loading='lazy'></p>
+<h3 id="IMAGE-BASE-RELOCATION结构体"><a href="#IMAGE-BASE-RELOCATION结构体" class="headerlink" title="IMAGE_BASE_RELOCATION结构体"></a>IMAGE_BASE_RELOCATION结构体</h3><p>上图的基址重定位表中罗列了硬编码地址的偏移（位置）。读取该张表就能获得准确的硬编码地址偏移。基址重定位表是 <code>IMAGE_BASE_RELOCATION</code> 结构体数组。</p>
+<p><code>IMAGE_BASE_RELOCATION</code> 结构体的定义如下。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Based relocation format.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">_IMAGE_BASE_RELOCATION</span> &#123;</span><br><span class="line">    DWORD   VirtualAddress;</span><br><span class="line">    DWORD   SizeOfBlock;</span><br><span class="line"><span class="comment">//  WORD    TypeOffset[1];</span></span><br><span class="line">&#125; IMAGE_BASE_RELOCATION;</span><br><span class="line"></span><br><span class="line"><span class="keyword">typedef</span> IMAGE_BASE_RELOCATION UNALIGNED * PIMAGE_BASE_RELOCATION;</span><br><span class="line"></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"><span class="comment">// Based relocation types.</span></span><br><span class="line"><span class="comment">//</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_REL_BASED_ABSOLUTE         0</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_REL_BASED_HIGH             1</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_REL_BASED_LOW              2</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_REL_BASED_HIGHLOW          3</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_REL_BASED_HIGHADJ          4</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_REL_BASED_MIPS_JMPADDR     5</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_REL_BASED_MIPS_JMPADDR16   9</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_REL_BASED_IA64_IMM64       9</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> IMAGE_REL_BASED_DIR64            10</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><code>IMAGE_BASE_RELOCATION</code> 结构体的第一个成员为 <code>VirtualAddress</code>，它是一个基准地址（Base Address），实际上是 RVA 值。</p>
+<p>第二个成员为 <code>SizeOfBlock</code>，指定此块的大小。</p>
+<p>最后一项 <code>TypeOffset</code> 数组<strong>不是结构体成员</strong>，而是以注释形式存在的，表示在该结构体之下会出现 WORD 类型的数组，并且该数组元素的值就是硬编码内存程序中的地址偏移。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">┌────────────────────────────┐</span><br><span class="line">│ VirtualAddress     4 bytes │</span><br><span class="line">├────────────────────────────┤</span><br><span class="line">│ SizeOfBlock        4 bytes │</span><br><span class="line">├────────────────────────────┤</span><br><span class="line">│ Entry 1            2 bytes │</span><br><span class="line">├────────────────────────────┤</span><br><span class="line">│ Entry 2            2 bytes │</span><br><span class="line">├────────────────────────────┤</span><br><span class="line">│ Entry 3            2 bytes │</span><br><span class="line">├────────────────────────────┤</span><br><span class="line">│ ...                        │</span><br><span class="line">└────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<h3 id="基址重定位表的分析"><a href="#基址重定位表的分析" class="headerlink" title="基址重定位表的分析"></a>基址重定位表的分析</h3><p>下表列出了基址重定位表的部分内容。</p>
+<table>
+<thead>
+<tr>
+<th>RVA</th>
+<th>数值</th>
+<th>注释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0002F000</td>
+<td>00001000</td>
+<td>VirtualAddress</td>
+</tr>
+<tr>
+<td>0002F004</td>
+<td>00000150</td>
+<td>SizeOfBlock</td>
+</tr>
+<tr>
+<td>0002F008</td>
+<td>3420</td>
+<td>TypeOffset</td>
+</tr>
+<tr>
+<td>0002F00A</td>
+<td>342D</td>
+<td>TypeOffset</td>
+</tr>
+<tr>
+<td>0002F00C</td>
+<td>3436</td>
+<td>TypeOffset</td>
+</tr>
+<tr>
+<td>……</td>
+<td>……</td>
+<td>……</td>
+</tr>
+</tbody></table>
+<p>由 <code>IMAGE_BASE_RELOCATION</code> 结构体的定义可知，<code>VirtualAddress</code> 成员（基准地址）的值为 <code>1000</code>，<code>SizeOfBlock</code> 成员的值为 <code>150</code>。</p>
+<p>也就是说，表显示的 <code>TypeOffset</code> 数组的基准地址（起始地址）为 RVA <code>1000</code>，块的总大小为 <code>150</code>（这块数据是基准地址的关联，以数据形式存在）。块的末尾显示为 0。<code>TypeOffset</code> 值为 2 个字节（16 位），是由 4 位的 Type 与 12 位的 Offset 合成的。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">15             12 11                     0</span><br><span class="line">┌────────────────┬────────────────────────┐</span><br><span class="line">│     Type       │        Offset          │</span><br><span class="line">│     4 bit      │        12 bit          │</span><br><span class="line">└────────────────┴────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p>比如 <code>TypeOffset</code> 值为 <code>3420</code>，解析如下表所示。</p>
+<p><strong>TypeOffset</strong></p>
+<table>
+<thead>
+<tr>
+<th>类型（4位）</th>
+<th>偏移（12位）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>3</td>
+<td>420</td>
+</tr>
+</tbody></table>
+<p>高4位用作 Type，PE 文件中常见的值为 3（<code>IMAGE_REL_BASED_HIGHLOW</code>），64位的 PE 文件中常见值为 A（<code>IMAGE_REL_BASED_DIR64</code>）。</p>
+<p><strong>提示</strong></p>
+<p>在恶意代码中正常修改文件代码后，有时要修改指向相应区域的重定位表（为了不去除 PE 装载器的重定位过程，常常使 Type 值修改为 0（<code>IMAGE_REL_BASED_ABSOLUTE</code>））。</p>
+<p><code>TypeOffset</code> 的低12位是真正的位移。该位移值基于 <code>VirtualAddress</code> 的偏移。所以程序中硬编码地址的偏移使用下面等式换算。</p>
+<p>VirtualSize(1000)+Offset(420)&#x3D;1420(RVA)</p>
+<div class="math-display">
+
+<div class="math-display">\[
+VirtualSize(1000)+Offset(420)=1420(RVA)
+\]</div>
+
+</div>
+
+
+
+
+<p>这么讲好像有点晦涩难懂,我们对着图一个一个看</p>
+<p><img src="/images/image-20260826145832637.png" alt="image-20260826145832637" loading='lazy'></p>
+<p>首先理解一个概念</p>
+<p><strong>重定位块</strong></p>
+<p>基址重定位表（Base Relocation Table）不是一串连续的 RVA，而是由若干个 <strong>重定位块</strong> 顺序组成。</p>
+<p>每一个重定位块描述：某一个 4KB RVA 页面内的所有基址重定位项</p>
+<p>再来看这个结构体</p>
+<p><code>IMAGE_BASE_RELOCATION</code> 是 <code>.reloc</code> 中每一组重定位记录的块头，它本身不保存新地址，而是指定一个 4KB RVA 页面；紧随其后的 Entry 再指出该页面中哪些位置存放了需要随加载基址变化而修正的绝对地址。</p>
+<p><strong>RVA of Block</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">_IMAGE_BASE_RELOCATION</span> &#123;</span><br><span class="line">    DWORD VirtualAddress;   <span class="comment">// RVA of Block</span></span><br><span class="line">    DWORD SizeOfBlock;</span><br><span class="line">&#125; IMAGE_BASE_RELOCATION;</span><br></pre></td></tr></table></figure>
+
+<p>就上图而言,这里的RVA of Blcok表示这一组重定位项负责从 <code>RVA 1000</code> 开始的一个 4KB 页面。</p>
+<p>也就是</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">RVA 1000 ~ RVA 1FFF</span><br></pre></td></tr></table></figure>
+
+
+
+<p>为什么正好是4KB,因为后面的每个重定位项只有 16 bit：</p>
+<p>其中的offset只占低12位,最大只能表示0XFFF</p>
+<p>就例如图中的</p>
+<p><img src="/images/image-20260826153058924.png" alt="image-20260826153058924" loading='lazy'></p>
+<p>偏移是420,那么真正的位置就是1420</p>
+<p><strong>Size of Block</strong></p>
+<p>重定位块（Base Relocation Block）是基址重定位表中的基本组织单位，由一个 <code>IMAGE_BASE_RELOCATION</code> 头部和其后的若干 16 位重定位项组成，用于描述一个 4KB RVA 页面中的重定位位置。<code>SizeOfBlock</code> 表示该重定位块自身的总字节长度，包括 8 字节头部和全部后续重定位项。</p>
+<p>其中还有一个重要用途,即确定下一个 <code>IMAGE_BASE_RELOCATION</code> 从哪里开始。</p>
+<p>假设当前Block位于RVA&#x3D;2F000,SizeOfBlock&#x3D;150,那么下一个Block的位置就是2F150</p>
+<p>Loader 可以按照这种方式遍历整个基址重定位表：</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">当前 Block 地址</span><br><span class="line">    ↓</span><br><span class="line">读取 SizeOfBlock</span><br><span class="line">    ↓</span><br><span class="line">当前地址 += SizeOfBlock</span><br><span class="line">    ↓</span><br><span class="line">得到下一个 Block</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="练习"><a href="#练习" class="headerlink" title="练习"></a>练习</h3><p>运行Notepad.exe时，假设它被加载到00AF0000，而不是ImageBase地址（01000000）中。那此时PE重定位是如何进行的呢？</p>
+<h4 id="1-查找程序中硬编码地址的位置"><a href="#1-查找程序中硬编码地址的位置" class="headerlink" title="#1. 查找程序中硬编码地址的位置"></a>#1. 查找程序中硬编码地址的位置</h4><p>程序中使用的硬编码地址的偏移（位置）可以通过查找重定位表找到（此处使用上面求得的RVA 1420）。使用PEView查看RVA 1420地址中的内容，如下图所示。</p>
+<p><img src="/images/image-20260826154346303.png" alt="image-20260826154346303" loading='lazy'></p>
+<p>从图中能看到,RVA 1420 地址中存在着程序的硬编码地址值为010010C4</p>
+<h4 id="2-读获取值，减去ImageBase值（VA→RVA）"><a href="#2-读获取值，减去ImageBase值（VA→RVA）" class="headerlink" title="#2.读获取值，减去ImageBase值（VA→RVA）"></a>#2.读获取值，减去ImageBase值（VA→RVA）</h4><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">01001C04 - 01000000 = 00001C04</span><br></pre></td></tr></table></figure>
+
+<p>得到了RVA</p>
+<h4 id="3-加上实际加载地址（RVA→VA）"><a href="#3-加上实际加载地址（RVA→VA）" class="headerlink" title="#3. 加上实际加载地址（RVA→VA）"></a>#3. 加上实际加载地址（RVA→VA）</h4><figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">00001C04 + 00AF0000 = 00AF1C04</span><br></pre></td></tr></table></figure>
+
+
+
+<p>对于程序内硬编码的地址（01001C04），PE装载器都做如上处理。根据实际加载的内存地址修正后，将得到的值（00AF1C04）覆盖到同一位置。对一个IMAGE_BASE_RELOCATION结构体的所有TypeOffset都重复上述过程，且对与RVA 1000~2000地址区域对应的所有硬编码地址都要进行PE重定位处理。若TypeOffset值为0，则表明一个IMAGE_BASE_RELOCATION结构体结束。</p>
+<p>对重定位表中出现的所有IMAGE_BASE_RELOCATION结构体都重复上述处理后，就完成了对进程内存区域相应的所有硬编码地址的PE重定位。重定位表以NULL结构体结束（即IMAGE_BASE_RELOCATION结构体成员的值全部为NULL）。</p>
+<p>以上就是PE重定位的操作原理与重定位表结构体的相关内容。</p>
+<h1 id="从可执行文件中删除-reloc节区"><a href="#从可执行文件中删除-reloc节区" class="headerlink" title="从可执行文件中删除.reloc节区"></a>从可执行文件中删除.reloc节区</h1><p>本章将通过练习使大家了解从PE文件中手动删除 <code>.reloc</code> 节区的方法，这将大大加深各位对PE文件格式的理解，同时进一步熟悉 Hex Editor 等工具的使用。</p>
+<h2 id="reloc节区"><a href="#reloc节区" class="headerlink" title=".reloc节区"></a>.reloc节区</h2><p>EXE形式的PE文件中，“基址重定位表”项对运行没什么影响。实际上，将其删除后程序仍然正常运行（基址重定位表对DLL&#x2F;SYS形式的文件来说几乎是必需的）。</p>
+<p>VC++中生成的PE文件的重定位节区名为 <code>.reloc</code>，删除该节区后文件照常运行，且文件大小将缩减（实际上存在这种实用小程序）。<code>.reloc</code> 节区一般位于所有节区的最后，删除这最后一个（不使用的）节区不像想得那么难。只使用 PEView 与 Hex Editor（手动删除）就足够了。</p>
+<h2 id="reloc-exe"><a href="#reloc-exe" class="headerlink" title="reloc.exe"></a>reloc.exe</h2><p>若想准确删除位于文件末尾的 <code>.reloc</code> 节区，需要按照以下4个步骤操作。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">步骤1 - 整理 .reloc 节区头；</span><br><span class="line">步骤2 - 删除 .reloc 节区；</span><br><span class="line">步骤3 - 修改 IMAGE_FILE_HEADER；</span><br><span class="line">步骤4 - 修改 IMAGE_OPTIONAL_HEADER。</span><br></pre></td></tr></table></figure>
+
+<h3 id="删除-reloc节区头"><a href="#删除-reloc节区头" class="headerlink" title="删除 .reloc节区头"></a>删除 .reloc节区头</h3><p><img src="/images/image-20260826172306229.png" alt="image-20260826172306229" loading='lazy'></p>
+<p>从上图可以看到，<code>.reloc</code> 节区头从文件偏移270处开始，大小为0X28。</p>
+<blockquote>
+<p>每一个节区头都是一个 <code>IMAGE_SECTION_HEADER</code> 结构体，结构体固定大小就是 <strong>40 字节 &#x3D; 0x28 字节</strong>。</p>
+</blockquote>
+<p>使用WinHex打开该区域（270~297），蓝圈全部用0覆盖填充</p>
+<p><img src="/images/image-20260826175506478.png" alt="image-20260826175506478" loading='lazy'></p>
+<p>得到</p>
+<p><img src="/images/image-20260826175557375.png" alt="image-20260826175557375" loading='lazy'></p>
+<h3 id="删除-reloc节区"><a href="#删除-reloc节区" class="headerlink" title="删除.reloc节区"></a>删除.reloc节区</h3><p>文件中 <code>.reloc</code> 节区的起始偏移为C000（由此开始到文件末尾为 <code>.reloc</code> 节区）。</p>
+<p>从C000偏移开始一直使用WinHex删除到文件末端所有数据，如图所示。</p>
+<p><img src="/images/image-20260826175657980.png" alt="image-20260826175657980" loading='lazy'></p>
+<p>得到</p>
+<p><img src="/images/image-20260826175728025.png" alt="image-20260826175728025" loading='lazy'></p>
+<p>这样，<code>.reloc</code> 节区即被物理删除。但是由于尚未修改其他PE头信息，文件仍无法正常运行。下面开始修改相关PE头信息，使文件最终能够正常运行。</p>
+<h3 id="修改-IMAGE-FILE-HEADER"><a href="#修改-IMAGE-FILE-HEADER" class="headerlink" title="修改 IMAGE_FILE_HEADER"></a>修改 IMAGE_FILE_HEADER</h3><p>删除1个节区后，首先要修改 <code>IMAGE_FILE_HEADER - Number of Sections</code> 项，如下图所示。</p>
+<p><img src="/images/image-20260826174227339.png" alt="image-20260826174227339" loading='lazy'></p>
+<p>当前Number of Sections项的值为5，删除1个节区后要把其值改为4，偏移是DE如下图所示。</p>
+<p><img src="/images/image-20260826175831876.png" alt="image-20260826175831876" loading='lazy'></p>
+<p>得到</p>
+<p><img src="/images/image-20260826174502522.png" alt="image-20260826174502522" loading='lazy'></p>
+<h3 id="修改-IMAGE-OPTIONAL-HEADER"><a href="#修改-IMAGE-OPTIONAL-HEADER" class="headerlink" title="修改 IMAGE_OPTIONAL_HEADER"></a>修改 IMAGE_OPTIONAL_HEADER</h3><p>删除 <code>.reloc</code> 节区后，（进程虚拟内存中）整个映像就随之减少相应大小。映像大小值存储在 <code>IMAGE_OPTIONAL_HEADER - Size of Image</code> 中，需要对其修改。</p>
+<p><img src="/images/image-20260826174733794.png" alt="image-20260826174733794" loading='lazy'></p>
+<p>从上图可以看出，当前Size of Image的值为11000。问题在于，要计算减去多少才能让程序正常运行。</p>
+<p><img src="/images/image-20260826174847354.png" alt="image-20260826174847354" loading='lazy'>由图可知，<code>.reloc</code> 节区的VirtualSize值为E40，将其根据Section Alignment扩展后变为10000（练习文件的Section Alignment值为1000)。所以应该从Size of Image减去1000才正确，就是应该修改成00010000</p>
+<p>地址为128,如图所示</p>
+<p><img src="/images/image-20260826175936676.png" alt="image-20260826175936676" loading='lazy'></p>
+<p>可以看到现在是00011000,修改得到</p>
+<p><img src="/images/image-20260826180029941.png" alt="image-20260826180029941" loading='lazy'></p>
+<p>保存即可</p>
+<p>封面来自邦乔彦</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://ksenrii.github.io">ksenr</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://ksenrii.github.io/2026/08/03/%E5%9F%BA%E5%9D%80%E9%87%8D%E5%AE%9A%E4%BD%8D%E8%A1%A8/">https://ksenrii.github.io/2026/08/03/%E5%9F%BA%E5%9D%80%E9%87%8D%E5%AE%9A%E4%BD%8D%E8%A1%A8/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://ksenrii.github.io" target="_blank">ksenr's blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Reverse/">Reverse</a></div><div class="post-share"><div class="social-share" data-image="/images/15.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://unpkg.com/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://unpkg.com/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/08/20/dll%E6%B3%A8%E5%85%A5/" title="DLL注入"><img class="cover" src="/images/18.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post" loading='lazy'><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">DLL注入</div></div><div class="info-2"><div class="info-item-1">DLL注入Windows消息钩取钩子英文 Hook 一词，翻成中文是 “钩子”、“鱼钩” 的意思，泛指钓取所需东西而使用的一切工具。“钩子” 这一基本含义延伸发展为 “偷看或截取信息时所用的手段或工具”。下面举例向各位进一步说明 “钩子” 这一概念。 “钩子” 的概念  假设有一个非常重要的军事设施，其外围设置了 3 层岗哨以进行保护。外部人员若想进入，需要经过 3 层岗哨复杂的检查程序（身份确认、随身物品查验、访问事由说明等）。若间谍在通往该军事设施的道路上私设一个岗哨，经过该岗哨的人员未起疑心，通过时履行同样的检查程序，那么间谍就可以坐享其成，轻松获取（甚至可以操纵）来往该岗哨的所有信息。 像这样，为了偷看或截取来往信息而在中间设置岗哨的行为称为 “挂钩”（或 “安装钩子”）。实际上，偷看或操作信息的行为就是人们常说的 “钩取”（Hooking）。 “钩取” 技术广泛应用于计算机领域。其实，我们不仅可以查看来往于 “OS‑应用程序‑用户” 之间的全部信息，也可以操作它们，并且神不知鬼不觉。具体方法有很多，其中最基本的是 “消息钩子”（Message Hook），下面会详细介绍...</div></div></div></a><a class="pagination-related" href="/2026/07/29/PE%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8FReview/" title="PE文件格式Review"><img class="cover" src="/images/16.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post" loading='lazy'><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">PE文件格式Review</div></div><div class="info-2"><div class="info-item-1">PE文件格式还是内容很多的,再来整体的复习一遍^^ PE文件PE 文件是 Windows 操作系统下使用的可执行文件格式。它是微软在 UNIX 平台的 COFF（Common Object File Format，通用对象文件格式）基础上制作而成的。最初（正如 Portable 这个单词所代表的那样）设计用来提高程序在不同操作系统上的移植性，但实际上这种文件格式仅用在 Windows 系列的操作系统下。 PE 文件是指 32 位的可执行文件，也称为 PE32。64 位的可执行文件称为 PE + 或 PE32+，是 PE（PE32）文件的一种扩展形式（请注意不是 PE64）。 PE文件种类 基本结构 DOS头微软创建 PE 文件格式时，人们正广泛使用 DOS 文件，所以微软充分考虑了 PE 文件对 DOS 文件的兼容性。其结果是在 PE 头的最前面添加了一个 IMAGE_DOS_HEADER 结构体，用来扩展已有的 DOS EXE 头。 123456789101112131415161718192021typedef struct _IMAGE_DOS_HEADER &#123; ...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/07/17/%E8%BF%90%E8%A1%8C%E6%97%B6%E5%8E%8B%E7%BC%A9/" title="运行时压缩"><img class="cover" src="/images/17.jpg" alt="cover" loading='lazy'><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-17</div><div class="info-item-2">运行时压缩</div></div><div class="info-2"><div class="info-item-1">运行时压缩运行时压缩器（Run-Time Packer）是软件逆向分析学的常见主题。为了理解好它，需要掌握有关 PE 文件格式、操作系统的基本知识（进程、内存、DLL 等），同时也要了解有关压缩 &#x2F; 解压缩算法的基本内容。 数据压缩数据压缩（Data Compression）是计算机工程的主要研究内容，经过数十年发展已经有了深入研究，今后还会不断出现更多、更好的算法。 如果日常生活中能够非常容易地压缩某个物体该多么方便啊！也就不再需要仓库、停车场、集装箱了，当然，得能压缩才行。而在数码世界，（只要不是压缩过的信息）任何信息都能轻松压缩。 不论哪种形态的文件（数据）都是由二进制（0 或 1）组成的，只要使用合适的压缩算法，就能缩减其大小。经过压缩的文件若能 100% 恢复，则称该压缩为 “无损压缩”（Lossless Data Compression）；若不能恢复原状，则称该压缩为 “有损压缩”（Loss Data Compression）。 无损压缩无损压缩用来缩减文件（数据）的大小，压缩后的文件更易保管、移动。使用经过压缩的文件之前，需要先对文件解压缩（此过程中应该保...</div></div></div></a><a class="pagination-related" href="/2026/07/27/PE%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F/" title="PE文件格式"><img class="cover" src="/images/14.jpg" alt="cover" loading='lazy'><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-27</div><div class="info-item-2">PE文件格式</div></div><div class="info-2"><div class="info-item-1">PE文件格式本章将介绍 Windows 操作系统的 PE 文件格式相关知识，同时介绍与之相关的进程、内存、DLL 等概念。 介绍PE（Portable Executable）是 Windows 操作系统的可执行文件格式，由 UNIX 系统的 COFF（Common Object File Format）格式修改而来。之所以叫”Portable”，是因为当初设计时希望它能跨平台使用，但最终它只用于 Windows 系统。32 位的 PE 格式称为 PE32，64 位的 PE 格式称为 PE32+（或 PE+），注意不是”PE64”。 PE文件格式PE 文件格式不仅是 .exe 文件的格式，很多其他文件也采用 PE 格式。表列出了 PE 文件的主要种类。    种类 主扩展名    可执行系列 EXE, SCR   库系列 DLL, OCX, CPL, DRV   驱动程序系列 SYS, VXD   对象文件系列 OBJ   提示  OBJ 文件不能以任何形式执行，在代码逆向分析中几乎不需要关注。  本章将以 Windows XP SP3 的 notepad.exe 为例讲解 PE ...</div></div></div></a><a class="pagination-related" href="/2026/07/13/%E4%BB%A3%E7%A0%81%E9%80%86%E5%90%91%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80/" title="代码逆向技术基础"><img class="cover" src="/images/7.jpg" alt="cover" loading='lazy'><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-13</div><div class="info-item-2">代码逆向技术基础</div></div><div class="info-2"><div class="info-item-1">代码逆向基础软件逆向工程（代码逆向分析）是一种探究应用程序内部组成结构及工作原理的技术。运用逆向分析技术，我们可以轻松窥探程序内部结构，掌握其工作原理，可以在程序的开发与测试阶段发现 Bug 和漏洞，并直接修改程序文件或内存解决这些问题，还可以为程序添加新功能，使程序更强大。 其中分析可执行文件时使用的方法大致分为两种：静态分析法和动态分析法。 静态分析法静态分析法是在不执行代码文件的情形下，对代码进行静态分析的一种方法。静态分析时并不执行代码，而是观察代码文件的外部特征，获取文件的类型（EXE、DLI、DOC、ZIP 等）、大小、PE 头信息、Import&#x2F;Export API、内部字符串、是否运行时解压缩、注册信息、调试信息、数字证书等多种信息。此外，使用反汇编工具（Disassembler）查看内部代码、分析代码结构也属于静态分析的范畴。 我们通过静态分析方法会获得多种信息，这些信息是进行动态分析的重要参考资料，对代码的动态分析非常有帮助。 动态分析法动态分析法是在程序文件的执行过程中对代码进行动态分析的一种方法，它通过调试来分析代码流，获得内存的状态等。通过动态...</div></div></div></a><a class="pagination-related" href="/2026/08/20/dll%E6%B3%A8%E5%85%A5/" title="DLL注入"><img class="cover" src="/images/18.jpg" alt="cover" loading='lazy'><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-20</div><div class="info-item-2">DLL注入</div></div><div class="info-2"><div class="info-item-1">DLL注入Windows消息钩取钩子英文 Hook 一词，翻成中文是 “钩子”、“鱼钩” 的意思，泛指钓取所需东西而使用的一切工具。“钩子” 这一基本含义延伸发展为 “偷看或截取信息时所用的手段或工具”。下面举例向各位进一步说明 “钩子” 这一概念。 “钩子” 的概念  假设有一个非常重要的军事设施，其外围设置了 3 层岗哨以进行保护。外部人员若想进入，需要经过 3 层岗哨复杂的检查程序（身份确认、随身物品查验、访问事由说明等）。若间谍在通往该军事设施的道路上私设一个岗哨，经过该岗哨的人员未起疑心，通过时履行同样的检查程序，那么间谍就可以坐享其成，轻松获取（甚至可以操纵）来往该岗哨的所有信息。 像这样，为了偷看或截取来往信息而在中间设置岗哨的行为称为 “挂钩”（或 “安装钩子”）。实际上，偷看或操作信息的行为就是人们常说的 “钩取”（Hooking）。 “钩取” 技术广泛应用于计算机领域。其实，我们不仅可以查看来往于 “OS‑应用程序‑用户” 之间的全部信息，也可以操作它们，并且神不知鬼不觉。具体方法有很多，其中最基本的是 “消息钩子”（Message Hook），下面会详细介绍...</div></div></div></a><a class="pagination-related" href="/2026/07/29/PE%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8FReview/" title="PE文件格式Review"><img class="cover" src="/images/16.jpg" alt="cover" loading='lazy'><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-29</div><div class="info-item-2">PE文件格式Review</div></div><div class="info-2"><div class="info-item-1">PE文件格式还是内容很多的,再来整体的复习一遍^^ PE文件PE 文件是 Windows 操作系统下使用的可执行文件格式。它是微软在 UNIX 平台的 COFF（Common Object File Format，通用对象文件格式）基础上制作而成的。最初（正如 Portable 这个单词所代表的那样）设计用来提高程序在不同操作系统上的移植性，但实际上这种文件格式仅用在 Windows 系列的操作系统下。 PE 文件是指 32 位的可执行文件，也称为 PE32。64 位的可执行文件称为 PE + 或 PE32+，是 PE（PE32）文件的一种扩展形式（请注意不是 PE64）。 PE文件种类 基本结构 DOS头微软创建 PE 文件格式时，人们正广泛使用 DOS 文件，所以微软充分考虑了 PE 文件对 DOS 文件的兼容性。其结果是在 PE 头的最前面添加了一个 IMAGE_DOS_HEADER 结构体，用来扩展已有的 DOS EXE 头。 123456789101112131415161718192021typedef struct _IMAGE_DOS_HEADER &#123; ...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/images/avatar-jointed.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/ loading='lazy'></div><div class="author-info-name">ksenr</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/ksenrii"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/ksenrii" target="_blank" title="GitHub"><i class="fab fa-github" style="color: #24292e;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到 ksenr's blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%9F%BA%E5%9D%80%E9%87%8D%E5%AE%9A%E4%BD%8D%E8%A1%A8"><span class="toc-number">1.</span> <span class="toc-text">基址重定位表</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#PE-%E9%87%8D%E5%AE%9A%E4%BD%8D"><span class="toc-number">1.1.</span> <span class="toc-text">PE 重定位</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#DLL-SYS"><span class="toc-number">1.1.1.</span> <span class="toc-text">DLL&#x2F;SYS</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#EXE"><span class="toc-number">1.1.2.</span> <span class="toc-text">EXE</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PE%E9%87%8D%E5%AE%9A%E4%BD%8D%E6%97%B6%E6%89%A7%E8%A1%8C%E7%9A%84%E6%93%8D%E4%BD%9C"><span class="toc-number">1.2.</span> <span class="toc-text">PE重定位时执行的操作</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#PE%E9%87%8D%E5%AE%9A%E4%BD%8D%E6%93%8D%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-number">1.3.</span> <span class="toc-text">PE重定位操作原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E5%9D%80%E9%87%8D%E5%AE%9A%E4%BD%8D%E8%A1%A8-1"><span class="toc-number">1.3.1.</span> <span class="toc-text">基址重定位表</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IMAGE-BASE-RELOCATION%E7%BB%93%E6%9E%84%E4%BD%93"><span class="toc-number">1.3.2.</span> <span class="toc-text">IMAGE_BASE_RELOCATION结构体</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9F%BA%E5%9D%80%E9%87%8D%E5%AE%9A%E4%BD%8D%E8%A1%A8%E7%9A%84%E5%88%86%E6%9E%90"><span class="toc-number">1.3.3.</span> <span class="toc-text">基址重定位表的分析</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%83%E4%B9%A0"><span class="toc-number">1.3.4.</span> <span class="toc-text">练习</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#1-%E6%9F%A5%E6%89%BE%E7%A8%8B%E5%BA%8F%E4%B8%AD%E7%A1%AC%E7%BC%96%E7%A0%81%E5%9C%B0%E5%9D%80%E7%9A%84%E4%BD%8D%E7%BD%AE"><span class="toc-number">1.3.4.1.</span> <span class="toc-text">#1. 查找程序中硬编码地址的位置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#2-%E8%AF%BB%E8%8E%B7%E5%8F%96%E5%80%BC%EF%BC%8C%E5%87%8F%E5%8E%BBImageBase%E5%80%BC%EF%BC%88VA%E2%86%92RVA%EF%BC%89"><span class="toc-number">1.3.4.2.</span> <span class="toc-text">#2.读获取值，减去ImageBase值（VA→RVA）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#3-%E5%8A%A0%E4%B8%8A%E5%AE%9E%E9%99%85%E5%8A%A0%E8%BD%BD%E5%9C%B0%E5%9D%80%EF%BC%88RVA%E2%86%92VA%EF%BC%89"><span class="toc-number">1.3.4.3.</span> <span class="toc-text">#3. 加上实际加载地址（RVA→VA）</span></a></li></ol></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E4%BB%8E%E5%8F%AF%E6%89%A7%E8%A1%8C%E6%96%87%E4%BB%B6%E4%B8%AD%E5%88%A0%E9%99%A4-reloc%E8%8A%82%E5%8C%BA"><span class="toc-number">2.</span> <span class="toc-text">从可执行文件中删除.reloc节区</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#reloc%E8%8A%82%E5%8C%BA"><span class="toc-number">2.1.</span> <span class="toc-text">.reloc节区</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#reloc-exe"><span class="toc-number">2.2.</span> <span class="toc-text">reloc.exe</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A0%E9%99%A4-reloc%E8%8A%82%E5%8C%BA%E5%A4%B4"><span class="toc-number">2.2.1.</span> <span class="toc-text">删除 .reloc节区头</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%A0%E9%99%A4-reloc%E8%8A%82%E5%8C%BA"><span class="toc-number">2.2.2.</span> <span class="toc-text">删除.reloc节区</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9-IMAGE-FILE-HEADER"><span class="toc-number">2.2.3.</span> <span class="toc-text">修改 IMAGE_FILE_HEADER</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BF%AE%E6%94%B9-IMAGE-OPTIONAL-HEADER"><span class="toc-number">2.2.4.</span> <span class="toc-text">修改 IMAGE_OPTIONAL_HEADER</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/08/20/dll%E6%B3%A8%E5%85%A5/" title="DLL注入"><img src="/images/18.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="DLL注入"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/08/20/dll%E6%B3%A8%E5%85%A5/" title="DLL注入">DLL注入</a><time datetime="2026-08-20T08:32:14.000Z" title="发表于 2026-08-20 16:32:14">2026-08-20</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/03/%E5%9F%BA%E5%9D%80%E9%87%8D%E5%AE%9A%E4%BD%8D%E8%A1%A8/" title="基址重定位表"><img src="/images/15.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="基址重定位表"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/08/03/%E5%9F%BA%E5%9D%80%E9%87%8D%E5%AE%9A%E4%BD%8D%E8%A1%A8/" title="基址重定位表">基址重定位表</a><time datetime="2026-08-03T05:32:54.000Z" title="发表于 2026-08-03 13:32:54">2026-08-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/07/29/PE%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8FReview/" title="PE文件格式Review"><img src="/images/16.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="PE文件格式Review"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/07/29/PE%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8FReview/" title="PE文件格式Review">PE文件格式Review</a><time datetime="2026-07-29T05:32:54.000Z" title="发表于 2026-07-29 13:32:54">2026-07-29</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/07/27/PE%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F/" title="PE文件格式"><img src="/images/14.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="PE文件格式"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/07/27/PE%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F/" title="PE文件格式">PE文件格式</a><time datetime="2026-07-27T05:32:54.000Z" title="发表于 2026-07-27 13:32:54">2026-07-27</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/07/17/%E8%BF%90%E8%A1%8C%E6%97%B6%E5%8E%8B%E7%BC%A9/" title="运行时压缩"><img src="/images/17.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="运行时压缩"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/07/17/%E8%BF%90%E8%A1%8C%E6%97%B6%E5%8E%8B%E7%BC%A9/" title="运行时压缩">运行时压缩</a><time datetime="2026-07-17T04:12:18.000Z" title="发表于 2026-07-17 12:12:18">2026-07-17</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By ksenr</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.7.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.7.0"></script><script src="/js/main.js?v=5.7.0"></script><script src="https://unpkg.com/@fancyapps/ui@6.1.14/dist/fancybox/fancybox.umd.js"></script><script src="https://unpkg.com/instant.page@5.2.0/instantpage.js" type="module"></script><script src="https://unpkg.com/node-snackbar@0.1.16/dist/snackbar.min.js"></script><div class="js-pjax"><script>(() => {
+  const changeScriptToMath = article => {
+    article.querySelectorAll('script[type^="math/tex"]').forEach(el => {
+      const display = /mode=display/.test(el.type)
+      const node = document.createElement(display ? 'div' : 'span')
+      node.textContent = display
+        ? `$$${el.textContent}$$`
+        : `$${el.textContent}$`
+      el.parentNode.replaceChild(node, el)
+    })
+  }
+
+  const loadMathjax = () => {
+    const article = document.getElementById('article-container')
+    if (!article || article.querySelector('.hbe-container')) return
+    changeScriptToMath(article)
+
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem',
+            'ui/lazy'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          lazyMargin: '200px',
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://unpkg.com/mathjax@4.1.3/tex-mml-chtml.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.typesetClear()
+      MathJax.typesetPromise([ article ])
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><div class="aplayer no-destroy" data-id="18342059095" data-server="netease" data-type="playlist" data-fixed="true" data-mini="true" data-listfolded="false" data-order="random" data-preload="none" data-autoplay="false" data-volume="0.5" data-storagename="ksenr-blog-player"></div><script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script><script src="https://cdn.jsdelivr.net/gh/metowolf/MetingJS@1.2/dist/Meting.min.js"></script><script src="/js/music-player.js"></script><script src="/js/bg-rotate.js"></script><script src="https://unpkg.com/pjax@0.2.8/pjax.min.js" defer="defer"></script><script>document.addEventListener('DOMContentLoaded', () => {
+  const pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+  window.pjax = new Pjax({
+    elements: 'a:not([target="_blank"]):not([data-fancybox])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+  })
+
+  const triggerPjaxFn = (val) => {
+    if (!val) return
+    Object.values(val).forEach(fn => {
+      try {
+        fn()
+      } catch (err) {
+        console.debug('Pjax callback failed:', err)
+      }
+    })
+  }
+
+  document.addEventListener('pjax:send', () => {
+    // removeEventListener
+    btf.removeGlobalFnEvent('pjaxSendOnce')
+    btf.removeGlobalFnEvent('themeChange')
+
+    // reset readmode
+    const $bodyClassList = document.body.classList
+    if ($bodyClassList.contains('read-mode')) $bodyClassList.remove('read-mode')
+
+    triggerPjaxFn(window.globalFn.pjaxSend)
+  })
+
+  document.addEventListener('pjax:complete', () => {
+    btf.removeGlobalFnEvent('pjaxCompleteOnce')
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+      if (!item.parentNode) return
+      const newScript = document.createElement('script')
+      const content = item.text || item.textContent || ''
+      Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.appendChild(document.createTextNode(content))
+      item.parentNode.replaceChild(newScript, item)
+    })
+
+    triggerPjaxFn(window.globalFn.pjaxComplete)
+  })
+
+  document.addEventListener('pjax:error', e => {
+    const responseURL = e.request && e.request.responseURL
+    if (e.request && e.request.status === 404) {
+      true
+        ? pjax.loadUrl('/404.html')
+        : responseURL && (window.location.href = responseURL)
+    } else if (responseURL) {
+      window.location.href = responseURL
+    }
+  })
+})</script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章..." type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.7.0"></script></div></div></body></html>
