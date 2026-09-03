@@ -1,0 +1,772 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>DLL注入-1 | ksenr's blog</title><meta name="author" content="ksenr"><meta name="copyright" content="ksenr"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="DLL注入Windows消息钩取钩子英文 Hook 一词，翻成中文是 “钩子”、“鱼钩” 的意思，泛指钓取所需东西而使用的一切工具。“钩子” 这一基本含义延伸发展为 “偷看或截取信息时所用的手段或工具”。下面举例向各位进一步说明 “钩子” 这一概念。 “钩子” 的概念  假设有一个非常重要的军事设施，其外围设置了 3 层岗哨以进行保护。外部人员若想进入，需要经过 3 层岗哨复杂的检查程序（身份确认">
+<meta property="og:type" content="article">
+<meta property="og:title" content="DLL注入-1">
+<meta property="og:url" content="https://ksenrii.github.io/2026/08/20/dll%E6%B3%A8%E5%85%A5-1/index.html">
+<meta property="og:site_name" content="ksenr&#39;s blog">
+<meta property="og:description" content="DLL注入Windows消息钩取钩子英文 Hook 一词，翻成中文是 “钩子”、“鱼钩” 的意思，泛指钓取所需东西而使用的一切工具。“钩子” 这一基本含义延伸发展为 “偷看或截取信息时所用的手段或工具”。下面举例向各位进一步说明 “钩子” 这一概念。 “钩子” 的概念  假设有一个非常重要的军事设施，其外围设置了 3 层岗哨以进行保护。外部人员若想进入，需要经过 3 层岗哨复杂的检查程序（身份确认">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ksenrii.github.io/images/18.jpg">
+<meta property="article:published_time" content="2026-08-20T08:32:14.000Z">
+<meta property="article:modified_time" content="2026-09-02T13:22:49.744Z">
+<meta property="article:author" content="ksenr">
+<meta property="article:tag" content="Reverse">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ksenrii.github.io/images/18.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "DLL注入-1",
+  "url": "https://ksenrii.github.io/2026/08/20/dll%E6%B3%A8%E5%85%A5-1/",
+  "image": "https://ksenrii.github.io/images/18.jpg",
+  "datePublished": "2026-08-20T08:32:14.000Z",
+  "dateModified": "2026-09-02T13:22:49.744Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "ksenr",
+      "url": "https://ksenrii.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/images/to.png"><link rel="canonical" href="https://ksenrii.github.io/2026/08/20/dll%E6%B3%A8%E5%85%A5-1/index.html"><link rel="preconnect" href="//unpkg.com"/><link rel="stylesheet" href="/css/index.css?v=5.7.0"><link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@7.3.1/css/all.min.css"><link rel="stylesheet" href="https://unpkg.com/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://unpkg.com/@fancyapps/ui@6.1.14/dist/fancybox/fancybox.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!true && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const start = 6
+              const end = 18
+              const isNight =
+                start < end
+                    ? hour < start || hour >= end
+                    : hour >= start || hour < end
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', e => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#425aef","bgDark":"#1f1f1f","position":"bottom-left"},
+  infinitegrid: {
+    js: 'https://unpkg.com/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'DLL注入-1',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css"><meta name="generator" content="Hexo 8.1.1"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      if ($loadingBox.classList.contains('loaded')) return
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+
+  if (document.readyState === 'complete') {
+    preloader.endLoading()
+  } else {
+    window.addEventListener('load', preloader.endLoading)
+    document.addEventListener('DOMContentLoaded', preloader.endLoading)
+    // Add timeout protection: force end after 7 seconds
+    setTimeout(preloader.endLoading, 7000)
+  }
+
+  if (true) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/avatar-jointed.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/ loading='lazy'></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">23</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/images/18.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ksenr's blog</span></a><a class="nav-page-title" href="/"><span class="site-name">DLL注入-1</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">DLL注入-1</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-08-20T08:32:14.000Z" title="发表于 2026-08-20 16:32:14">2026-08-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-09-02T13:22:49.744Z" title="更新于 2026-09-02 21:22:49">2026-09-02</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">10.6k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>38分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="DLL注入"><a href="#DLL注入" class="headerlink" title="DLL注入"></a>DLL注入</h1><h2 id="Windows消息钩取"><a href="#Windows消息钩取" class="headerlink" title="Windows消息钩取"></a>Windows消息钩取</h2><h3 id="钩子"><a href="#钩子" class="headerlink" title="钩子"></a>钩子</h3><p>英文 Hook 一词，翻成中文是 “钩子”、“鱼钩” 的意思，泛指钓取所需东西而使用的一切工具。“钩子” 这一基本含义延伸发展为 “偷看或截取信息时所用的手段或工具”。下面举例向各位进一步说明 “钩子” 这一概念。</p>
+<p><strong>“钩子” 的概念</strong> </p>
+<p>假设有一个非常重要的军事设施，其外围设置了 3 层岗哨以进行保护。外部人员若想进入，需要经过 3 层岗哨复杂的检查程序（身份确认、随身物品查验、访问事由说明等）。若间谍在通往该军事设施的道路上私设一个岗哨，经过该岗哨的人员未起疑心，通过时履行同样的检查程序，那么间谍就可以坐享其成，轻松获取（甚至可以操纵）来往该岗哨的所有信息。</p>
+<p>像这样，为了偷看或截取来往信息而在中间设置岗哨的行为称为 “挂钩”（或 “安装钩子”）。实际上，偷看或操作信息的行为就是人们常说的 “钩取”（Hooking）。</p>
+<p>“钩取” 技术广泛应用于计算机领域。其实，我们不仅可以查看来往于 “OS‑应用程序‑用户” 之间的全部信息，也可以操作它们，并且神不知鬼不觉。具体方法有很多，其中最基本的是 “消息钩子”（Message Hook），下面会详细介绍。</p>
+<h3 id="消息钩子"><a href="#消息钩子" class="headerlink" title="消息钩子"></a>消息钩子</h3><p>Windows 操作系统向用户提供 GUI（Graphic User Interface，图形用户界面），它以事件驱动（Event Driven）方式工作。在操作系统中借助键盘、鼠标，选择菜单、按钮，以及移动鼠标、改变窗口大小与位置等都是事件（Event）。发生这样的事件时，OS 会把事先定义好的消息发送给相应的应用程序，应用程序分析收到的信息后执行相应动作（上述过程在《Windows 程序设计》一书中有详尽说明）。</p>
+<p>也就是说，敲击键盘时，消息会从 OS 移动到应用程序。所谓的 “消息钩子” 就在此间偷看这些信息。为了帮助各位进一步理解它，下面以键盘消息为例说明。请看下图</p>
+<p><img src="/images/image-20260826201247670.png" alt="image-20260826201247670" loading='lazy'></p>
+<p>先讲解常规 Windows 消息流。</p>
+<ul>
+<li>发生键盘输入事件时，WM_KEYDOWN 消息被添加到 [OS message queue]。</li>
+<li>OS 判断哪个应用程序中发生了事件，然后从 [OS message queue] 取出消息，添加到相应应用程序的 [application message queue] 中。</li>
+<li>应用程序 (如记事本) 监视自身的 [application message queue]，发现新添加的 WM_KEYDOWN 消息后，调用相应的事件处理程序处理。</li>
+</ul>
+<p>正如在上图中看到的一样，OS 消息队列与应用程序消息队列之间存在一条 “钩链”（Hook Chain），设置好键盘消息钩子之后，处于 “钩链” 中的键盘消息钩子会比应用程序先看到相应信息。<strong>在键盘消息钩子函数的内部，除了可以查看消息之外，还可以修改消息本身，而且还能对消息实施拦截，阻止消息传递。</strong></p>
+<p><strong>提示</strong> </p>
+<p>可以同时设置多个相同的键盘消息钩子。按照设置顺序依次调用这些钩子，它们组成的链条称为 “钩链”。</p>
+<p>像这样的消息钩子功能是 Windows 操作系统提供的基本功能，其中最具代表性的是 MS Visual Studio 中提供的 SPY++，它是一个功能十分强大的消息钩取程序，能够查看操作系统中来往的所有消息。</p>
+<h3 id="SetWindowsHookEx"><a href="#SetWindowsHookEx" class="headerlink" title="SetWindowsHookEx()"></a>SetWindowsHookEx()</h3><p>使用 SetWindowsHookEx () API 可轻松实现消息钩子，SetWindowsHookEx () API 的定义如下所示。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">HHOOK <span class="title">SetWindowsHookEx</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="type">int</span> idHook,          <span class="comment">// hook type</span></span></span></span><br><span class="line"><span class="params"><span class="function">    HOOKPROC lpfn,       <span class="comment">// hook procedure</span></span></span></span><br><span class="line"><span class="params"><span class="function">    HINSTANCE hMod,      <span class="comment">// hook procedure所属的DLL句柄（Handle）</span></span></span></span><br><span class="line"><span class="params"><span class="function">    DWORD dwThreadId     <span class="comment">// 想要挂钩的线程ID</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>钩子过程（hook procedure）是由操作系统调用的回调函数。安装消息 “钩子” 时，“钩子” 过程需要存在于某个 DLL 内部，且该 DLL 的示例句柄（instance handle）即是 hMod。</p>
+<p><strong>提示</strong></p>
+<p> 若 dwThreadID 参数被设置为 0，则安装的钩子为 “全局钩子”（Global Hook），它会影响到运行中的（以及以后要运行的）所有进程。</p>
+<p>像这样，使用 SetWindowsHookEx () 设置好钩子之后，在某个进程中生成指定消息时，操作系统会将相关的 DLL 文件强制注入（injection）相应进程，然后调用注册的 “钩子” 过程。注入进程时用户几乎不需要做什么，非常方便。</p>
+<h3 id="键盘消息钩取练习"><a href="#键盘消息钩取练习" class="headerlink" title="键盘消息钩取练习"></a>键盘消息钩取练习</h3><p>做一个简单的键盘消息钩取练习，以进一步加深各位对前面内容的理解</p>
+<p><img src="/images/image-20260828104448432.png" alt="image-20260828104448432" loading='lazy'></p>
+<p>KeyHook.dll文件是一个含有钩子过程（KeyboardProc）的DLL文件。</p>
+<p>HookMain.exe是最先加载KeyHook.dll并安装键盘钩子的程序。HookMain.exe加载KeyHook.dll文件后使用SetWindowsHookEx()安装键盘钩子（KeyboardProc）。若其他进程（explorer.exe、iexplore.exe、notepad.exe等）中发生键盘输入事件，OS就会强制将KeyHook.dll加载到相应进程的内存，然后调用KeyboardProc()函数。</p>
+<p>这里需要注意的一点是，OS会将KeyHook.dll强制加载到发生键盘输入事件的所有进程。换言之，消息钩取技术常常被用作一种DLL注入技术。</p>
+<h4 id="练习示例-HookMain-exe"><a href="#练习示例-HookMain-exe" class="headerlink" title="练习示例 HookMain.exe"></a>练习示例 HookMain.exe</h4><p>通过示例来练习一下键盘钩取技术，拦截notepad.exe进程的键盘消息，使之无法显示在记事本中。</p>
+<p><strong>运行HookMain.exe</strong></p>
+<p>首先运行HookMain.exe程序，如图所示。</p>
+<p><img src="/images/image-20260902103849620.png" alt="image-20260902103849620" loading='lazy'></p>
+<p>运行HookMain.exe程序后，输出“press ‘q’ to quit!”信息，提示在HookMain.exe程序中输入“q”即可停止键盘钩取。</p>
+<p><strong>运行Noterpad.exe程序</strong></p>
+<p>当前系统中已安装好键盘钩子。运行Notepad.exe，用键盘输入。</p>
+<p>如图所示，Notepad.exe进程忽视了用户的键盘输入。使用Process Explorer查看notepad.exe进程，可以看到KeyHook.dll已经加载其中。</p>
+<p><img src="/images/image-20260902104547841.png" alt="image-20260902104547841" loading='lazy'></p>
+<p><strong>HookMain.exe终止 - 拆除键盘钩子</strong></p>
+<p>直接在Process Explorer终止任务即可</p>
+<h4 id="分析源代码"><a href="#分析源代码" class="headerlink" title="分析源代码"></a>分析源代码</h4><p><strong>HookMain.cpp</strong></p>
+<p>首先看一下 HookMain.exe 文件的源代码（HookMain.cpp）。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// HookMain.cpp</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;stdio.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;conio.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;windows.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEF_DLL_NAME     <span class="string">&quot;KeyHook.dll&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEF_HOOKSTART    <span class="string">&quot;HookStart&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEF_HOOKSTOP     <span class="string">&quot;HookStop&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span><span class="params">(*PFN_HOOKSTART)</span><span class="params">()</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">typedef</span> <span class="title">void</span><span class="params">(*PFN_HOOKSTOP)</span><span class="params">()</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="type">void</span> <span class="title">main</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    HMODULE hDll = <span class="literal">NULL</span>;</span><br><span class="line">    PFN_HOOKSTART HookStart = <span class="literal">NULL</span>;</span><br><span class="line">    PFN_HOOKSTOP HookStop = <span class="literal">NULL</span>;</span><br><span class="line">    <span class="type">char</span> ch = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 加载KeyHook.dll</span></span><br><span class="line">    hDll = <span class="built_in">LoadLibraryA</span>(DEF_DLL_NAME);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取导出函数地址</span></span><br><span class="line">    HookStart = (PFN_HOOKSTART)<span class="built_in">GetProcAddress</span>(hDll, DEF_HOOKSTART);</span><br><span class="line">    HookStop = (PFN_HOOKSTOP)<span class="built_in">GetProcAddress</span>(hDll, DEF_HOOKSTOP);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 开始钩取</span></span><br><span class="line">    <span class="built_in">HookStart</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 等待直到用户输入&quot;q&quot;</span></span><br><span class="line">    <span class="built_in">printf</span>(<span class="string">&quot;press &#x27;q&#x27; to quit!\n&quot;</span>);</span><br><span class="line">    <span class="keyword">while</span>( _getch() != <span class="string">&#x27;q&#x27;</span> );</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 终止钩取</span></span><br><span class="line">    <span class="built_in">HookStop</span>();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 卸载KeyHook.dll</span></span><br><span class="line">    <span class="built_in">FreeLibrary</span>(hDll);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>源代码非常简单。先加载 KeyHook.dll 文件，然后调用 HookStart() 函数开始钩取，用户输入 “q” 时，调用 HookStop() 函数终止钩取。</p>
+<p><strong>KeyHook.cpp</strong></p>
+<p>接下来继续看 KeyHook.dll 文件的源代码（KeyHook.cpp）。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// KeyHook.cpp</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;stdio.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;windows.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEF_PROCESS_NAME    <span class="string">&quot;notepad.exe&quot;</span></span></span><br><span class="line"></span><br><span class="line">HINSTANCE g_hInstance = <span class="literal">NULL</span>;</span><br><span class="line">HHOOK g_hHook = <span class="literal">NULL</span>;</span><br><span class="line">HWND g_hWnd = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line"><span class="function">BOOL WINAPI <span class="title">DllMain</span><span class="params">(HINSTANCE hinstDLL, DWORD dwReason, LPVOID</span></span></span><br><span class="line"><span class="params"><span class="function">                    lpvReserved)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">switch</span>( dwReason )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">case</span> DLL_PROCESS_ATTACH:</span><br><span class="line">            g_hInstance = hinstDLL;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">case</span> DLL_PROCESS_DETACH:</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">LRESULT CALLBACK <span class="title">KeyboardProc</span><span class="params">(<span class="type">int</span> nCode, WPARAM wParam, LPARAM lParam)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="type">char</span> szPath[MAX_PATH] = &#123;<span class="number">0</span>,&#125;;</span><br><span class="line">    <span class="type">char</span> *p = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>( nCode == <span class="number">0</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// bit 31 : 0 = key press, 1 = key release</span></span><br><span class="line">        <span class="keyword">if</span>( !(lParam &amp; <span class="number">0x80000000</span>) )  <span class="comment">// 释放键盘按键时</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="built_in">GetModuleFileNameA</span>(<span class="literal">NULL</span>, szPath, MAX_PATH);</span><br><span class="line">            p = <span class="built_in">strrchr</span>(szPath, <span class="string">&#x27;\\&#x27;</span>);</span><br><span class="line"></span><br><span class="line">            <span class="comment">// 比较当前进程名称，若为notepad.exe，则消息不会传递给应用程序（或下一个“钩子”）</span></span><br><span class="line">            <span class="keyword">if</span>( !_stricmp(p + <span class="number">1</span>, DEF_PROCESS_NAME) )</span><br><span class="line">                <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 若非notepad.exe，则调用CallNextHookEx()函数，将消息传递给应用程序（或下一个“钩子”）</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">CallNextHookEx</span>(g_hHook, nCode, wParam, lParam);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> __cplusplus</span></span><br><span class="line"><span class="keyword">extern</span> <span class="string">&quot;C&quot;</span> &#123;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br><span class="line">__declspec(dllexport) <span class="function"><span class="type">void</span> <span class="title">HookStart</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">   g_hHook = <span class="built_in">SetWindowsHookEx</span>(</span><br><span class="line">    WH_KEYBOARD,   #钩子类型：WH_KEYBOARD</span><br><span class="line">    KeyboardProc,  #回调函数：KeyboardProc</span><br><span class="line">    g_hInstance,   #回调函数所在 DLL：KeyHook.dll</span><br><span class="line">    <span class="number">0</span>              #目标线程：<span class="number">0</span>，也就是全局键盘 Hook</span><br><span class="line">);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">__declspec(dllexport) <span class="function"><span class="type">void</span> <span class="title">HookStop</span><span class="params">()</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">if</span>( g_hHook )</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="built_in">UnhookWindowsHookEx</span>(g_hHook);</span><br><span class="line">        g_hHook = <span class="literal">NULL</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">ifdef</span> __cplusplus</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">#<span class="keyword">endif</span></span></span><br></pre></td></tr></table></figure>
+
+<p>DLL 代码也非常简单。调用导出函数 HookStart() 时，SetWindowsHookEx() 函数就会将 KeyboardProc() 添加到键盘钩链。</p>
+<p><strong>提示</strong></p>
+<p>MSDN 中对 KeyboardProc 函数的定义如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">LRESULT CALLBACK KeyboardProc(</span><br><span class="line">    int code,       // HC_ACTION(0), HC_NOREMOVE(3)</span><br><span class="line">    WPARAM wParam,  // virtual-key code</span><br><span class="line">    LPARAM lParam   // extra information</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
+
+<p>上面 3 个参数中，wParam 指用户按下的键盘按键的虚拟键值（virtual key code）。对键盘这一硬件而言，英文字符 “A” 与 “a” 具有完全相同的虚拟键值。参数 lParam 根据不同的位具有多种不同的含义（repeat count、scan code、extended-key flag、context code、previous key-state flag、transition-state flag）。使用 ToAscii() API 函数可以获得实际按下的键盘的 ASCII 值。</p>
+<p>安装好键盘“钩子”后，无论哪个进程，只要发生键盘输入事件，OS 就会强制将 KeyHook.dll 注入相应进程。加载了 KeyHook.dll 的进程中，发生键盘事件时会首先调用执行 KeyHook.KeyboardProc()。</p>
+<p>KeyboardProc() 函数中发生键盘输入事件时，就会比较当前进程的名称与 “notepad.exe” 字符串，若相同，则返回 1，终止 KeyboardProc() 函数，这意味着截获且删除消息。这样，键盘消息就不会传递到 notepad.exe 程序的消息队列。</p>
+<p>因 notepad.exe 未能接收到任何键盘消息，故无法输出。</p>
+<p>除此之外（即当前进程名称并非 “notepad.exe” 时），执行 <code>return CallNextHookEx(g_hHook,nCode,wParam,lParam);</code> 语句，消息会被传递到另一个应用程序或钩链的另一个“钩子”函数。</p>
+<p>初次学习会遇到很多疑惑</p>
+<h5 id="整个过程发生了什么"><a href="#整个过程发生了什么" class="headerlink" title="整个过程发生了什么"></a>整个过程发生了什么</h5><p><img src="/images/image-20260902113923575.png" alt="image-20260902113923575" loading='lazy'></p>
+<h5 id="KeyboardProc-回调函数"><a href="#KeyboardProc-回调函数" class="headerlink" title="KeyboardProc 回调函数"></a>KeyboardProc 回调函数</h5><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">LRESULT CALLBACK <span class="title">KeyboardProc</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">  _In_ <span class="type">int</span>    code,</span></span></span><br><span class="line"><span class="params"><span class="function">  _In_ WPARAM wParam,</span></span></span><br><span class="line"><span class="params"><span class="function">  _In_ LPARAM lParam</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p><strong>简单来说就是你定义一个函数，把函数指针交给系统或库，之后由系统&#x2F;库在特定事件发生时调用它</strong>。</p>
+<p>一个应用程序定义或库定义的回调函数，配合 [<strong>SetWindowsHookExA</strong>]&#x2F;[<strong>SetWindowsHookExW</strong>] 函数使用。</p>
+<p>每当应用程序调用 [<strong>GetMessage</strong>]或 [<strong>PeekMessageA</strong>]&#x2F;[<strong>PeekMessageW</strong>] 函数且有键盘消息（[<strong>WM_KEYUP</strong>] 或 [<strong>WM_KEYDOWN</strong>] 需要处理时，<strong>系统就会调用该函数。</strong></p>
+<h3 id="调试"><a href="#调试" class="headerlink" title="调试"></a>调试</h3><p>本节将学习有关 Windows 消息钩取调试的技术。</p>
+<h4 id="调试-HookMain-exe"><a href="#调试-HookMain-exe" class="headerlink" title="调试 HookMain.exe"></a>调试 HookMain.exe</h4><p>先调试用来安装键盘钩子的 HookMain.exe。</p>
+<h4 id="EP代码"><a href="#EP代码" class="headerlink" title="EP代码"></a>EP代码</h4><p><img src="/images/image-20260902114419943.png" alt="image-20260902114419943" loading='lazy'></p>
+<p>上图显示的是 HookMain.exe 的 EP 代码，它是典型的 VC++ 启动函数，其中最受关注的是开始进行键盘钩取的部分。</p>
+<p><strong>查找核心代码</strong></p>
+<p>有几种方法可以帮助我们找到关注的核心代码：</p>
+<ul>
+<li>逐行跟踪。</li>
+<li>检索相关 API。</li>
+<li>检索相关字符串。</li>
+</ul>
+<p>第一种方法是程序无法正常运行或难以预测时使用的下策，此处略去不谈。这样就剩下后面 2 种方法（检索 API 或字符串）了。</p>
+<p>由于已经运行过 HookMain.exe 程序，我们知道了该程序的功能（键盘钩取）与输出的字符串，所以下面要使用检索字符串的方法。</p>
+<p><img src="/images/image-20260902114629339.png" alt="image-20260902114629339" loading='lazy'></p>
+<p>40104D 地址处的指令引用了要查找的字符串。双击字符串，转到相应地址处（40104D）</p>
+<p><img src="/images/image-20260902114848432.png" alt="image-20260902114848432" loading='lazy'></p>
+<p>上图中显示的代码其实就是 HookMain.exe 程序的 main() 函数</p>
+<h4 id="调试main函数"><a href="#调试main函数" class="headerlink" title="调试main函数"></a>调试main函数</h4><p>在 401000 地址处设置断点，然后运行程序，到断点处停下来，开始调试。</p>
+<p>从断点开始依次跟踪调试代码，可以了解 main() 中的主要代码流。先在 401006 地址处调用 LoadLibrary(KeyHook.dll)，然后由 40104B 地址处的 CALL EBX 命令调用 KeyHook.HookStart() 函数。</p>
+<p>跟踪 40104B 地址处的 CALL EBX 命令（StepInto(F7)），出现下图所示的代码。</p>
+<p><img src="/images/image-20260902120518442.png" alt="image-20260902120518442" loading='lazy'></p>
+<p>上图中的代码是被加载到 HookMain.exe 进程中的 KeyHook.dll 的 HookStart() 函数。</p>
+<p>在 100010EE 地址处可以看到 CALL SetWindowsHookExW() 指令，其上方 100010E8 与 100010ED 地址处的 2 条 PUSH 指令用于把 SetWindowsHookExW() API 的第 1、2 两个参数压入栈。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">HHOOK <span class="title">SetWindowsHookEx</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    <span class="type">int</span> idHook,          <span class="comment">// hook type</span></span></span></span><br><span class="line"><span class="params"><span class="function">    HOOKPROC lpfn,       <span class="comment">// hook procedure</span></span></span></span><br><span class="line"><span class="params"><span class="function">    HINSTANCE hMod,      <span class="comment">// hook procedure所属的DLL句柄（Handle）</span></span></span></span><br><span class="line"><span class="params"><span class="function">    DWORD dwThreadId     <span class="comment">// 想要挂钩的线程ID</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>SetWindowsHookExW() API 的第一个参数（idHook）值为 WH_KEYBOARD(2)，第二个参数（lpfn）值为 10001020，该值即是钩子过程的地址。后面调试 KeyHook.dll 时再仔细看该地址。HookMain.exe 的 main() 函数（401000）的其余代码接收到用户输入的 “q” 命令后终止钩取。</p>
+<h4 id="调试Notepad-exe-进程内的-KeyHook-dll"><a href="#调试Notepad-exe-进程内的-KeyHook-dll" class="headerlink" title="调试Notepad.exe 进程内的 KeyHook.dll"></a>调试Notepad.exe 进程内的 KeyHook.dll</h4><p>本小节将调试 KeyHook.dll 中的钩子过程，此时 KeyHook.dll 已被注入 notepad.exe 进程。</p>
+<p>首先使用Dbg 打开 Notepad.exe 程序（也可以使用 Attach 命令打开运行中的 notepad.exe 进程）。</p>
+<p><img src="/images/image-20260902122849032.png" alt="image-20260902122849032" loading='lazy'></p>
+<p>其次,在Options里的Preferences的Events开启DLL Load</p>
+<p><img src="/images/image-20260902121724361.png" alt="image-20260902121724361" loading='lazy'></p>
+<p>开启该选项后，每当新的DLL装入被调试（Debuggee）进程时就会自动暂停调试（这在“从DLL注入时开始调试”的情况下非常有用）。</p>
+<p>此时运行HookMain.exe。然后在notepad.exe中使用键盘输入，此时Dbg暂停调试，下方显示</p>
+<p><img src="/images/QQ_1788323494231.png" alt="QQ_1788323494231" loading='lazy'></p>
+<p>KeyHook.dll被加载到10000000地址处。</p>
+<p>双击KeyHook.dll转到KeyHook.dll的EP地址处。由于我们已经知道钩子过程的地址为10001020，下面直接转到该地址处</p>
+<p><img src="/images/QQ_1788324323436.png" alt="QQ_1788324323436" loading='lazy'></p>
+<p>“钩子”过程（10001020）设置断点，每当notepad.exe中发生键盘输入事件时，调试就停在该处。</p>
+<p>在栈中可以看到KeyboardProc()函数的参数</p>
+<p>整理过程如下 :</p>
+<ul>
+<li>用ODbg运行notepad.exe（或者Attach运行中的notepad.exe）；</li>
+<li>开启Break on new module(DLL)选项；</li>
+<li>运行KeyLogger.exe → 安装global keyboard message hook；</li>
+<li>在notepad中使用键盘输入 → 发生键盘消息事件；</li>
+<li>KeyLogger.dll被注入notepad.exe进程；</li>
+<li>在Dbg中向KeyboardProc（钩子过程）设置断点。</li>
+</ul>
+<h2 id="DLL注入-1"><a href="#DLL注入-1" class="headerlink" title="DLL注入"></a>DLL注入</h2><p>DLL注入（DLL Injection）是渗透其他进程的最简单有效的方法，本章将详细讲解DLL注入的有关内容。借助DLL注入技术，可以钩取API、改进程序、修复Bug等。</p>
+<h3 id="什么是DLL注入"><a href="#什么是DLL注入" class="headerlink" title="什么是DLL注入"></a>什么是DLL注入</h3><p>DLL注入指的是向运行中的其他进程强制插入特定的DLL文件。</p>
+<p>从技术细节来说，DLL注入命令其他进程自行调用LoadLibrary() API，加载（Loading）用户指定的DLL文件。</p>
+<p>DLL注入与一般DLL加载的区别在于，加载的目标进程是其自身或其他进程。下图描述了DLL注入的概念。</p>
+<p><img src="/images/image-20260902130255032.png" alt="image-20260902130255032" loading='lazy'></p>
+<p>从上图中可以看到，myhack.dll已被强制插入notepad进程（本来notepad并不会加载myhack.dll）。</p>
+<p>加载到notepad.exe进程中的myhack.dll与已经加载到notepad.exe进程中的DLL（kernel32.dll、user32.dll）一样，拥有访问notepad.exe进程内存的（正常的）权限，这样用户就可以做任何想做的事了（比如：向notepad添加通信功能以实现Messenger、文本网络浏览器等）。</p>
+<p><strong>DLL（Dynamic Linked Library，动态链接库）</strong></p>
+<p>DLL被加载到进程后会自动运行DllMain()函数，用户可以把想执行的代码放到**DllMain()**函数，参与加载DLL时，添加的代码就会自然而然得到执行。利用该特性可修复程序Bug，或向程序添加新功能。</p>
+<p><code>DllMain</code> 是 DLL 的入口函数，类似于 exe 程序里的 <code>main()</code>，但它不是由你手动调用的，而是由 Windows 加载器自动调用。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL WINAPI <span class="title">DllMain</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    HINSTANCE hinstDLL,</span></span></span><br><span class="line"><span class="params"><span class="function">    DWORD dwReason,</span></span></span><br><span class="line"><span class="params"><span class="function">    LPVOID lpvReserved</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    <span class="keyword">switch</span> (dwReason)</span><br><span class="line">    &#123;</span><br><span class="line">    <span class="keyword">case</span> DLL_PROCESS_ATTACH:</span><br><span class="line">        <span class="comment">// DLL 被加载到某个进程时执行</span></span><br><span class="line">        <span class="comment">// 添加想执行的代码</span></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> DLL_THREAD_ATTACH:</span><br><span class="line">        <span class="comment">// 当前进程创建新线程时执行</span></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> DLL_THREAD_DETACH:</span><br><span class="line">        <span class="comment">// 当前进程中的某个线程结束时执行</span></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">case</span> DLL_PROCESS_DETACH:</span><br><span class="line">        <span class="comment">// DLL 从进程中卸载时执行</span></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="DLL注入示例"><a href="#DLL注入示例" class="headerlink" title="DLL注入示例"></a>DLL注入示例</h3><p>使用LoadLibrary() API加载某个DLL时，该DLL中的DllMain()函数就会被调用执行。</p>
+<p>DLL注入的工作原理就是从外部促使目标进程调用LoadLibrary() API（与一般DLL加载相同），所以会强制调用执行DLL的DllMain()函数。并且，被注入的DLL拥有目标进程内存的访问权限，用户可以随意操作（修复Bug、添加功能等）。下面看一些使用DLL注入技术的示例。</p>
+<h4 id="改善功能与修复BUG"><a href="#改善功能与修复BUG" class="headerlink" title="改善功能与修复BUG"></a>改善功能与修复BUG</h4><p>DLL注入技术可用于改善功能与修复Bug。没有程序对应的源码，或直接修改程序比较困难时，就可以使用DLL注入技术为程序添加新功能（类似于插件），或者修改有问题的代码、数据。</p>
+<h4 id="消息钩取"><a href="#消息钩取" class="headerlink" title="消息钩取"></a>消息钩取</h4><p>Windows OS默认提供的消息钩取功能应用的就是一种DLL注入技术。与常规的DLL注入唯一的区别是，OS会直接将已注册的钩取DLL注入目标进程。</p>
+<h4 id="API钩取"><a href="#API钩取" class="headerlink" title="API钩取"></a>API钩取</h4><p>API钩取广泛应用于实际的项目开发，而进行API钩取时经常使用DLL注入技术。先创建好DLL形态的钩取函数，再将其轻松注入要钩取的目标进程，这样就完成了API钩取。这灵活运用了“被注入的DLL拥有目标进程内存访问权限”这一特性。</p>
+<h4 id="其他应用程序"><a href="#其他应用程序" class="headerlink" title="其他应用程序"></a>其他应用程序</h4><p>DLL注入技术也应用于监视、管理PC用户的应用程序。</p>
+<p>比如，用来阻止特定程序（像游戏、股票交易等）运行、禁止访问有害网站，以及监视PC的使用等。管理员（或者父母）主要安装这类拦截&#x2F;阻断应用程序来管理&#x2F;监视。受管理&#x2F;监视的一方当然千方百计地想关闭这些监视程序，但由于这些监视程序采用DLL注入技术，它们可以隐藏在正常进程中运行，所以管理员一般不用担心被发现或被终止（若用户强制终止Windows系统进程，也会一并关闭系统，最后也算达成了拦截&#x2F;阻断这一目标）。</p>
+<h4 id="恶意代码"><a href="#恶意代码" class="headerlink" title="恶意代码"></a>恶意代码</h4><p>恶意代码制作者们是不会置这么好的技术于不顾的，他们积极地把DLL注入技术运用到自己制作的恶意代码中。这些人把自己编写的恶意代码隐藏到正常进程（winlogon.exe、services.exe、svchost.exe、explorer.exe等），打开后门端口（Backdoor port）、尝试从外部连接，或通过键盘偷录（Keylogging）功能将用户的个人信息盗走。只有了解恶意代码制作者们使用的手法，才能拿出相应对策。</p>
+<h3 id="DLL注入的实现方法"><a href="#DLL注入的实现方法" class="headerlink" title="DLL注入的实现方法"></a>DLL注入的实现方法</h3><p>向某个进程注入DLL时主要使用以下三种方法：</p>
+<p><strong>DLL注入方法</strong></p>
+<ul>
+<li>创建远程线程（CreateRemoteThread() API）</li>
+<li>使用注册表（AppInit_DLLs 值）</li>
+<li>消息钩取（SetWindowsHookEx() API）</li>
+</ul>
+<h3 id="CreateRemoteThread"><a href="#CreateRemoteThread" class="headerlink" title="CreateRemoteThread()"></a>CreateRemoteThread()</h3><p>本方法是《Windows核心编程》中介绍过的。本节通过一个简单的示例来演示如何通过创建远程线程完成DLL注入。</p>
+<h4 id="练习示例myhack-dll"><a href="#练习示例myhack-dll" class="headerlink" title="练习示例myhack.dll"></a>练习示例myhack.dll</h4><p>本示例将把myhack.dll注入notepad.exe进程，被注入的myhack.dll是用来联网并下载 <code>http://www.naver.com/index.html</code> 文件的。</p>
+<p>首先将练习文件（InjectDll.exe、myhack.dll）放到同一文件夹。</p>
+<p><img src="/images/image-20260902133743925.png" alt="image-20260902133743925" loading='lazy'></p>
+<p><strong>运行notepad.exe程序</strong></p>
+<p>先运行notepad.exe（日记本）程序，再运行Process Explorer（或者Windows任务管理器）获取notepad.exe进程的PID。</p>
+<p><img src="/images/image-20260902133039515.png" alt="image-20260902133039515" loading='lazy'></p>
+<p>可以看到图中notepad.exe进程的PID值为33044。</p>
+<p><strong>运行DebugView</strong></p>
+<p>DebugView是一个非常有用的实用程序，它可以用来捕获并显示系统中运行的进程输出的所有调试字符串，请访问下面URL下载。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http://technet.microsoft.com/en-us/sysinternals/bb896647</span><br></pre></td></tr></table></figure>
+
+<p>当示例中的DLL文件被成功注入notepad.exe进程时，就会输出调试字符串，此时使用DebugView即可查看。</p>
+<p><strong>myhack.dll注入</strong></p>
+<p>InjectDll.exe是用来向目标进程注入DLL文件的实用小程序（后面会详细讲解工作原理及源代码）。如图所示，打开命令窗口并输入相应参数即可运行InjectDll.exe。</p>
+<p><img src="/images/image-20260902134126118.png" alt="image-20260902134126118" loading='lazy'></p>
+<p><strong>确认DLL注入成功</strong></p>
+<p>下面要检查myhack.dll文件是否成功注入notepad.exe进程。首先查看DebugView日志，如图所示。</p>
+<p><img src="/images/image-20260902134257963.png" alt="image-20260902134257963" loading='lazy'></p>
+<p>DebugView中显示出调试字符串中，该字符串是由PID:33044进程输出的。PID:33044进程就是注入myhack.dll的notepad.exe进程。成功注入myhack.dll时，就会调用执行DllMain()函数的OutputDebugString() API。</p>
+<p>在Process Explorer中也可以看到myhack.dll已经成功注入notepad.exe进程。在Process Explorer的View菜单中，选择Show Lower Pane与Lower Pane Views - DLLs项，然后选择notepad.exe进程，就会列出所有加载到notepad.exe进程中的dll，如图所示。在图中可以看到已经成功注入notepad.exe的myhack.dll文件。</p>
+<p><img src="/images/image-20260902134745374.png" alt="image-20260902134745374" loading='lazy'></p>
+<p><strong>结果确认</strong></p>
+<p>下面确认一下指定网站的index.html文件下载是否正常。</p>
+<p><img src="/images/image-20260902134940903.png" alt="image-20260902134940903" loading='lazy'></p>
+<p>双击图中的Index.html文件，在浏览器中查看页面。</p>
+<p><img src="/images/image-20260902135122389.png" alt="image-20260902135122389" loading='lazy'></p>
+<p>就像在上述示例中看到的一样，借助创建远程线程的方法可以成功“渗透”指定进程，进而可以随意操作。下面继续分析示例源代码，进一步学习使用CreateRemoteThread() API实施DLL注入的原理与实现方法。</p>
+<h4 id="分析示例源代码"><a href="#分析示例源代码" class="headerlink" title="分析示例源代码"></a>分析示例源代码</h4><p><strong>Myhack.cpp</strong></p>
+<p>先分析一下myhack.dll源代码（myhack.cpp）。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// myhack.cpp</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;windows.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;tchar.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">pragma</span> comment(lib, <span class="string">&quot;urlmon.lib&quot;</span>)   <span class="comment">// 使用 URLDownloadToFile 需要链接 urlmon.lib</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEF_URL          (<span class="string">L&quot;http://www.naver.com/index.html&quot;</span>)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEF_FILE_NAME    (<span class="string">L&quot;index.html&quot;</span>)</span></span><br><span class="line"></span><br><span class="line">HMODULE g_hMod = <span class="literal">NULL</span>;   <span class="comment">// 保存当前 DLL 的模块句柄</span></span><br><span class="line"></span><br><span class="line"><span class="function">DWORD WINAPI <span class="title">ThreadProc</span><span class="params">(LPVOID lParam)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    TCHAR szPath[MAX_PATH] = &#123;<span class="number">0</span>,&#125;;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取当前 DLL 的完整路径</span></span><br><span class="line">    <span class="keyword">if</span>( !<span class="built_in">GetModuleFileName</span>(g_hMod, szPath, MAX_PATH) )</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 找到路径中最后一个 &#x27;\&#x27;</span></span><br><span class="line">    TCHAR *p = _tcsrchr(szPath, <span class="string">&#x27;\\&#x27;</span>);</span><br><span class="line">    <span class="keyword">if</span>( !p )</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 把 myhack.dll 改成 index.html</span></span><br><span class="line">    _tcscpy_s(p + <span class="number">1</span>, MAX_PATH, DEF_FILE_NAME);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 下载网页到 index.html</span></span><br><span class="line">    <span class="built_in">URLDownloadToFile</span>(<span class="literal">NULL</span>, DEF_URL, szPath, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function">BOOL WINAPI <span class="title">DllMain</span><span class="params">(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    HANDLE hThread = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 保存 DLL 句柄，后面用于获取 DLL 路径</span></span><br><span class="line">    g_hMod = (HMODULE)hinstDLL;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">switch</span>( fdwReason )</span><br><span class="line">    &#123;</span><br><span class="line">    <span class="keyword">case</span> DLL_PROCESS_ATTACH:</span><br><span class="line">        <span class="comment">// DLL 被加载到进程时执行</span></span><br><span class="line"></span><br><span class="line">        <span class="built_in">OutputDebugString</span>(<span class="string">L&quot;&lt;myhack.dll Injection!!!&gt;&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 创建线程执行下载逻辑</span></span><br><span class="line">        hThread = <span class="built_in">CreateThread</span>(<span class="literal">NULL</span>, <span class="number">0</span>, ThreadProc, <span class="literal">NULL</span>, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 关闭线程句柄，不是结束线程</span></span><br><span class="line">        <span class="built_in">CloseHandle</span>(hThread);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在DllMain()函数中可以看到，该DLL被加载（DLL_PROCESS_ATTACH）时，先输出一个调试字符串（“myhack.dll Injection!!!”），然后创建线程调用函数（ThreadProc）。在ThreadProc()函数中通过调用urlmon!URLDownloadToFile() API来下载指定网站的index.html文件。</p>
+<p>前面提到过，向进程注入DLL后就会调用执行该DLL的DllMain()函数。所以当myhack.dll注入notepad.exe进程后，最终会调用执行URLDownloadToFile() API。</p>
+<p><strong>InjectDll.cpp</strong></p>
+<p>InjectDll.exe程序用来将myhack.dll注入notepad.exe进程，下面看一下其源代码。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// InjectDll.cpp</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;windows.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;tchar.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function">BOOL <span class="title">InjectDll</span><span class="params">(DWORD dwPID, LPCTSTR szDllPath)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    HANDLE hProcess = <span class="literal">NULL</span>, hThread = <span class="literal">NULL</span>;</span><br><span class="line">    HMODULE hMod = <span class="literal">NULL</span>;</span><br><span class="line">    LPVOID pRemoteBuf = <span class="literal">NULL</span>;</span><br><span class="line">    DWORD dwBufSize = (DWORD)(_tcslen(szDllPath) + <span class="number">1</span>) * <span class="built_in">sizeof</span>(TCHAR);</span><br><span class="line">    LPTHREAD_START_ROUTINE pThreadProc;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// #1. 使用dwPID获取目标进程（notepad.exe）的句柄。</span></span><br><span class="line">    <span class="keyword">if</span>( !(hProcess = <span class="built_in">OpenProcess</span>(PROCESS_ALL_ACCESS, FALSE, dwPID)) )</span><br><span class="line">    &#123;</span><br><span class="line">        _tprintf(<span class="string">L&quot;OpenProcess(%d) failed!!! [%d]\n&quot;</span>, dwPID,</span><br><span class="line">                 <span class="built_in">GetLastError</span>());</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// #2. 在目标进程（notepad.exe）内存中分配szDllName大小的内存。</span></span><br><span class="line">    pRemoteBuf = <span class="built_in">VirtualAllocEx</span>(hProcess, <span class="literal">NULL</span>, dwBufSize, MEM_COMMIT,</span><br><span class="line">                                PAGE_READWRITE);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// #3. 将myhack.dll路径写入分配的内存。</span></span><br><span class="line">    <span class="built_in">WriteProcessMemory</span>(hProcess, pRemoteBuf, (LPVOID)szDllPath, dwBufSize,</span><br><span class="line">                       <span class="literal">NULL</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// #4. 获取LoadLibraryW() API的地址。</span></span><br><span class="line">    hMod = <span class="built_in">GetModuleHandle</span>(<span class="string">L&quot;kernel32.dll&quot;</span>);</span><br><span class="line">    pThreadProc = (LPTHREAD_START_ROUTINE)<span class="built_in">GetProcAddress</span>(hMod,</span><br><span class="line">                                                         <span class="string">&quot;LoadLibraryW&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// #5. 在notepad.exe中运行线程。</span></span><br><span class="line">    hThread = <span class="built_in">CreateRemoteThread</span>(hProcess,    <span class="comment">// hProcess</span></span><br><span class="line">                                 <span class="literal">NULL</span>,        <span class="comment">// lpThreadAttributes</span></span><br><span class="line">                                 <span class="number">0</span>,           <span class="comment">// dwStackSize</span></span><br><span class="line">                                 pThreadProc, <span class="comment">// lpStartAddress</span></span><br><span class="line">                                 pRemoteBuf,  <span class="comment">// lpParameter</span></span><br><span class="line">                                 <span class="number">0</span>,           <span class="comment">// dwCreationFlags</span></span><br><span class="line">                                 <span class="literal">NULL</span>);       <span class="comment">// lpThreadId</span></span><br><span class="line"></span><br><span class="line">    <span class="built_in">WaitForSingleObject</span>(hThread, INFINITE);</span><br><span class="line">    <span class="built_in">CloseHandle</span>(hThread);</span><br><span class="line">    <span class="built_in">CloseHandle</span>(hProcess);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> _tmain(<span class="type">int</span> argc, TCHAR *argv[])</span><br><span class="line">&#123;</span><br><span class="line">    <span class="keyword">if</span>( argc != <span class="number">3</span> )</span><br><span class="line">    &#123;</span><br><span class="line">        _tprintf(<span class="string">L&quot;USAGE : %s pid dll_path\n&quot;</span>, argv[<span class="number">0</span>]);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// inject dll</span></span><br><span class="line">    <span class="keyword">if</span>( <span class="built_in">InjectDll</span>((DWORD)_tstol(argv[<span class="number">1</span>]), argv[<span class="number">2</span>]) )</span><br><span class="line">        _tprintf(<span class="string">L&quot;InjectDll(\&quot;%s\&quot;) success!!!\n&quot;</span>, argv[<span class="number">2</span>]);</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        _tprintf(<span class="string">L&quot;InjectDll(\&quot;%s\&quot;) failed!!!\n&quot;</span>, argv[<span class="number">2</span>]);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>main()函数的主要功能是检查输入程序的参数，然后调用InjectDll()函数。InjectDll()函数是用来实施DLL注入的核心函数，其功能是命令目标进程（notepad.exe）自行调用LoadLibrary(“myhack.dll”) API。下面逐行详细查看InjectDll()函数。</p>
+<h5 id="获取目标进程句柄"><a href="#获取目标进程句柄" class="headerlink" title="获取目标进程句柄"></a><strong>获取目标进程句柄</strong></h5><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hProcess = <span class="built_in">OpenProcess</span>(PROCESS_ALL_ACCESS, FALSE, dwPID)</span><br></pre></td></tr></table></figure>
+
+<p>调用 <code>OpenProcess()</code> API，借助程序运行时以参数形式传递过来的 <code>dwPID</code> 值，获取 <code>notepad.exe</code> 进程的句柄（<code>PROCESS_ALL_ACCESS</code> 权限）。获得 <code>PROCESS_ALL_ACCESS</code> 权限后，就可以使用获取的句柄（<code>hProcess</code>）控制对应进程（<code>notepad.exe</code>）。</p>
+<p><strong>OpenProcess 函数</strong>用于打开现有的本地进程对象。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">HANDLE <span class="title">OpenProcess</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function"> DWORD dwDesiredAccess, <span class="comment">// 访问权限</span></span></span></span><br><span class="line"><span class="params"><span class="function"> BOOL bInheritHandle, <span class="comment">// 是否继承句柄</span></span></span></span><br><span class="line"><span class="params"><span class="function"> DWORD dwProcessId <span class="comment">// 目标进程的 PID</span></span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数说明</p>
+<ul>
+<li><strong>dwDesiredAccess</strong>: 指定对目标进程的访问权限。常见权限包括： PROCESS_ALL_ACCESS: 获取所有权限。 PROCESS_TERMINATE: 终止进程的权限。 PROCESS_VM_READ: 读取进程内存的权限。 PROCESS_VM_WRITE: 写入进程内存的权限。 PROCESS_QUERY_INFORMATION: 查询进程信息的权限。 PROCESS_CREATE_THREAD: 创建线程的权限。</li>
+<li><strong>bInheritHandle</strong>: 指定句柄是否可以被子进程继承。<em>TRUE</em> 表示可以继承，<em>FALSE</em> 表示不能继承。</li>
+<li><strong>dwProcessId</strong>: 要打开的目标进程的进程 ID (PID)。可以通过 <em>EnumProcesses</em> 或 <em>GetCurrentProcessId</em> 获取。</li>
+</ul>
+<p>返回值</p>
+<ul>
+<li>成功时，返回目标进程的句柄。</li>
+<li>失败时，返回 <em>NULL</em>，可通过 <em>GetLastError</em> 获取错误代码。</li>
+</ul>
+<h5 id="将要注入的-DLL-路径写入目标进程内存"><a href="#将要注入的-DLL-路径写入目标进程内存" class="headerlink" title="将要注入的 DLL 路径写入目标进程内存"></a><strong>将要注入的 DLL 路径写入目标进程内存</strong></h5><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">pRemoteBuf = <span class="built_in">VirtualAllocEx</span>(hProcess, <span class="literal">NULL</span>, dwBufSize, MEM_COMMIT,</span><br><span class="line">                            PAGE_READWRITE);</span><br></pre></td></tr></table></figure>
+
+<p>需要把即将加载的 DLL 文件的路径（字符串）告知目标进程（<code>notepad.exe</code>）。</p>
+<p>因为任何内存空间都无法进行写入操作，故先使用 <code>VirtualAllocEx()</code> API 在目标进程（<code>notepad.exe</code>）的内存空间中分配一块缓冲区，且指定该缓冲区的大小为 DLL 文件路径字符串的长度（含 <code>Terminating NULL</code>）即可。</p>
+<p><strong>VirtualAllocEx 函数</strong> 用于保留、提交或更改指定进程的虚拟地址空间中内存区域的状态。 它特别适用于需要给其他进程分配内存的场景。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">LPVOID <span class="title">VirtualAllocEx</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">  [in]           HANDLE hProcess,</span></span></span><br><span class="line"><span class="params"><span class="function">  [in, optional] LPVOID lpAddress,</span></span></span><br><span class="line"><span class="params"><span class="function">  [in]           SIZE_T dwSize,</span></span></span><br><span class="line"><span class="params"><span class="function">  [in]           DWORD  flAllocationType,</span></span></span><br><span class="line"><span class="params"><span class="function">  [in]           DWORD  flProtect</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>参数说明</p>
+<ul>
+<li><p><strong>hProcess</strong> :目标进程的句柄。调用该函数时，这个句柄需要具有：PROCESS_VM_OPERATION权限,也就是说,你必须先通过类似下面的方式打开目标进程**OpenProcess(PROCESS_VM_OPERATION, …);**当然我们已经有了所有权限</p>
+</li>
+<li><p><strong>lpAddress</strong> : 期望分配内存的起始地址。若传入<strong>NULL</strong>,则由系统自动选择合适的地址。</p>
+</li>
+<li><p><strong>dwSize</strong> : 要分配的内存大小，单位是字节。例如要写入 DLL 路径：C:\work\myhack.dll,那么 <code>dwSize</code> 就应该是这个字符串长度加上结尾的 <code>\0</code>。</p>
+</li>
+<li><p><strong>flAllocationType</strong> : 指定内存分配类型。常见取值有：<strong>MEM_COMMIT</strong>,提交内存，为这块虚拟内存分配实际可用的存储空间。<strong>MEM_RESERVE</strong>,保留一段虚拟地址空间，但暂时不分配实际物理存储。</p>
+</li>
+<li><p><strong>flProtect</strong> : 指定内存保护属性。就是可读可写可执行。</p>
+</li>
+</ul>
+<p>返回值</p>
+<ul>
+<li><strong>成功时</strong>，返回分配到的内存区域的基地址。注意是目标进程中的内存地址,而不是当前进程自己的地址。</li>
+<li><strong>失败时</strong>,返回NULL。</li>
+</ul>
+<p><strong>提示</strong></p>
+<p><code>VirtualAllocEx()</code> 函数的返回值（<code>pRemoteBuf</code>）为分配所得缓冲区的地址。该地址并不是程序（<code>Inject.exe</code>）的虚拟内存地址，而是 <code>hProcess</code> 句柄所指目标进程（<code>notepad.exe</code>）的内存地址，请务必牢记这一点。</p>
+<p>再来看</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">WriteProcessMemory</span>(hProcess, pRemoteBuf, (LPVOID)szDllName, dwBufSize, <span class="literal">NULL</span>);</span><br></pre></td></tr></table></figure>
+
+<p>使用 <code>WriteProcessMemory()</code> API 将 DLL 路径字符串（<code>C:\work\dummy.dll</code>）写入分配所得缓冲区（<code>pRemoteBuf</code>）地址。<code>WriteProcessMemory()</code> API 所写的内存空间也是 <code>hProcess</code> 句柄所指的目标进程（<code>notepad.exe</code>）的内存空间。这样，要注入的 DLL 文件的路径就被写入目标进程（<code>notepad.exe</code>）的内存空间。</p>
+<p><strong>调试 API</strong></p>
+<p>Windows 操作系统提供了调试 API，借助它们可以访问其他进程的内存空间。其中具有代表性的有 <code>VirtualAllocEx()</code>、<code>VirtualFreeEx()</code>、<code>WriteProcessMemory()</code>、<code>ReadProcessMemory()</code> 等。</p>
+<h5 id="获取-LoadLibraryW-API-地址"><a href="#获取-LoadLibraryW-API-地址" class="headerlink" title="获取 LoadLibraryW() API 地址"></a><strong>获取 LoadLibraryW() API 地址</strong></h5><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hMod = <span class="built_in">GetModuleHandle</span>(<span class="string">L&quot;kernel32.dll&quot;</span>);</span><br><span class="line">pThreadProc = (LPTHREAD_START_ROUTINE)<span class="built_in">GetProcAddress</span>(hMod, <span class="string">&quot;LoadLibraryW&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>最重要的是理解好以上代码的含义。</p>
+<p>我们的目标明明是获取加载到 <code>notepad.exe</code> 进程的 <code>kernel32.dll</code> 的 <code>LoadLibraryW()</code> API 起始地址，但上面的代码却用来获取加载到 <code>InjectDll.exe</code> 进程的 <code>kernel32.dll</code> 的 <code>LoadLibraryW()</code> API 的起始地址。</p>
+<p>如果加载到 <code>notepad.exe</code> 进程中的 <code>kernel32.dll</code> 地址与加载到 <code>InjectDll.exe</code> 进程中的 <code>kernel32.dll</code> 地址相同，那么上面的代码就不会有什么问题。</p>
+<p>但是如果 <code>kernel32.dll</code> 在每个进程中加载的地址都不同，那么上面的代码就错了，执行时会发生内存引用错误。</p>
+<p>其实在 Windows 系统中，<code>kernel32.dll</code> 在每个进程中的加载地址都是相同的。</p>
+<p>《Windows核心编程》一书中对此进行了介绍，此后这一特性被广泛应用于 DLL 注入技术。</p>
+<p><strong>提示</strong></p>
+<p>根据 OS 类型、语言、版本不同，<code>kernel32.dll</code> 加载的地址也不同。并且 Vista&#x2F;7 中启用了新的 ASLR 功能，每次启动时，系统 DLL 加载的地址都会改变。但是在系统运行期间它都不会被映射（Mapping）到每个进程的相同地址。Windows 操作系统中，DLL 首次注入内存称为“加载”（Loading），以后其他进程需要使用相同 DLL 时不必再次加载，只要将加载过的 DLL 代码与资源映射一下即可，这种映射技术有利于提高内存的使用效率。</p>
+<p>像上面这样，OS 核心 DLL 会被加载到自身固有的地址，DLL 注入利用的就是 Windows OS 的这一特性（该特性也可能会被恶意使用，成为 Windows 安全漏洞）。所以，导入 <code>InjectDll.exe</code> 进程中的 <code>LoadLibraryW()</code> 地址与导入 <code>notepad.exe</code> 进程中的 <code>LoadLibraryW()</code> 地址是相同的。</p>
+<p><strong>提示</strong></p>
+<p>一般而言，DLL 文件的 <code>ImageBase</code> 默认为 <code>0x10000000</code>。依次加载 <code>a.dll</code> 与 <code>b.dll</code> 时，先加载的 <code>a.dll</code> 被正常加载到 <code>0x10000000</code> 地址处，后加载的 <code>b.dll</code> 无法再被加载到此，而是加载到其他空白地址空间，也就是说，该过程中发生了 DLL 重定位（因为 <code>a.dll</code> 已经先加载到它默认的地址处）。</p>
+<p>若 <code>kernel32.dll</code> 加载到各个进程的地址不同，那么上述代码肯定是错误的。但实际上 Windows 操作系统中，<code>kernel32.dll</code> 不管在哪个进程都会被加载至相同地址。为什么会这样呢？我借助 PEView 软件查看了 Windows 操作系统的核心 DLL 文件的 <code>ImageBase</code> 值，罗列如下表（Windows XP SP3 版本，根据 Windows 更新不同，各值会有所变化）。</p>
+<table>
+<thead>
+<tr>
+<th>DLL 文件</th>
+<th>ImageBase</th>
+<th>SizeOfImage</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>msvcrt.dll</td>
+<td>77BC0000</td>
+<td>00058000</td>
+</tr>
+<tr>
+<td>user32.dll</td>
+<td>77CF0000</td>
+<td>00090000</td>
+</tr>
+<tr>
+<td>gdi32.dll</td>
+<td>77E20000</td>
+<td>00049000</td>
+</tr>
+<tr>
+<td>advapi32.dll</td>
+<td>77F50000</td>
+<td>000A8000</td>
+</tr>
+<tr>
+<td>kernel32.dll</td>
+<td>7C7D0000</td>
+<td>0013D000</td>
+</tr>
+<tr>
+<td>shell32.dll</td>
+<td>7D5A0000</td>
+<td>007FD000</td>
+</tr>
+<tr>
+<td>……</td>
+<td>……</td>
+<td>……</td>
+</tr>
+</tbody></table>
+<p>微软整理了一份 OS 核心 DLL 文件的 <code>ImageBase</code> 值，防止各 DLL 文件加载时出现区域重合，这样加载 DLL 就不会发生 DLL 重定位了。</p>
+<h5 id="在目标进程中运行远程线程（Remote-Thread）"><a href="#在目标进程中运行远程线程（Remote-Thread）" class="headerlink" title="在目标进程中运行远程线程（Remote Thread）"></a>在目标进程中运行远程线程（Remote Thread）</h5><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">hThread = <span class="built_in">CreateRemoteThread</span>(hProcess, <span class="literal">NULL</span>, <span class="number">0</span>, pThreadProc, pRemoteBuf, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br><span class="line">pThreadProc = notepad.exe进程内存中的<span class="built_in">LoadLibraryW</span>()地址</span><br><span class="line">pRemoteBuf = notepad.exe进程内存中的 <span class="string">&quot;C:\work\myhack.dll&quot;</span> 字符串地址</span><br></pre></td></tr></table></figure>
+
+<p>一切准备就绪后，最后向 <code>notepad.exe</code> 发送一个命令，让其调用 <code>LoadLibraryW()</code> API 函数加载指定的 DLL 文件即可，遗憾的是 Windows 并未直接提供执行这一个命令的 API。但是我们可以另辟蹊径，使用 <code>CreateRemoteThread()</code> 这个 API（在 DLL 注入时几乎总会用到）。</p>
+<p><code>CreateRemoteThread()</code> API 用来在目标进程中执行其创建出的线程，其函数原型如下：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">HANDLE WINAPI <span class="title">CreateRemoteThread</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    __in   HANDLE                 hProcess,          <span class="comment">// 目标进程的句柄</span></span></span></span><br><span class="line"><span class="params"><span class="function">    __in   LPSECURITY_ATTRIBUTES  lpThreadAttributes,</span></span></span><br><span class="line"><span class="params"><span class="function">    __in   SIZE_T                 dwStackSize,</span></span></span><br><span class="line"><span class="params"><span class="function">    __in   LPTHREAD_START_ROUTINE lpStartAddress,    <span class="comment">// 线程函数地址</span></span></span></span><br><span class="line"><span class="params"><span class="function">    __in   LPVOID                 lpParameter,       <span class="comment">// 线程参数地址</span></span></span></span><br><span class="line"><span class="params"><span class="function">    __in   DWORD                  dwCreationFlags,</span></span></span><br><span class="line"><span class="params"><span class="function">    __out  LPDWORD                lpThreadId</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p>除第一个参数 <code>hProcess</code> 外，其他参数与 <code>CreateThread()</code> 函数完全一样。<code>hProcess</code> 参数是要执行线程的目标进程（或称“远程进程”、“宿主进程”）的句柄。<code>lpStartAddress</code> 与 <code>lpParameter</code> 参数分别给出线程函数地址与线程参数地址。需要注意的是，这 2 个地址都应该在目标进程虚拟内存空间中（这样目标进程才能认识它们）。</p>
+<p>初次接触 DLL 注入技术的读者朋友可能会头昏脑胀、不知所云。本来想向其他进程注入 DLL 文件，这里为何突然出现线程运行函数呢？仔细观察线程函数 <code>ThreadProc()</code> 与 <code>LoadLibrary()</code> API，可以从中得到一些启示。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">DWORD WINAPI <span class="title">ThreadProc</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    __in  LPVOID lpParameter</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="function">HMODULE WINAPI <span class="title">LoadLibrary</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    __in  LPCTSTR lpFileName</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>两函数都有一个 4 字节的参数，并返回一个 4 字节的值。也就是说，二者形态结构完全一样，灵感即源于此。调用 <code>CreateRemoteThread()</code> 时，只要将 <code>LoadLibrary()</code> 函数的地址传递给第四个参数 <code>lpStartAddress</code>，把要注入的 DLL 的路径字符串地址传递给第五个参数 <code>lpParameter</code> 即可（必须是目标进程的虚拟内存空间中的地址）。由于前面已经做好了一切准备，现在调用该函数使目标进程加载指定的 DLL 文件就行了。</p>
+<p>其实，<code>CreateRemoteThread()</code> 函数最主要的功能就是驱使目标进程调用 <code>LoadLibrary()</code> 函数，进而加载指定的 DLL 文件了。</p>
+<h4 id="调试方法"><a href="#调试方法" class="headerlink" title="调试方法"></a>调试方法</h4><p>本节将介绍如何从 DLL 文件注入目标进程就开始调试。首先重新运行 <code>notepad.exe</code>，然后使用 Dbg 的 Attach 命令附加新生成的 <code>notepad.exe</code> 进程。</p>
+<p>在 Option 对话框的 Events 中复选 “用户DLL入口” 一项。</p>
+<p><img src="/images/image-20260902150525009.png" alt="image-20260902150525009" loading='lazy'></p>
+<p>这样一来，每当有新的 DLL 被加载到 <code>notepad.exe</code> 进程，都会在该 DLL 的 EP 处暂停。同样，进行 DLL 注入时也会在该 DLL 的 EP 处暂停。使用 <code>InjectDll.exe</code> 将 <code>myhack.dll</code> 文件注入 <code>notepad.exe</code> 进程</p>
+<p><img src="/images/image-20260902162401218.png" alt="image-20260902162401218" loading='lazy'></p>
+<p>此时调试器暂停，如图所示。</p>
+<p><img src="/images/image-20260902162456026.png" alt="image-20260902162456026" loading='lazy'></p>
+<p>但10000000还只是myhack.dll 的 PE 文件头,看4D 5A就知道了,F9运行一次</p>
+<p><img src="/images/image-20260902164543973.png" alt="image-20260902164543973" loading='lazy'></p>
+<p>EIP即为myhack.dll的EP</p>
+<p>至此，对于使用 CreateRemoteThread() 函数进行 DLL 注入技术的讲解就完成了。初学时可能不怎么理解，反复认真阅读前面的讲解，实际动手操作，就较容易掌握。</p>
+<h3 id="AppInit-DLLs"><a href="#AppInit-DLLs" class="headerlink" title="AppInit_DLLs"></a>AppInit_DLLs</h3><p>这里我就贴原著的图了,虽然步骤不多,但怕改错了xD</p>
+<p>进行 DLL 注入的第二种方法是使用注册表。Windows 操作系统的注册表中默认提供了 AppInit_DLLs 与 LoadAppInit_DLLs 两个注册表项，如图所示。</p>
+<p><img src="/images/image-20260902165454361.png" alt="image-20260902165454361" loading='lazy'></p>
+<p>在注册表编辑器中，将要注入的 DLL 的路径字符串写入 AppInit_DLLs 项中，然后把 LoadAppInit_DLLs 的项目值设置为 1。重启后，指定 DLL 会注入所有运行进程。该方法操作非常简单，但功能相当强大。</p>
+<p><strong>提示</strong></p>
+<p>上述方法的工作原理是，User32.dll 被加载到进程时，会读取 AppInit_DLLs 注册表项，若有值，则调用 LoadLibrary() API 加载用户 DLL。所以，严格地说，相应 DLL 并不会被加载到所有进程，而只是加载至加载 user32.dll 的进程。请注意，Windows XP 会忽略 LoadAppInit_DLLs 注册表项。</p>
+<h4 id="分析示例源码"><a href="#分析示例源码" class="headerlink" title="分析示例源码"></a>分析示例源码</h4><p><strong>myhack2.cpp</strong></p>
+<p>下面分析一下 myhack2.dll 的源代码（myhack2.cpp）。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// myhack2.cpp</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;windows.h&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&quot;tchar.h&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEF_CMD       <span class="string">L&quot;c:\\Program Files\\Internet Explorer\\iexplore.exe&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEF_ADDR      <span class="string">L&quot;http://www.naver.com&quot;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEF_DST_PROC  <span class="string">L&quot;notepad.exe&quot;</span></span></span><br><span class="line"></span><br><span class="line"><span class="function">BOOL WINAPI <span class="title">DllMain</span><span class="params">(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID</span></span></span><br><span class="line"><span class="params"><span class="function">                    lpvReserved)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    TCHAR szCmd[MAX_PATH] = &#123;<span class="number">0</span>,&#125;;</span><br><span class="line">    TCHAR szPath[MAX_PATH] = &#123;<span class="number">0</span>,&#125;;</span><br><span class="line">    TCHAR *p = <span class="literal">NULL</span>;</span><br><span class="line">    STARTUPINFO si = &#123;<span class="number">0</span>,&#125;;</span><br><span class="line">    PROCESS_INFORMATION pi = &#123;<span class="number">0</span>,&#125;;</span><br><span class="line"></span><br><span class="line">    si.cb = <span class="built_in">sizeof</span>(STARTUPINFO);</span><br><span class="line">    si.dwFlags = STARTF_USESHOWWINDOW;</span><br><span class="line">    si.wShowWindow = SW_HIDE;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">switch</span>( fdwReason )</span><br><span class="line">    &#123;</span><br><span class="line">    <span class="keyword">case</span> DLL_PROCESS_ATTACH :</span><br><span class="line">        <span class="keyword">if</span>( !<span class="built_in">GetModuleFileName</span>( <span class="literal">NULL</span>, szPath, MAX_PATH ) )</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>( !(p = _tcsrchr(szPath, <span class="string">&#x27;\\&#x27;</span>)) )</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>( _tcsicmp(p<span class="number">+1</span>, DEF_DST_PROC) )</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="built_in">wsprintf</span>(szCmd, <span class="string">L&quot;%s %s&quot;</span>, DEF_CMD, DEF_ADDR);</span><br><span class="line">        <span class="keyword">if</span>( !<span class="built_in">CreateProcess</span>(<span class="literal">NULL</span>, (LPTSTR)(LPCTSTR)szCmd,</span><br><span class="line">                            <span class="literal">NULL</span>, <span class="literal">NULL</span>, FALSE,</span><br><span class="line">                            NORMAL_PRIORITY_CLASS,</span><br><span class="line">                            <span class="literal">NULL</span>, <span class="literal">NULL</span>, &amp;si, &amp;pi) )</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span>( pi.hProcess != <span class="literal">NULL</span> )</span><br><span class="line">            <span class="built_in">CloseHandle</span>(pi.hProcess);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>myhack2.dll 的源代码非常简单，若当前加载自己的进程为 “notepad.exe”，则以隐藏模式运行 IE，连接指定网站。这样就可以根据不同目的执行多种任务了。</p>
+<h4 id="练习示例-myhack2-dll"><a href="#练习示例-myhack2-dll" class="headerlink" title="练习示例 myhack2.dll"></a>练习示例 myhack2.dll</h4><p>下面使用修改注册表项的方法做个 DLL 注入练习，注意操作顺序。</p>
+<p><strong>复制文件</strong></p>
+<p>首先将要注入的 DLL 文件（myhack2.dll）复制到合适位置（在我电脑中的位置为 <code>C:\work\myhack2.dll</code>）</p>
+<p><strong>修改注册表项</strong></p>
+<p>运行注册表编辑器 regedit.exe，进入如下路径。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Windows</span><br></pre></td></tr></table></figure>
+
+<p>编辑修改 AppInit_DLLs 表项的值</p>
+<p><img src="/images/image-20260902170204867.png" alt="image-20260902170204867" loading='lazy'></p>
+<p>然后修改 LoadAppInit_DLLs 注册表项的值为 1</p>
+<p><img src="/images/image-20260902170244988.png" alt="image-20260902170244988" loading='lazy'></p>
+<p><strong>重启系统</strong></p>
+<p>注册表项修改完毕后，重启系统，使修改生效。系统重启完成后，使用 Process Explorer 查看 <code>myhack2.dll</code> 是否被注入所有（加载 <code>user32.dll</code> 的）进程。</p>
+<p><img src="/images/image-20260902185312204.png" alt="image-20260902185312204" loading='lazy'></p>
+<p>从下图可以看到，<code>myhack2.dll</code> 成功注入所有加载 <code>user32.dll</code> 的进程。但由于它的目标进程仅是 <code>notepad.exe</code> 进程，所以在其他进程中不会执行任何动作。运行 <code>notepad.exe</code>，可以看到 IE 被（以隐藏模式）执行，如下图所示。</p>
+<p><img src="/images/image-20260902185256169.png" alt="image-20260902185256169" loading='lazy'></p>
+<p><strong>提示</strong></p>
+<p><code>AppInit_DLLs</code> 注册表键非常强大，通过它几乎可以向所有进程注入 DLL 文件。若被注入的 DLL 出现问题（Bug），则有可能导致 Windows 无法正常启动，所以修改该 <code>AppInit_DLLs</code> 前务必慎重。</p>
+<h3 id="SetWindowsHookEx-1"><a href="#SetWindowsHookEx-1" class="headerlink" title="SetWindowsHookEx()"></a>SetWindowsHookEx()</h3><p>注入 DLL 的第三个方法就是消息钩取，即用 <code>SetWindowsHookEx()</code> API 安装消息“钩子”，然后由 OS 将指定 DLL（含有“钩子”过程）强制注入相应（带窗口的）进程。其工作原理与使用方法在上述已有详细讲解。</p>
+<h2 id="DLL卸载"><a href="#DLL卸载" class="headerlink" title="DLL卸载"></a>DLL卸载</h2><p>DLL卸载（DLL Ejection）是将强制插入进程的DLL弹出的一种技术，其基本工作原理与使用<code>CreateRemoteThread</code> API 进行 DLL 注入的原理类似。</p>
+<h3 id="DLL-卸载的工作原理"><a href="#DLL-卸载的工作原理" class="headerlink" title="DLL 卸载的工作原理"></a>DLL 卸载的工作原理</h3><p>前面我们学习过使用 <code>CreateRemoteThread()</code> API 进行 DLL 注入的工作原理，概括如下：</p>
+<blockquote>
+<p>驱使目标进程调用 <code>LoadLibrary()</code> API</p>
+</blockquote>
+<p>同样，DLL 卸载工作原理也非常简单：</p>
+<blockquote>
+<p>驱使目标进程调用 <code>FreeLibrary()</code> API</p>
+</blockquote>
+<p>也就是说，将 <code>FreeLibrary()</code> API 的地址传递给 <code>CreateRemoteThread()</code> 的 <code>lpStartAddress</code> 参数，并把要卸载的 DLL 的句柄传递给 <code>lpParameter</code> 参数。</p>
+<p><strong>提示</strong></p>
+<p>每个 Windows 内核对象（Kernel Object）都拥有一个引用计数（Reference Count），代表对象被使用的次数。调用 10 次 <code>LoadLibrary(&quot;a.dll&quot;)</code>，<code>a.dll</code> 的引用计数就变为 10，卸载 <code>a.dll</code> 时同样需要调用 10 次 <code>FreeLibrary()</code>。每调用一次 <code>LoadLibrary()</code>，引用计数会加 1；每调用一次 <code>FreeLibrary()</code>，引用计数会减 1。因此，卸载 DLL 时要充分考虑好“引用计数”这个因素。</p>
+<h3 id="实现-DLL-卸载"><a href="#实现-DLL-卸载" class="headerlink" title="实现 DLL 卸载"></a>实现 DLL 卸载</h3><p>首先分析一下 <code>EjectDll.exe</code> 程序，它用来从目标进程（<code>notepad.exe</code>）卸载指定的 DLL 文件（<code>myhack.dll</code>，已注入目标进程），程序源代码（<code>EjectDll.cpp</code>）如下所示。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br><span class="line">155</span><br><span class="line">156</span><br><span class="line">157</span><br><span class="line">158</span><br><span class="line">159</span><br><span class="line">160</span><br><span class="line">161</span><br><span class="line">162</span><br><span class="line">163</span><br><span class="line">164</span><br><span class="line">165</span><br><span class="line">166</span><br><span class="line">167</span><br><span class="line">168</span><br><span class="line">169</span><br><span class="line">170</span><br><span class="line">171</span><br><span class="line">172</span><br><span class="line">173</span><br><span class="line">174</span><br><span class="line">175</span><br><span class="line">176</span><br><span class="line">177</span><br><span class="line">178</span><br><span class="line">179</span><br><span class="line">180</span><br><span class="line">181</span><br><span class="line">182</span><br><span class="line">183</span><br><span class="line">184</span><br><span class="line">185</span><br><span class="line">186</span><br><span class="line">187</span><br><span class="line">188</span><br><span class="line">189</span><br><span class="line">190</span><br><span class="line">191</span><br><span class="line">192</span><br><span class="line">193</span><br><span class="line">194</span><br><span class="line">195</span><br><span class="line">196</span><br><span class="line">197</span><br><span class="line">198</span><br><span class="line">199</span><br><span class="line">200</span><br><span class="line">201</span><br><span class="line">202</span><br><span class="line">203</span><br><span class="line">204</span><br><span class="line">205</span><br><span class="line">206</span><br><span class="line">207</span><br><span class="line">208</span><br><span class="line">209</span><br><span class="line">210</span><br><span class="line">211</span><br><span class="line">212</span><br><span class="line">213</span><br><span class="line">214</span><br><span class="line">215</span><br><span class="line">216</span><br><span class="line">217</span><br><span class="line">218</span><br><span class="line">219</span><br><span class="line">220</span><br><span class="line">221</span><br><span class="line">222</span><br><span class="line">223</span><br><span class="line">224</span><br><span class="line">225</span><br><span class="line">226</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// EjectDll.cpp</span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;windows.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;tlhelp32.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;tchar.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="keyword">include</span> <span class="string">&lt;stdio.h&gt;</span></span></span><br><span class="line"></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEF_PROC_NAME  (<span class="string">L&quot;notepad.exe&quot;</span>)</span></span><br><span class="line"><span class="meta">#<span class="keyword">define</span> DEF_DLL_NAME   (<span class="string">L&quot;myhack.dll&quot;</span>)</span></span><br><span class="line"></span><br><span class="line"><span class="comment">// 根据进程名查找 PID</span></span><br><span class="line"><span class="function">DWORD <span class="title">FindProcessID</span><span class="params">(LPCTSTR szProcessName)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    DWORD dwPID = <span class="number">0xFFFFFFFF</span>;</span><br><span class="line">    HANDLE hSnapShot = INVALID_HANDLE_VALUE;</span><br><span class="line">    PROCESSENTRY32 pe = &#123; <span class="number">0</span> &#125;;</span><br><span class="line"></span><br><span class="line">    pe.dwSize = <span class="built_in">sizeof</span>(PROCESSENTRY32);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取系统进程快照</span></span><br><span class="line">    hSnapShot = <span class="built_in">CreateToolhelp32Snapshot</span>(TH32CS_SNAPPROCESS, <span class="number">0</span>);</span><br><span class="line">    <span class="keyword">if</span> (hSnapShot == INVALID_HANDLE_VALUE)</span><br><span class="line">        <span class="keyword">return</span> dwPID;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 遍历进程</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">Process32First</span>(hSnapShot, &amp;pe))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="keyword">do</span></span><br><span class="line">        &#123;</span><br><span class="line">            <span class="keyword">if</span> (!_tcsicmp(szProcessName, pe.szExeFile))</span><br><span class="line">            &#123;</span><br><span class="line">                dwPID = pe.th32ProcessID;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">while</span> (<span class="built_in">Process32Next</span>(hSnapShot, &amp;pe));</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">CloseHandle</span>(hSnapShot);</span><br><span class="line">    <span class="keyword">return</span> dwPID;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 开启指定权限，例如 SeDebugPrivilege</span></span><br><span class="line"><span class="function">BOOL <span class="title">SetPrivilege</span><span class="params">(LPCTSTR lpszPrivilege, BOOL bEnablePrivilege)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    TOKEN_PRIVILEGES tp;</span><br><span class="line">    HANDLE hToken = <span class="literal">NULL</span>;</span><br><span class="line">    LUID luid;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打开当前进程的访问令牌</span></span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">OpenProcessToken</span>(<span class="built_in">GetCurrentProcess</span>(),</span><br><span class="line">        TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY,</span><br><span class="line">        &amp;hToken))</span><br><span class="line">    &#123;</span><br><span class="line">        _tprintf(<span class="string">L&quot;OpenProcessToken error: %u\n&quot;</span>, <span class="built_in">GetLastError</span>());</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取权限对应的 LUID</span></span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">LookupPrivilegeValue</span>(<span class="literal">NULL</span>, lpszPrivilege, &amp;luid))</span><br><span class="line">    &#123;</span><br><span class="line">        _tprintf(<span class="string">L&quot;LookupPrivilegeValue error: %u\n&quot;</span>, <span class="built_in">GetLastError</span>());</span><br><span class="line">        <span class="built_in">CloseHandle</span>(hToken);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    tp.PrivilegeCount = <span class="number">1</span>;</span><br><span class="line">    tp.Privileges[<span class="number">0</span>].Luid = luid;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (bEnablePrivilege)</span><br><span class="line">        tp.Privileges[<span class="number">0</span>].Attributes = SE_PRIVILEGE_ENABLED;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">        tp.Privileges[<span class="number">0</span>].Attributes = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 调整当前进程权限</span></span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">AdjustTokenPrivileges</span>(hToken,</span><br><span class="line">        FALSE,</span><br><span class="line">        &amp;tp,</span><br><span class="line">        <span class="built_in">sizeof</span>(TOKEN_PRIVILEGES),</span><br><span class="line">        <span class="literal">NULL</span>,</span><br><span class="line">        <span class="literal">NULL</span>))</span><br><span class="line">    &#123;</span><br><span class="line">        _tprintf(<span class="string">L&quot;AdjustTokenPrivileges error: %u\n&quot;</span>, <span class="built_in">GetLastError</span>());</span><br><span class="line">        <span class="built_in">CloseHandle</span>(hToken);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">GetLastError</span>() == ERROR_NOT_ALL_ASSIGNED)</span><br><span class="line">    &#123;</span><br><span class="line">        _tprintf(<span class="string">L&quot;The token does not have the specified privilege.\n&quot;</span>);</span><br><span class="line">        <span class="built_in">CloseHandle</span>(hToken);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">CloseHandle</span>(hToken);</span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 从指定 PID 的进程中卸载指定 DLL</span></span><br><span class="line"><span class="function">BOOL <span class="title">EjectDll</span><span class="params">(DWORD dwPID, LPCTSTR szDllName)</span></span></span><br><span class="line"><span class="function"></span>&#123;</span><br><span class="line">    BOOL bMore = FALSE;</span><br><span class="line">    BOOL bFound = FALSE;</span><br><span class="line"></span><br><span class="line">    HANDLE hSnapshot = INVALID_HANDLE_VALUE;</span><br><span class="line">    HANDLE hProcess = <span class="literal">NULL</span>;</span><br><span class="line">    HANDLE hThread = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    HMODULE hKernel32 = <span class="literal">NULL</span>;</span><br><span class="line">    MODULEENTRY32 me = &#123; <span class="number">0</span> &#125;;</span><br><span class="line">    LPTHREAD_START_ROUTINE pThreadProc = <span class="literal">NULL</span>;</span><br><span class="line"></span><br><span class="line">    me.dwSize = <span class="built_in">sizeof</span>(MODULEENTRY32);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取目标进程中加载的模块快照</span></span><br><span class="line">    hSnapshot = <span class="built_in">CreateToolhelp32Snapshot</span>(TH32CS_SNAPMODULE, dwPID);</span><br><span class="line">    <span class="keyword">if</span> (hSnapshot == INVALID_HANDLE_VALUE)</span><br><span class="line">    &#123;</span><br><span class="line">        _tprintf(<span class="string">L&quot;CreateToolhelp32Snapshot failed! [%u]\n&quot;</span>, <span class="built_in">GetLastError</span>());</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 遍历目标进程中的 DLL 模块</span></span><br><span class="line">    bMore = <span class="built_in">Module32First</span>(hSnapshot, &amp;me);</span><br><span class="line">    <span class="keyword">for</span> (; bMore; bMore = <span class="built_in">Module32Next</span>(hSnapshot, &amp;me))</span><br><span class="line">    &#123;</span><br><span class="line">        <span class="comment">// 比较模块名或者完整路径</span></span><br><span class="line">        <span class="keyword">if</span> (!_tcsicmp(me.szModule, szDllName) ||</span><br><span class="line">            !_tcsicmp(me.szExePath, szDllName))</span><br><span class="line">        &#123;</span><br><span class="line">            bFound = TRUE;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!bFound)</span><br><span class="line">    &#123;</span><br><span class="line">        _tprintf(<span class="string">L&quot;Cannot find %s in target process.\n&quot;</span>, szDllName);</span><br><span class="line">        <span class="built_in">CloseHandle</span>(hSnapshot);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    _tprintf(<span class="string">L&quot;Found DLL: %s\n&quot;</span>, me.szModule);</span><br><span class="line">    _tprintf(<span class="string">L&quot;Base Address: 0x%p\n&quot;</span>, me.modBaseAddr);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 打开目标进程</span></span><br><span class="line">    hProcess = <span class="built_in">OpenProcess</span>(PROCESS_ALL_ACCESS, FALSE, dwPID);</span><br><span class="line">    <span class="keyword">if</span> (!hProcess)</span><br><span class="line">    &#123;</span><br><span class="line">        _tprintf(<span class="string">L&quot;OpenProcess(%d) failed! [%u]\n&quot;</span>, dwPID, <span class="built_in">GetLastError</span>());</span><br><span class="line">        <span class="built_in">CloseHandle</span>(hSnapshot);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取 FreeLibrary 地址</span></span><br><span class="line">    hKernel32 = <span class="built_in">GetModuleHandle</span>(<span class="string">L&quot;kernel32.dll&quot;</span>);</span><br><span class="line">    pThreadProc = (LPTHREAD_START_ROUTINE)<span class="built_in">GetProcAddress</span>(hKernel32, <span class="string">&quot;FreeLibrary&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!pThreadProc)</span><br><span class="line">    &#123;</span><br><span class="line">        _tprintf(<span class="string">L&quot;GetProcAddress(FreeLibrary) failed! [%u]\n&quot;</span>, <span class="built_in">GetLastError</span>());</span><br><span class="line">        <span class="built_in">CloseHandle</span>(hProcess);</span><br><span class="line">        <span class="built_in">CloseHandle</span>(hSnapshot);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 在目标进程中创建远程线程，执行 FreeLibrary(me.modBaseAddr)</span></span><br><span class="line">    hThread = <span class="built_in">CreateRemoteThread</span>(</span><br><span class="line">        hProcess,</span><br><span class="line">        <span class="literal">NULL</span>,</span><br><span class="line">        <span class="number">0</span>,</span><br><span class="line">        pThreadProc,</span><br><span class="line">        me.modBaseAddr,</span><br><span class="line">        <span class="number">0</span>,</span><br><span class="line">        <span class="literal">NULL</span></span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (!hThread)</span><br><span class="line">    &#123;</span><br><span class="line">        _tprintf(<span class="string">L&quot;CreateRemoteThread failed! [%u]\n&quot;</span>, <span class="built_in">GetLastError</span>());</span><br><span class="line">        <span class="built_in">CloseHandle</span>(hProcess);</span><br><span class="line">        <span class="built_in">CloseHandle</span>(hSnapshot);</span><br><span class="line">        <span class="keyword">return</span> FALSE;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="built_in">WaitForSingleObject</span>(hThread, INFINITE);</span><br><span class="line"></span><br><span class="line">    <span class="built_in">CloseHandle</span>(hThread);</span><br><span class="line">    <span class="built_in">CloseHandle</span>(hProcess);</span><br><span class="line">    <span class="built_in">CloseHandle</span>(hSnapshot);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> TRUE;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="type">int</span> _tmain(<span class="type">int</span> argc, TCHAR* argv[])</span><br><span class="line">&#123;</span><br><span class="line">    DWORD dwPID = <span class="number">0xFFFFFFFF</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 查找 notepad.exe 的 PID</span></span><br><span class="line">    dwPID = <span class="built_in">FindProcessID</span>(DEF_PROC_NAME);</span><br><span class="line">    <span class="keyword">if</span> (dwPID == <span class="number">0xFFFFFFFF</span>)</span><br><span class="line">    &#123;</span><br><span class="line">        _tprintf(<span class="string">L&quot;There is no %s process!\n&quot;</span>, DEF_PROC_NAME);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    _tprintf(<span class="string">L&quot;PID of \&quot;%s\&quot; is %d\n&quot;</span>, DEF_PROC_NAME, dwPID);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 开启调试权限</span></span><br><span class="line">    <span class="keyword">if</span> (!<span class="built_in">SetPrivilege</span>(SE_DEBUG_NAME, TRUE))</span><br><span class="line">    &#123;</span><br><span class="line">        _tprintf(<span class="string">L&quot;SetPrivilege failed!\n&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="number">1</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 卸载 DLL</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">EjectDll</span>(dwPID, DEF_DLL_NAME))</span><br><span class="line">    &#123;</span><br><span class="line">        _tprintf(<span class="string">L&quot;EjectDll(%d, \&quot;%s\&quot;) success!\n&quot;</span>, dwPID, DEF_DLL_NAME);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span></span><br><span class="line">    &#123;</span><br><span class="line">        _tprintf(<span class="string">L&quot;EjectDll(%d, \&quot;%s\&quot;) failed!\n&quot;</span>, dwPID, DEF_DLL_NAME);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>szModule</code> 成员表示 DLL 的名称，<code>modBaseAddr</code> 成员表示相应 DLL 被加载的地址（进程虚拟内存）。在 <code>EjectDll()</code> 函数的 <code>for</code> 循环中比较 <code>szModule</code> 与希望卸载的 DLL 文件名称，能够准确查找到相应模块的信息。</p>
+<h4 id="获取目标进程的句柄"><a href="#获取目标进程的句柄" class="headerlink" title="获取目标进程的句柄"></a>获取目标进程的句柄</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">hProcess = <span class="built_in">OpenProcess</span>(PROCESS_ALL_ACCESS, FALSE, dwPID);</span><br></pre></td></tr></table></figure>
+
+<p>该语句使用进程 ID 来获取目标进程（<code>notepad</code>）的进程句柄，下面用获得的进程句柄调用 <code>CreateRemoteThread()</code> API。</p>
+<h4 id="获取-FreeLibrary-API-地址"><a href="#获取-FreeLibrary-API-地址" class="headerlink" title="获取 FreeLibrary() API 地址"></a>获取 FreeLibrary() API 地址</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hModule = <span class="built_in">GetModuleHandle</span>(<span class="string">L&quot;kernel32.dll&quot;</span>);</span><br><span class="line">pThreadProc = (LPTHREAD_START_ROUTINE)<span class="built_in">GetProcAddress</span>(hModule, <span class="string">&quot;FreeLibrary&quot;</span>);</span><br></pre></td></tr></table></figure>
+
+<p>若要驱使 <code>notepad</code> 进程自己调用 <code>FreeLibrary()</code> API，需要先得到 <code>FreeLibrary()</code> 的地址。然而上述代码获取的不是加载到 <code>notepad.exe</code> 进程中的 <code>Kernel32!FreeLibrary</code> 地址，而是加载到 <code>EjectDll.exe</code> 进程中的 <code>Kernel32!FreeLibrary</code> 地址。</p>
+<p>如果理解了前面学过的有关 DLL 注入的内容，那么各位应该能猜出其中缘由——<code>FreeLibrary</code> 地址在所有进程中都是相同的。</p>
+<h4 id="在目标进程中运行线程"><a href="#在目标进程中运行线程" class="headerlink" title="在目标进程中运行线程"></a>在目标进程中运行线程</h4><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">hThread = <span class="built_in">CreateRemoteThread</span>(hProcess, <span class="literal">NULL</span>, <span class="number">0</span>, pThreadProc,</span><br><span class="line">                             me.modBaseAddr, <span class="number">0</span>, <span class="literal">NULL</span>);</span><br></pre></td></tr></table></figure>
+
+<p><code>pThreadProc</code> 参数是 <code>FreeLibrary()</code> API 的地址，<code>me.modBaseAddr</code> 参数是要卸载的 DLL 的加载地址。将线程函数指定为 <code>FreeLibrary</code> 函数，并把 DLL 加载地址传递给线程参数，这样就在目标进程中成功调用了 <code>FreeLibrary()</code> API。</p>
+<p><code>CreateRemoteThread()</code> API 原意是在外部进程调用执行线程函数，只不过这里的线程函数换成了 <code>FreeLibrary()</code> 函数。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">BOOL WINAPI <span class="title">FreeLibrary</span><span class="params">(</span></span></span><br><span class="line"><span class="params"><span class="function">    HMODULE hLibModule</span></span></span><br><span class="line"><span class="params"><span class="function">)</span></span>;</span><br></pre></td></tr></table></figure>
+
+<p><code>ThreadProc</code> 函数与 <code>FreeLibrary</code> 函数都只有 1 个参数，以上方法的灵感即源于此。</p>
+<p>封面来自げみ</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://ksenrii.github.io">ksenr</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://ksenrii.github.io/2026/08/20/dll%E6%B3%A8%E5%85%A5-1/">https://ksenrii.github.io/2026/08/20/dll%E6%B3%A8%E5%85%A5-1/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://ksenrii.github.io" target="_blank">ksenr's blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Reverse/">Reverse</a></div><div class="post-share"><div class="social-share" data-image="/images/18.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://unpkg.com/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://unpkg.com/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2026/08/23/dll%E6%B3%A8%E5%85%A5-2/" title="DLL注入-2"><img class="cover" src="/images/19.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post" loading='lazy'><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">DLL注入-2</div></div><div class="info-2"><div class="info-item-1">通过修改PE加载DLL除了前面讲过的 DLL 动态注入技术外，还可以采用“手工修改可执行文件”的方式加载用户指定的 DLL 文件。本章将向各位介绍这种方法。学习这种技术前，首先要掌握有关 PE 文件格式的知识。 前面我们学过向“运行中的进程”强制注入指定 DLL 文件的方法。下面我们将使用另外一种方法，通过“直接修改目标程序的可执行文件”，使其运行时强制加载指定的 DLL 文件。这种方法只要应用过一次后，不需要另外的注入操作，每当进程开始运行时就会自动加载指定的 DLL 文件。其实，这是一种破解的方法。 练习文件将做个简单练习以帮助大家更好地理解要学习的内容。我们的目标是，直接修改 TextView.exe 文件，使其在运行时自动加载 myhack3.dll 文件。 TextView.exeTextView.exe 是一个非常简单的文本查看程序，只要用鼠标将要查看的文本文件拖动到其中，即可通过它查看文本文件的内容，如图所示。 例如我在txt里面写了Hello World,把txt拖到exe,如下图  接下来，使用 PEView 工具查看 TextView.exe 可执行文件的 I...</div></div></div></a><a class="pagination-related" href="/2026/08/17/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/" title="代码注入"><img class="cover" src="/images/24.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post" loading='lazy'><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">代码注入</div></div><div class="info-2"><div class="info-item-1">代码注入本章将讲解代码注入（Code Injection）相关技术，并借助一个练习示例向各位展示代码注入的实施原理与方法。通过比较分析，了解代码注入与 DLL 注入的不同点。 代码注入代码注入是一种向目标进程插入独立运行代码并使之运行的技术，它一般调用 CreateRemoteThread() API 以远程线程形式运行插入的代码，所以也被称为线程注入。下图描述了代码注入技术的实现原理。  首先向目标进程 target.exe 插入代码与数据，在此过程中，代码以线程过程（Thread Procedure）形式插入，而代码中使用的数据则以线程参数的形式传入。也就是说，代码与数据是分别注入的。 如上所言，代码注入的原理非常简单，但具体实现过程中有一些内容必须注意。下面就通过与 DLL 注入比较来讲解实现代码注入的注意事项。 DLL 注入与代码注入请看下面这段简单的代码，它用来弹出 Windows 消息框。 12345678// ThreadProc()DWORD WINAPI ThreadProc(LPVOID lParam)&#123;    MessageBoxA(NULL, &...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/07/27/PE%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8F/" title="PE文件格式"><img class="cover" src="/images/14.jpg" alt="cover" loading='lazy'><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-27</div><div class="info-item-2">PE文件格式</div></div><div class="info-2"><div class="info-item-1">PE文件格式本章将介绍 Windows 操作系统的 PE 文件格式相关知识，同时介绍与之相关的进程、内存、DLL 等概念。 介绍PE（Portable Executable）是 Windows 操作系统的可执行文件格式，由 UNIX 系统的 COFF（Common Object File Format）格式修改而来。之所以叫”Portable”，是因为当初设计时希望它能跨平台使用，但最终它只用于 Windows 系统。32 位的 PE 格式称为 PE32，64 位的 PE 格式称为 PE32+（或 PE+），注意不是”PE64”。 PE文件格式PE 文件格式不仅是 .exe 文件的格式，很多其他文件也采用 PE 格式。表列出了 PE 文件的主要种类。    种类 主扩展名    可执行系列 EXE, SCR   库系列 DLL, OCX, CPL, DRV   驱动程序系列 SYS, VXD   对象文件系列 OBJ   提示  OBJ 文件不能以任何形式执行，在代码逆向分析中几乎不需要关注。  本章将以 Windows XP SP3 的 notepad.exe 为例讲解 PE ...</div></div></div></a><a class="pagination-related" href="/2026/08/01/TLS%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0/" title="TLS回调函数"><img class="cover" src="/images/21.jpg" alt="cover" loading='lazy'><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-01</div><div class="info-item-2">TLS回调函数</div></div><div class="info-2"><div class="info-item-1">TLS回调函数代码逆向分析领域中，TLS（Thread Local Storage，线程局部存储）回调函数（Callback Function）常用于反调试，本章将学习TLS回调函数的相关知识。TLS回调函数的调用运行要先于EP代码的执行，该特征使它可以作为一种反调试技术使用。下面通过练习示例来了解有关TLS回调函数的内容。 练习 #1运行练习程序文件（HelloTls.exe），弹出一个消息框，单击“确定”按钮后，程序终止运行，如图所示  下面再用Xdbg来调试示例程序,打开并运行HelloTls.exe文件，弹出如下图所示的消息对话框  消息对话框中显示的内容与程序正常运行时显示的内容不同。单击“确定”按钮，HelloTls.exe进程随即终止 正常运行与调试运行中出现不同行为的原因在于，程序运行EP代码前先调用了TLS回调函数，而该回调函数中含有反调试代码，使程序在被调试时弹出“Debugger Detected!”消息对话框。 如果不理解这一原理，调试将无法继续。以上练习示例虽然简单，但却很好地描述了TLS回调函数的行为特征。接下来讲TLS与TLS回调函数的相关知识，学习...</div></div></div></a><a class="pagination-related" href="/2026/08/23/dll%E6%B3%A8%E5%85%A5-2/" title="DLL注入-2"><img class="cover" src="/images/19.jpg" alt="cover" loading='lazy'><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-23</div><div class="info-item-2">DLL注入-2</div></div><div class="info-2"><div class="info-item-1">通过修改PE加载DLL除了前面讲过的 DLL 动态注入技术外，还可以采用“手工修改可执行文件”的方式加载用户指定的 DLL 文件。本章将向各位介绍这种方法。学习这种技术前，首先要掌握有关 PE 文件格式的知识。 前面我们学过向“运行中的进程”强制注入指定 DLL 文件的方法。下面我们将使用另外一种方法，通过“直接修改目标程序的可执行文件”，使其运行时强制加载指定的 DLL 文件。这种方法只要应用过一次后，不需要另外的注入操作，每当进程开始运行时就会自动加载指定的 DLL 文件。其实，这是一种破解的方法。 练习文件将做个简单练习以帮助大家更好地理解要学习的内容。我们的目标是，直接修改 TextView.exe 文件，使其在运行时自动加载 myhack3.dll 文件。 TextView.exeTextView.exe 是一个非常简单的文本查看程序，只要用鼠标将要查看的文本文件拖动到其中，即可通过它查看文本文件的内容，如图所示。 例如我在txt里面写了Hello World,把txt拖到exe,如下图  接下来，使用 PEView 工具查看 TextView.exe 可执行文件的 I...</div></div></div></a><a class="pagination-related" href="/2026/08/25/dll%E6%B3%A8%E5%85%A5Review/" title="DLL注入Review"><img class="cover" src="/images/20.jpg" alt="cover" loading='lazy'><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-25</div><div class="info-item-2">DLL注入Review</div></div><div class="info-2"><div class="info-item-1">这篇快速回顾 Windows 消息钩取、DLL 注入与卸载，以及通过修改 PE 导入表加载 DLL 的方法。 DLL注入DLL 注入就是把指定 DLL 强制加载到其他进程的地址空间中。 运行时注入的核心可以概括为： 1让目标进程调用 LoadLibrary(&quot;指定 DLL 路径&quot;)  DLL 被加载后，Windows 装载器会调用它的 DllMain()。当 dwReason 为 DLL_PROCESS_ATTACH 时，便可以执行初始化代码。  本篇涉及 4 种加载思路：    方法 谁负责加载 DLL 特点    CreateRemoteThread() 自己控制目标进程调用 LoadLibrary() 目标明确，步骤最完整   AppInit_DLLs user32.dll 根据注册表加载 影响范围大，依赖系统配置   SetWindowsHookEx() Windows 在触发消息钩子时加载 适合消息钩取，也是一种 DLL 注入   修改 PE 导入表 PE 装载器根据 IDT 加载 修改一次，以后启动时自动加载   Windows消息钩取Window...</div></div></div></a><a class="pagination-related" href="/2026/07/17/%E8%BF%90%E8%A1%8C%E6%97%B6%E5%8E%8B%E7%BC%A9/" title="运行时压缩"><img class="cover" src="/images/17.jpg" alt="cover" loading='lazy'><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-17</div><div class="info-item-2">运行时压缩</div></div><div class="info-2"><div class="info-item-1">运行时压缩运行时压缩器（Run-Time Packer）是软件逆向分析学的常见主题。为了理解好它，需要掌握有关 PE 文件格式、操作系统的基本知识（进程、内存、DLL 等），同时也要了解有关压缩 &#x2F; 解压缩算法的基本内容。 数据压缩数据压缩（Data Compression）是计算机工程的主要研究内容，经过数十年发展已经有了深入研究，今后还会不断出现更多、更好的算法。 如果日常生活中能够非常容易地压缩某个物体该多么方便啊！也就不再需要仓库、停车场、集装箱了，当然，得能压缩才行。而在数码世界，（只要不是压缩过的信息）任何信息都能轻松压缩。 不论哪种形态的文件（数据）都是由二进制（0 或 1）组成的，只要使用合适的压缩算法，就能缩减其大小。经过压缩的文件若能 100% 恢复，则称该压缩为 “无损压缩”（Lossless Data Compression）；若不能恢复原状，则称该压缩为 “有损压缩”（Loss Data Compression）。 无损压缩无损压缩用来缩减文件（数据）的大小，压缩后的文件更易保管、移动。使用经过压缩的文件之前，需要先对文件解压缩（此过程中应该保...</div></div></div></a><a class="pagination-related" href="/2026/08/17/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/" title="代码注入"><img class="cover" src="/images/24.jpg" alt="cover" loading='lazy'><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-17</div><div class="info-item-2">代码注入</div></div><div class="info-2"><div class="info-item-1">代码注入本章将讲解代码注入（Code Injection）相关技术，并借助一个练习示例向各位展示代码注入的实施原理与方法。通过比较分析，了解代码注入与 DLL 注入的不同点。 代码注入代码注入是一种向目标进程插入独立运行代码并使之运行的技术，它一般调用 CreateRemoteThread() API 以远程线程形式运行插入的代码，所以也被称为线程注入。下图描述了代码注入技术的实现原理。  首先向目标进程 target.exe 插入代码与数据，在此过程中，代码以线程过程（Thread Procedure）形式插入，而代码中使用的数据则以线程参数的形式传入。也就是说，代码与数据是分别注入的。 如上所言，代码注入的原理非常简单，但具体实现过程中有一些内容必须注意。下面就通过与 DLL 注入比较来讲解实现代码注入的注意事项。 DLL 注入与代码注入请看下面这段简单的代码，它用来弹出 Windows 消息框。 12345678// ThreadProc()DWORD WINAPI ThreadProc(LPVOID lParam)&#123;    MessageBoxA(NULL, &...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/images/avatar-jointed.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/ loading='lazy'></div><div class="author-info-name">ksenr</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">23</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/ksenrii"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/ksenrii" target="_blank" title="GitHub"><i class="fab fa-github" style="color: #24292e;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到 ksenr's blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#DLL%E6%B3%A8%E5%85%A5"><span class="toc-number">1.</span> <span class="toc-text">DLL注入</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Windows%E6%B6%88%E6%81%AF%E9%92%A9%E5%8F%96"><span class="toc-number">1.1.</span> <span class="toc-text">Windows消息钩取</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%92%A9%E5%AD%90"><span class="toc-number">1.1.1.</span> <span class="toc-text">钩子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E9%92%A9%E5%AD%90"><span class="toc-number">1.1.2.</span> <span class="toc-text">消息钩子</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SetWindowsHookEx"><span class="toc-number">1.1.3.</span> <span class="toc-text">SetWindowsHookEx()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%AE%E7%9B%98%E6%B6%88%E6%81%AF%E9%92%A9%E5%8F%96%E7%BB%83%E4%B9%A0"><span class="toc-number">1.1.4.</span> <span class="toc-text">键盘消息钩取练习</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%83%E4%B9%A0%E7%A4%BA%E4%BE%8B-HookMain-exe"><span class="toc-number">1.1.4.1.</span> <span class="toc-text">练习示例 HookMain.exe</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E6%BA%90%E4%BB%A3%E7%A0%81"><span class="toc-number">1.1.4.2.</span> <span class="toc-text">分析源代码</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%95%B4%E4%B8%AA%E8%BF%87%E7%A8%8B%E5%8F%91%E7%94%9F%E4%BA%86%E4%BB%80%E4%B9%88"><span class="toc-number">1.1.4.2.1.</span> <span class="toc-text">整个过程发生了什么</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#KeyboardProc-%E5%9B%9E%E8%B0%83%E5%87%BD%E6%95%B0"><span class="toc-number">1.1.4.2.2.</span> <span class="toc-text">KeyboardProc 回调函数</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B0%83%E8%AF%95"><span class="toc-number">1.1.5.</span> <span class="toc-text">调试</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%B0%83%E8%AF%95-HookMain-exe"><span class="toc-number">1.1.5.1.</span> <span class="toc-text">调试 HookMain.exe</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#EP%E4%BB%A3%E7%A0%81"><span class="toc-number">1.1.5.2.</span> <span class="toc-text">EP代码</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%B0%83%E8%AF%95main%E5%87%BD%E6%95%B0"><span class="toc-number">1.1.5.3.</span> <span class="toc-text">调试main函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%B0%83%E8%AF%95Notepad-exe-%E8%BF%9B%E7%A8%8B%E5%86%85%E7%9A%84-KeyHook-dll"><span class="toc-number">1.1.5.4.</span> <span class="toc-text">调试Notepad.exe 进程内的 KeyHook.dll</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DLL%E6%B3%A8%E5%85%A5-1"><span class="toc-number">1.2.</span> <span class="toc-text">DLL注入</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AFDLL%E6%B3%A8%E5%85%A5"><span class="toc-number">1.2.1.</span> <span class="toc-text">什么是DLL注入</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DLL%E6%B3%A8%E5%85%A5%E7%A4%BA%E4%BE%8B"><span class="toc-number">1.2.2.</span> <span class="toc-text">DLL注入示例</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%94%B9%E5%96%84%E5%8A%9F%E8%83%BD%E4%B8%8E%E4%BF%AE%E5%A4%8DBUG"><span class="toc-number">1.2.2.1.</span> <span class="toc-text">改善功能与修复BUG</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B6%88%E6%81%AF%E9%92%A9%E5%8F%96"><span class="toc-number">1.2.2.2.</span> <span class="toc-text">消息钩取</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#API%E9%92%A9%E5%8F%96"><span class="toc-number">1.2.2.3.</span> <span class="toc-text">API钩取</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E5%BA%94%E7%94%A8%E7%A8%8B%E5%BA%8F"><span class="toc-number">1.2.2.4.</span> <span class="toc-text">其他应用程序</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%81%B6%E6%84%8F%E4%BB%A3%E7%A0%81"><span class="toc-number">1.2.2.5.</span> <span class="toc-text">恶意代码</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DLL%E6%B3%A8%E5%85%A5%E7%9A%84%E5%AE%9E%E7%8E%B0%E6%96%B9%E6%B3%95"><span class="toc-number">1.2.3.</span> <span class="toc-text">DLL注入的实现方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CreateRemoteThread"><span class="toc-number">1.2.4.</span> <span class="toc-text">CreateRemoteThread()</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%83%E4%B9%A0%E7%A4%BA%E4%BE%8Bmyhack-dll"><span class="toc-number">1.2.4.1.</span> <span class="toc-text">练习示例myhack.dll</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E7%A4%BA%E4%BE%8B%E6%BA%90%E4%BB%A3%E7%A0%81"><span class="toc-number">1.2.4.2.</span> <span class="toc-text">分析示例源代码</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E7%9B%AE%E6%A0%87%E8%BF%9B%E7%A8%8B%E5%8F%A5%E6%9F%84"><span class="toc-number">1.2.4.2.1.</span> <span class="toc-text">获取目标进程句柄</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%B0%86%E8%A6%81%E6%B3%A8%E5%85%A5%E7%9A%84-DLL-%E8%B7%AF%E5%BE%84%E5%86%99%E5%85%A5%E7%9B%AE%E6%A0%87%E8%BF%9B%E7%A8%8B%E5%86%85%E5%AD%98"><span class="toc-number">1.2.4.2.2.</span> <span class="toc-text">将要注入的 DLL 路径写入目标进程内存</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96-LoadLibraryW-API-%E5%9C%B0%E5%9D%80"><span class="toc-number">1.2.4.2.3.</span> <span class="toc-text">获取 LoadLibraryW() API 地址</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%9C%A8%E7%9B%AE%E6%A0%87%E8%BF%9B%E7%A8%8B%E4%B8%AD%E8%BF%90%E8%A1%8C%E8%BF%9C%E7%A8%8B%E7%BA%BF%E7%A8%8B%EF%BC%88Remote-Thread%EF%BC%89"><span class="toc-number">1.2.4.2.4.</span> <span class="toc-text">在目标进程中运行远程线程（Remote Thread）</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%B0%83%E8%AF%95%E6%96%B9%E6%B3%95"><span class="toc-number">1.2.4.3.</span> <span class="toc-text">调试方法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AppInit-DLLs"><span class="toc-number">1.2.5.</span> <span class="toc-text">AppInit_DLLs</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E6%9E%90%E7%A4%BA%E4%BE%8B%E6%BA%90%E7%A0%81"><span class="toc-number">1.2.5.1.</span> <span class="toc-text">分析示例源码</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%83%E4%B9%A0%E7%A4%BA%E4%BE%8B-myhack2-dll"><span class="toc-number">1.2.5.2.</span> <span class="toc-text">练习示例 myhack2.dll</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SetWindowsHookEx-1"><span class="toc-number">1.2.6.</span> <span class="toc-text">SetWindowsHookEx()</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#DLL%E5%8D%B8%E8%BD%BD"><span class="toc-number">1.3.</span> <span class="toc-text">DLL卸载</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#DLL-%E5%8D%B8%E8%BD%BD%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="toc-number">1.3.1.</span> <span class="toc-text">DLL 卸载的工作原理</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0-DLL-%E5%8D%B8%E8%BD%BD"><span class="toc-number">1.3.2.</span> <span class="toc-text">实现 DLL 卸载</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96%E7%9B%AE%E6%A0%87%E8%BF%9B%E7%A8%8B%E7%9A%84%E5%8F%A5%E6%9F%84"><span class="toc-number">1.3.2.1.</span> <span class="toc-text">获取目标进程的句柄</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96-FreeLibrary-API-%E5%9C%B0%E5%9D%80"><span class="toc-number">1.3.2.2.</span> <span class="toc-text">获取 FreeLibrary() API 地址</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9C%A8%E7%9B%AE%E6%A0%87%E8%BF%9B%E7%A8%8B%E4%B8%AD%E8%BF%90%E8%A1%8C%E7%BA%BF%E7%A8%8B"><span class="toc-number">1.3.2.3.</span> <span class="toc-text">在目标进程中运行线程</span></a></li></ol></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/08/26/TEB/" title="TEB"><img src="/images/22.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="TEB"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/08/26/TEB/" title="TEB">TEB</a><time datetime="2026-08-26T04:12:18.000Z" title="发表于 2026-08-26 12:12:18">2026-08-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/25/PEB/" title="PEB"><img src="/images/23.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="PEB"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/08/25/PEB/" title="PEB">PEB</a><time datetime="2026-08-25T05:32:54.000Z" title="发表于 2026-08-25 13:32:54">2026-08-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/25/dll%E6%B3%A8%E5%85%A5Review/" title="DLL注入Review"><img src="/images/20.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="DLL注入Review"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/08/25/dll%E6%B3%A8%E5%85%A5Review/" title="DLL注入Review">DLL注入Review</a><time datetime="2026-08-25T04:27:07.000Z" title="发表于 2026-08-25 12:27:07">2026-08-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/23/dll%E6%B3%A8%E5%85%A5-2/" title="DLL注入-2"><img src="/images/19.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="DLL注入-2"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/08/23/dll%E6%B3%A8%E5%85%A5-2/" title="DLL注入-2">DLL注入-2</a><time datetime="2026-08-23T04:12:18.000Z" title="发表于 2026-08-23 12:12:18">2026-08-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/20/dll%E6%B3%A8%E5%85%A5-1/" title="DLL注入-1"><img src="/images/18.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="DLL注入-1"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/08/20/dll%E6%B3%A8%E5%85%A5-1/" title="DLL注入-1">DLL注入-1</a><time datetime="2026-08-20T08:32:14.000Z" title="发表于 2026-08-20 16:32:14">2026-08-20</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By ksenr</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.7.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.7.0"></script><script src="/js/main.js?v=5.7.0"></script><script src="https://unpkg.com/@fancyapps/ui@6.1.14/dist/fancybox/fancybox.umd.js"></script><script src="https://unpkg.com/instant.page@5.2.0/instantpage.js" type="module"></script><script src="https://unpkg.com/node-snackbar@0.1.16/dist/snackbar.min.js"></script><div class="js-pjax"><script>(() => {
+  const changeScriptToMath = article => {
+    article.querySelectorAll('script[type^="math/tex"]').forEach(el => {
+      const display = /mode=display/.test(el.type)
+      const node = document.createElement(display ? 'div' : 'span')
+      node.textContent = display
+        ? `$$${el.textContent}$$`
+        : `$${el.textContent}$`
+      el.parentNode.replaceChild(node, el)
+    })
+  }
+
+  const loadMathjax = () => {
+    const article = document.getElementById('article-container')
+    if (!article || article.querySelector('.hbe-container')) return
+    changeScriptToMath(article)
+
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem',
+            'ui/lazy'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          lazyMargin: '200px',
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://unpkg.com/mathjax@4.1.3/tex-mml-chtml.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.typesetClear()
+      MathJax.typesetPromise([ article ])
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><div id="global-music-player" data-server="netease" data-type="playlist" data-id="18342059095"></div><script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script><script src="/js/music-player.js?v=20260901-2"></script><script src="/js/bg-rotate.js"></script><script src="https://unpkg.com/pjax@0.2.8/pjax.min.js" defer="defer"></script><script>document.addEventListener('DOMContentLoaded', () => {
+  const pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+  window.pjax = new Pjax({
+    elements: 'a:not([target="_blank"]):not([data-fancybox])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+  })
+
+  const triggerPjaxFn = (val) => {
+    if (!val) return
+    Object.values(val).forEach(fn => {
+      try {
+        fn()
+      } catch (err) {
+        console.debug('Pjax callback failed:', err)
+      }
+    })
+  }
+
+  document.addEventListener('pjax:send', () => {
+    // removeEventListener
+    btf.removeGlobalFnEvent('pjaxSendOnce')
+    btf.removeGlobalFnEvent('themeChange')
+
+    // reset readmode
+    const $bodyClassList = document.body.classList
+    if ($bodyClassList.contains('read-mode')) $bodyClassList.remove('read-mode')
+
+    triggerPjaxFn(window.globalFn.pjaxSend)
+  })
+
+  document.addEventListener('pjax:complete', () => {
+    btf.removeGlobalFnEvent('pjaxCompleteOnce')
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+      if (!item.parentNode) return
+      const newScript = document.createElement('script')
+      const content = item.text || item.textContent || ''
+      Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.appendChild(document.createTextNode(content))
+      item.parentNode.replaceChild(newScript, item)
+    })
+
+    triggerPjaxFn(window.globalFn.pjaxComplete)
+  })
+
+  document.addEventListener('pjax:error', e => {
+    const responseURL = e.request && e.request.responseURL
+    if (e.request && e.request.status === 404) {
+      true
+        ? pjax.loadUrl('/404.html')
+        : responseURL && (window.location.href = responseURL)
+    } else if (responseURL) {
+      window.location.href = responseURL
+    }
+  })
+})</script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章..." type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.7.0"></script></div></div></body></html>

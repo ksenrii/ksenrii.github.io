@@ -1,0 +1,473 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>TEB | ksenr's blog</title><meta name="author" content="ksenr"><meta name="copyright" content="ksenr"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="ffffff"><meta name="description" content="TEB本章将学习有关 TEB（Thread Environment Block，线程环境块）的知识。 TEBTEB 指线程环境块，该结构体包含进程中运行线程的各种信息，进程中的每个线程都对应一个 TEB 结构体。 不同 OS 中 TEB 结构体的形态略有不同，有关 TEB 结构体的详细说明都已被文档化，各位可以直接查看并参考。 TEB 结构体的定义首先看看 MSDN 中关于 TEB 结构体的说明。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="TEB">
+<meta property="og:url" content="https://ksenrii.github.io/2026/08/26/TEB/index.html">
+<meta property="og:site_name" content="ksenr&#39;s blog">
+<meta property="og:description" content="TEB本章将学习有关 TEB（Thread Environment Block，线程环境块）的知识。 TEBTEB 指线程环境块，该结构体包含进程中运行线程的各种信息，进程中的每个线程都对应一个 TEB 结构体。 不同 OS 中 TEB 结构体的形态略有不同，有关 TEB 结构体的详细说明都已被文档化，各位可以直接查看并参考。 TEB 结构体的定义首先看看 MSDN 中关于 TEB 结构体的说明。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://ksenrii.github.io/images/22.jpg">
+<meta property="article:published_time" content="2026-08-26T04:12:18.000Z">
+<meta property="article:modified_time" content="2026-09-03T15:14:32.786Z">
+<meta property="article:author" content="ksenr">
+<meta property="article:tag" content="Reverse">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://ksenrii.github.io/images/22.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "TEB",
+  "url": "https://ksenrii.github.io/2026/08/26/TEB/",
+  "image": "https://ksenrii.github.io/images/22.jpg",
+  "datePublished": "2026-08-26T04:12:18.000Z",
+  "dateModified": "2026-09-03T15:14:32.786Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "ksenr",
+      "url": "https://ksenrii.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/images/to.png"><link rel="canonical" href="https://ksenrii.github.io/2026/08/26/TEB/index.html"><link rel="preconnect" href="//unpkg.com"/><link rel="stylesheet" href="/css/index.css?v=5.7.0"><link rel="stylesheet" href="https://unpkg.com/@fortawesome/fontawesome-free@7.3.1/css/all.min.css"><link rel="stylesheet" href="https://unpkg.com/node-snackbar@0.1.16/dist/snackbar.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://unpkg.com/@fancyapps/ui@6.1.14/dist/fancybox/fancybox.css" media="print" onload="this.media='all'"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        const data = { value }
+
+        if (ttl != null) {
+          data.expiry = Date.now() + ttl * 86400000
+        }
+
+        localStorage.setItem(key, JSON.stringify(data))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return
+
+        try {
+          const data = JSON.parse(itemStr)
+
+          if (data.expiry && Date.now() > data.expiry) {
+            localStorage.removeItem(key)
+            return
+          }
+
+          return data.value
+        } catch {
+          localStorage.removeItem(key)
+        }
+      }
+    }
+
+    const scriptCache = new Map()
+    const cssCache = new Map()
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => {
+        if (scriptCache.has(url)) {
+          return scriptCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const script = document.createElement('script')
+
+          script.src = url
+          script.async = true
+
+          for (const key in attr) {
+            script.setAttribute(key, attr[key])
+          }
+
+          script.onload = resolve
+          script.onerror = reject
+
+          document.head.appendChild(script)
+        })
+
+        scriptCache.set(url, promise)
+
+        return promise
+      },
+      getCSS: (url, id) => {
+        if (cssCache.has(url)) {
+          return cssCache.get(url)
+        }
+
+        const promise = new Promise((resolve, reject) => {
+          const link = document.createElement('link')
+
+          link.rel = 'stylesheet'
+          link.href = url
+
+          if (id) {
+            link.id = id
+          }
+
+          link.onload = resolve
+          link.onerror = reject
+
+          document.head.appendChild(link)
+        })
+
+        cssCache.set(url, promise)
+
+        return promise
+      },
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!true && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+      const activateDarkMode = () => {
+        document.documentElement.dataset.theme = 'dark'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.dataset.theme = 'light'
+        if (metaThemeColor !== null) {
+          metaThemeColor.setAttribute('content', 'ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          const mediaQueryDark = window.matchMedia('(prefers-color-scheme: dark)')
+          const mediaQueryLight = window.matchMedia('(prefers-color-scheme: light)')
+
+          if (theme === undefined) {
+            if (mediaQueryLight.matches) activateLightMode()
+            else if (mediaQueryDark.matches) activateDarkMode()
+            else {
+              const hour = new Date().getHours()
+              const start = 6
+              const end = 18
+              const isNight =
+                start < end
+                    ? hour < start || hour >= end
+                    : hour >= start || hour < end
+              isNight ? activateDarkMode() : activateLightMode()
+            }
+            mediaQueryDark.addEventListener('change', e => {
+              if (saveToLocal.get('theme') === undefined) {
+                e.matches ? activateDarkMode() : activateLightMode()
+              }
+            })
+          } else {
+            theme === 'light' ? activateLightMode() : activateDarkMode()
+          }
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"pagination":{"enable":false,"hitsPerPage":8},"languages":{"hits_empty":"未找到符合您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":true},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '天',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: {"chs_to_cht":"已切换为繁体中文","cht_to_chs":"已切换为简体中文","day_to_night":"已切换为深色模式","night_to_day":"已切换为浅色模式","bgLight":"#425aef","bgDark":"#1f1f1f","position":"bottom-left"},
+  infinitegrid: {
+    js: 'https://unpkg.com/@egjs/infinitegrid@4.13.0/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: true,
+  },
+  autoDarkmode: true
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'TEB',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.css"><meta name="generator" content="Hexo 8.1.1"></head><body><div id="loading-box"><div class="loading-left-bg"></div><div class="loading-right-bg"></div><div class="spinner-box"><div class="configure-border-1"><div class="configure-core"></div></div><div class="configure-border-2"><div class="configure-core"></div></div><div class="loading-word">加载中...</div></div></div><script>(()=>{
+  const $loadingBox = document.getElementById('loading-box')
+  const $body = document.body
+  const preloader = {
+    endLoading: () => {
+      if ($loadingBox.classList.contains('loaded')) return
+      $body.style.overflow = ''
+      $loadingBox.classList.add('loaded')
+    },
+    initLoading: () => {
+      $body.style.overflow = 'hidden'
+      $loadingBox.classList.remove('loaded')
+    }
+  }
+
+  preloader.initLoading()
+
+  if (document.readyState === 'complete') {
+    preloader.endLoading()
+  } else {
+    window.addEventListener('load', preloader.endLoading)
+    document.addEventListener('DOMContentLoaded', preloader.endLoading)
+    // Add timeout protection: force end after 7 seconds
+    setTimeout(preloader.endLoading, 7000)
+  }
+
+  if (true) {
+    btf.addGlobalFn('pjaxSend', preloader.initLoading, 'preloader_init')
+    btf.addGlobalFn('pjaxComplete', preloader.endLoading, 'preloader_end')
+  }
+})()</script><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/images/avatar-jointed.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/ loading='lazy'></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">23</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url(/images/22.jpg);"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">ksenr's blog</span></a><a class="nav-page-title" href="/"><span class="site-name">TEB</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"><div id="search-button"><span class="site-page social-icon search"><i class="fas fa-search fa-fw"></i><span> 搜索</span></span></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">TEB</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2026-08-26T04:12:18.000Z" title="发表于 2026-08-26 12:12:18">2026-08-26</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2026-09-03T15:14:32.786Z" title="更新于 2026-09-03 23:14:32">2026-09-03</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/Reverse/">Reverse</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">总字数:</span><span class="word-count">2.1k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>9分钟</span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="TEB"><a href="#TEB" class="headerlink" title="TEB"></a>TEB</h1><p>本章将学习有关 TEB（Thread Environment Block，线程环境块）的知识。</p>
+<h2 id="TEB-1"><a href="#TEB-1" class="headerlink" title="TEB"></a>TEB</h2><p>TEB 指线程环境块，该结构体包含进程中运行线程的各种信息，进程中的每个线程都对应一个 TEB 结构体。</p>
+<p>不同 OS 中 TEB 结构体的形态略有不同，有关 TEB 结构体的详细说明都已被文档化，各位可以直接查看并参考。</p>
+<h3 id="TEB-结构体的定义"><a href="#TEB-结构体的定义" class="headerlink" title="TEB 结构体的定义"></a>TEB 结构体的定义</h3><p>首先看看 MSDN 中关于 TEB 结构体的说明。</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">_TEB</span> &#123;</span><br><span class="line">    BYTE Reserved1[<span class="number">1952</span>];</span><br><span class="line">    PVOID Reserved2[<span class="number">412</span>];</span><br><span class="line">    PVOID TlsSlots[<span class="number">64</span>];</span><br><span class="line">    BYTE Reserved3[<span class="number">8</span>];</span><br><span class="line">    PVOID Reserved4[<span class="number">26</span>];</span><br><span class="line">    PVOID ReservedForOle;</span><br><span class="line">    PVOID Reserved5[<span class="number">4</span>];</span><br><span class="line">    PVOID TlsExpansionSlots;</span><br><span class="line">&#125; TEB, *PTEB;</span><br></pre></td></tr></table></figure>
+
+<p>正如大家所见，MSDN 对 TEB 结构体的说明太过简单。要想查看关于 TEB 结构体的更多细节，必须借助类似于 WinDbg 的内核调试器（Kernel Debugger）才行。</p>
+<blockquote>
+<p><a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-gb/windows-hardware/drivers/debugger/">Install WinDbg - Windows drivers | Microsoft Learn</a></p>
+</blockquote>
+<h3 id="TEB结构成员"><a href="#TEB结构成员" class="headerlink" title="TEB结构成员"></a>TEB结构成员</h3><p>使用 WinDbg 调试器获取 TEB 结构体的组成成员，如下所示。</p>
+<p><strong>Windows XP SP3 中</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">+0x000</span> NtTib                         : _NT_TIB</span><br><span class="line"><span class="number">+0x01c</span> EnvironmentPointer            : Ptr32 Void</span><br><span class="line"><span class="number">+0x020</span> ClientId                      : _CLIENT_ID</span><br><span class="line"><span class="number">+0x028</span> ActiveRpcHandle               : Ptr32 Void</span><br><span class="line"><span class="number">+0x02c</span> ThreadLocalStoragePointer     : Ptr32 Void</span><br><span class="line"><span class="number">+0x030</span> ProcessEnvironmentBlock       : Ptr32 _PEB</span><br><span class="line"><span class="number">+0x034</span> LastErrorValue                : Uint4B</span><br><span class="line"><span class="number">+0x038</span> CountOfOwnedCriticalSections  : Uint4B</span><br><span class="line"><span class="number">+0x03c</span> CsrClientThread               : Ptr32 Void</span><br><span class="line"><span class="number">+0x040</span> Win32ThreadInfo               : Ptr32 Void</span><br><span class="line"><span class="number">+0x044</span> User32Reserved                : [<span class="number">26</span>] Uint4B</span><br><span class="line"><span class="number">+0x0ac</span> UserReserved                  : [<span class="number">5</span>] Uint4B</span><br><span class="line"><span class="number">+0x0c0</span> WOW32Reserved                 : Ptr32 Void</span><br><span class="line"><span class="number">+0x0c4</span> CurrentLocale                 : Uint4B</span><br><span class="line"><span class="number">+0x0c8</span> FpSoftwareStatusRegister      : Uint4B</span><br><span class="line"><span class="number">+0x0cc</span> SystemReserved1               : [<span class="number">54</span>] Ptr32 Void</span><br><span class="line"><span class="number">+0x1a4</span> ExceptionCode                 : Int4B</span><br><span class="line"><span class="number">+0x1a8</span> ActivationContextStack        : _ACTIVATION_CONTEXT_STACK</span><br><span class="line"><span class="number">+0x1bc</span> SpareBytes1                   : [<span class="number">24</span>] UChar</span><br><span class="line"><span class="number">+0x1d4</span> GdiTebBatch                   : _GDI_TEB_BATCH</span><br><span class="line"><span class="number">+0x6b4</span> RealClientId                  : _CLIENT_ID</span><br><span class="line"><span class="number">+0x6bc</span> GdiCachedProcessHandle        : Ptr32 Void</span><br><span class="line"><span class="number">+0x6c0</span> GdiClientPID                  : Uint4B</span><br><span class="line"><span class="number">+0x6c4</span> GdiClientTID                  : Uint4B</span><br><span class="line"><span class="number">+0x6c8</span> GdiThreadLocalInfo            : Ptr32 Void</span><br><span class="line"><span class="number">+0x6cc</span> Win32ClientInfo               : [<span class="number">62</span>] Uint4B</span><br><span class="line"><span class="number">+0x7c4</span> glDispatchTable               : [<span class="number">233</span>] Ptr32 Void</span><br><span class="line"><span class="number">+0xb68</span> glReserved1                   : [<span class="number">29</span>] Uint4B</span><br><span class="line"><span class="number">+0xbdc</span> glReserved2                   : Ptr32 Void</span><br><span class="line"><span class="number">+0xbe0</span> glSectionInfo                 : Ptr32 Void</span><br><span class="line"><span class="number">+0xbe4</span> glSection                     : Ptr32 Void</span><br><span class="line"><span class="number">+0xbe8</span> glTable                       : Ptr32 Void</span><br><span class="line"><span class="number">+0xbec</span> glCurrentRC                   : Ptr32 Void</span><br><span class="line"><span class="number">+0xbf0</span> glContext                     : Ptr32 Void</span><br><span class="line"><span class="number">+0xbf4</span> LastStatusValue               : Uint4B</span><br><span class="line"><span class="number">+0xbf8</span> StaticUnicodeString           : _Unicode_STRING</span><br><span class="line"><span class="number">+0xc00</span> StaticUnicodeBuffer           : [<span class="number">261</span>] Uint2B</span><br><span class="line"><span class="number">+0xe0c</span> DeallocationStack             : Ptr32 Void</span><br><span class="line"><span class="number">+0xe10</span> TlsSlots                      : [<span class="number">64</span>] Ptr32 Void</span><br><span class="line"><span class="number">+0xf10</span> TlsLinks                      : _LIST_ENTRY</span><br><span class="line"><span class="number">+0xf18</span> Vdm                           : Ptr32 Void</span><br><span class="line"><span class="number">+0xf1c</span> ReservedForNtRpc              : Ptr32 Void</span><br><span class="line"><span class="number">+0xf20</span> DbgSsReserved                 : [<span class="number">2</span>] Ptr32 Void</span><br><span class="line"><span class="number">+0xf28</span> HardErrorsAreDisabled         : Uint4B</span><br><span class="line"><span class="number">+0xf2c</span> Instrumentation               : [<span class="number">16</span>] Ptr32 Void</span><br><span class="line"><span class="number">+0xf6c</span> WinSockData                   : Ptr32 Void</span><br><span class="line"><span class="number">+0xf70</span> GdiBatchCount                 : Uint4B</span><br><span class="line"><span class="number">+0xf74</span> InDbgPrint                    : UChar</span><br><span class="line"><span class="number">+0xf75</span> FreeStackOnTermination        : UChar</span><br><span class="line"><span class="number">+0xf76</span> HasFiberData                  : UChar</span><br><span class="line"><span class="number">+0xf77</span> IdealProcessor                : UChar</span><br><span class="line"><span class="number">+0xf78</span> Spare3                        : Uint4B</span><br><span class="line"><span class="number">+0xf7c</span> ReservedForPerf               : Ptr32 Void</span><br><span class="line"><span class="number">+0xf80</span> ReservedForOle                : Ptr32 Void</span><br><span class="line"><span class="number">+0xf84</span> WaitingOnLoaderLock           : Uint4B</span><br><span class="line"><span class="number">+0xf88</span> Wx86Thread                    : _Wx86ThreadState</span><br><span class="line"><span class="number">+0xf94</span> TlsExpansionSlots             : Ptr32 Ptr32 Void</span><br><span class="line"><span class="number">+0xf98</span> ImpersonationLocale           : Uint4B</span><br><span class="line"><span class="number">+0xf9c</span> IsImpersonating               : Uint4B</span><br><span class="line"><span class="number">+0xfa0</span> NlsCache                      : Ptr32 Void</span><br><span class="line"><span class="number">+0xfa4</span> pShimData                     : Ptr32 Void</span><br><span class="line"><span class="number">+0xfa8</span> HeapVirtualAffinity           : Uint4B</span><br><span class="line"><span class="number">+0xfac</span> CurrentTransactionHandle      : Ptr32 Void</span><br><span class="line"><span class="number">+0xfb0</span> ActiveFrame                   : Ptr32 _TEB_ACTIVE_FRAME</span><br><span class="line"><span class="number">+0xfb4</span> SafeThunkCall                 : UChar</span><br><span class="line"><span class="number">+0xfb5</span> BooleanSpare                  : [<span class="number">3</span>] UChar</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>Windows 7 中</strong></p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br></pre></td><td class="code"><pre><span class="line"><span class="number">+0x000</span> NtTib                         : _NT_TIB</span><br><span class="line"><span class="number">+0x01c</span> EnvironmentPointer            : Ptr32 Void</span><br><span class="line"><span class="number">+0x020</span> ClientId                      : _CLIENT_ID</span><br><span class="line"><span class="number">+0x028</span> ActiveRpcHandle               : Ptr32 Void</span><br><span class="line"><span class="number">+0x02c</span> ThreadLocalStoragePointer     : Ptr32 Void</span><br><span class="line"><span class="number">+0x030</span> ProcessEnvironmentBlock       : Ptr32 _PEB</span><br><span class="line"><span class="number">+0x034</span> LastErrorValue                : Uint4B</span><br><span class="line"><span class="number">+0x038</span> CountOfOwnedCriticalSections  : Uint4B</span><br><span class="line"><span class="number">+0x03c</span> CsrClientThread               : Ptr32 Void</span><br><span class="line"><span class="number">+0x040</span> Win32ThreadInfo               : Ptr32 Void</span><br><span class="line"><span class="number">+0x044</span> User32Reserved                : [<span class="number">26</span>] Uint4B</span><br><span class="line"><span class="number">+0x0ac</span> UserReserved                  : [<span class="number">5</span>] Uint4B</span><br><span class="line"><span class="number">+0x0c0</span> WOW32Reserved                 : Ptr32 Void</span><br><span class="line"><span class="number">+0x0c4</span> CurrentLocale                 : Uint4B</span><br><span class="line"><span class="number">+0x0c8</span> FpSoftwareStatusRegister      : Uint4B</span><br><span class="line"><span class="number">+0x0cc</span> SystemReserved1               : [<span class="number">54</span>] Ptr32 Void</span><br><span class="line"><span class="number">+0x1a4</span> ExceptionCode                 : Int4B</span><br><span class="line"><span class="number">+0x1a8</span> ActivationContextStackPointer : Ptr32 _ACTIVATION_CONTEXT_STACK</span><br><span class="line"><span class="number">+0x1ac</span> SpareBytes                    : [<span class="number">36</span>] UChar</span><br><span class="line"><span class="number">+0x1d0</span> TxFsContext                   : Uint4B</span><br><span class="line"><span class="number">+0x1d4</span> GdiTebBatch                   : _GDI_TEB_BATCH</span><br><span class="line"><span class="number">+0x6b4</span> RealClientId                  : _CLIENT_ID</span><br><span class="line"><span class="number">+0x6bc</span> GdiCachedProcessHandle        : Ptr32 Void</span><br><span class="line"><span class="number">+0x6c0</span> GdiClientPID                  : Uint4B</span><br><span class="line"><span class="number">+0x6c4</span> GdiClientTID                  : Uint4B</span><br><span class="line"><span class="number">+0x6c8</span> GdiThreadLocalInfo            : Ptr32 Void</span><br><span class="line"><span class="number">+0x6cc</span> Win32ClientInfo               : [<span class="number">62</span>] Uint4B</span><br><span class="line"><span class="number">+0x7c4</span> glDispatchTable               : [<span class="number">233</span>] Ptr32 Void</span><br><span class="line"><span class="number">+0xb68</span> glReserved1                   : [<span class="number">29</span>] Uint4B</span><br><span class="line"><span class="number">+0xbdc</span> glReserved2                   : Ptr32 Void</span><br><span class="line"><span class="number">+0xbe0</span> glSectionInfo                 : Ptr32 Void</span><br><span class="line"><span class="number">+0xbe4</span> glSection                     : Ptr32 Void</span><br><span class="line"><span class="number">+0xbe8</span> glTable                       : Ptr32 Void</span><br><span class="line"><span class="number">+0xbec</span> glCurrentRC                   : Ptr32 Void</span><br><span class="line"><span class="number">+0xbf0</span> glContext                     : Ptr32 Void</span><br><span class="line"><span class="number">+0xbf4</span> LastStatusValue               : Uint4B</span><br><span class="line"><span class="number">+0xbf8</span> StaticUnicodeString           : _Unicode_STRING</span><br><span class="line"><span class="number">+0xc00</span> StaticUnicodeBuffer           : [<span class="number">261</span>] Wchar</span><br><span class="line"><span class="number">+0xe0c</span> DeallocationStack             : Ptr32 Void</span><br><span class="line"><span class="number">+0xe10</span> TlsSlots                      : [<span class="number">64</span>] Ptr32 Void</span><br><span class="line"><span class="number">+0xf10</span> TlsLinks                      : _LIST_ENTRY</span><br><span class="line"><span class="number">+0xf18</span> Vdm                           : Ptr32 Void</span><br><span class="line"><span class="number">+0xf1c</span> ReservedForNtRpc              : Ptr32 Void</span><br><span class="line"><span class="number">+0xf20</span> DbgSsReserved                 : [<span class="number">2</span>] Ptr32 Void</span><br><span class="line"><span class="number">+0xf28</span> HardErrorMode                 : Uint4B</span><br><span class="line"><span class="number">+0xf2c</span> Instrumentation               : [<span class="number">9</span>] Ptr32 Void</span><br><span class="line"><span class="number">+0xf50</span> ActivityId                    : _GUID</span><br><span class="line"><span class="number">+0xf60</span> SubProcessTag                 : Ptr32 Void</span><br><span class="line"><span class="number">+0xf64</span> EtwLocalData                  : Ptr32 Void</span><br><span class="line"><span class="number">+0xf68</span> EtwTraceData                  : Ptr32 Void</span><br><span class="line"><span class="number">+0xf6c</span> WinSockData                   : Ptr32 Void</span><br><span class="line"><span class="number">+0xf70</span> GdiBatchCount                 : Uint4B</span><br><span class="line"><span class="number">+0xf74</span> CurrentIdealProcessor         : _PROCESSOR_NUMBER</span><br><span class="line"><span class="number">+0xf74</span> IdealProcessorValue           : Uint4B</span><br><span class="line"><span class="number">+0xf74</span> ReservedPad0                  : UChar</span><br><span class="line"><span class="number">+0xf75</span> ReservedPad1                  : UChar</span><br><span class="line"><span class="number">+0xf76</span> ReservedPad2                  : UChar</span><br><span class="line"><span class="number">+0xf77</span> IdealProcessor                : UChar</span><br><span class="line"><span class="number">+0xf78</span> GuaranteedStackBytes          : Uint4B</span><br><span class="line"><span class="number">+0xf7c</span> ReservedForPerf               : Ptr32 Void</span><br><span class="line"><span class="number">+0xf80</span> ReservedForOle                : Ptr32 Void</span><br><span class="line"><span class="number">+0xf84</span> WaitingOnLoaderLock           : Uint4B</span><br><span class="line"><span class="number">+0xf88</span> SavedPriorityState            : Ptr32 Void</span><br><span class="line"><span class="number">+0xf8c</span> SoftPatchPtr1                 : Uint4B</span><br><span class="line"><span class="number">+0xf90</span> ThreadPoolData                : Ptr32 Void</span><br><span class="line"><span class="number">+0xf94</span> TlsExpansionSlots             : Ptr32 Ptr32 Void</span><br><span class="line"><span class="number">+0xf98</span> MuiGeneration                 : Uint4B</span><br><span class="line"><span class="number">+0xf9c</span> IsImpersonating               : Uint4B</span><br><span class="line"><span class="number">+0xfa0</span> NlsCache                      : Ptr32 Void</span><br><span class="line"><span class="number">+0xfa4</span> pShimData                     : Ptr32 Void</span><br><span class="line"><span class="number">+0xfa8</span> HeapVirtualAffinity           : Uint4B</span><br><span class="line"><span class="number">+0xfac</span> CurrentTransactionHandle      : Ptr32 Void</span><br><span class="line"><span class="number">+0xfb0</span> ActiveFrame                   : Ptr32 _TEB_ACTIVE_FRAME</span><br><span class="line"><span class="number">+0xfb4</span> FlsData                       : Ptr32 Void</span><br><span class="line"><span class="number">+0xfb8</span> PreferredLanguages            : Ptr32 Void</span><br><span class="line"><span class="number">+0xfbc</span> UserPrefLanguages             : Ptr32 Void</span><br><span class="line"><span class="number">+0xfc0</span> MergedPrefLanguages           : Ptr32 Void</span><br><span class="line"><span class="number">+0xfc4</span> MuiImpersonation              : Uint4B</span><br><span class="line"><span class="number">+0xfc8</span> CrossTebFlags                 : Uint2B</span><br><span class="line"><span class="number">+0xfca</span> SpareCrossTebBits             : Pos <span class="number">0</span>, <span class="number">16</span> Bits</span><br><span class="line"><span class="number">+0xfca</span> SameTebFlags                  : Uint2B</span><br><span class="line"><span class="number">+0xfca</span> SafeThunkCall                 : Pos <span class="number">0</span>, <span class="number">1</span> Bit</span><br><span class="line"><span class="number">+0xfca</span> InDebugPrint                  : Pos <span class="number">1</span>, <span class="number">1</span> Bit</span><br><span class="line"><span class="number">+0xfca</span> HasFiberData                  : Pos <span class="number">2</span>, <span class="number">1</span> Bit</span><br><span class="line"><span class="number">+0xfca</span> SkipThreadAttach              : Pos <span class="number">3</span>, <span class="number">1</span> Bit</span><br><span class="line"><span class="number">+0xfca</span> WerInShipAssertCode           : Pos <span class="number">4</span>, <span class="number">1</span> Bit</span><br><span class="line"><span class="number">+0xfca</span> RanProcessInit                : Pos <span class="number">5</span>, <span class="number">1</span> Bit</span><br><span class="line"><span class="number">+0xfca</span> ClonedThread                  : Pos <span class="number">6</span>, <span class="number">1</span> Bit</span><br><span class="line"><span class="number">+0xfca</span> SuppressDebugMsg              : Pos <span class="number">7</span>, <span class="number">1</span> Bit</span><br><span class="line"><span class="number">+0xfca</span> DisableUserStackWalk          : Pos <span class="number">8</span>, <span class="number">1</span> Bit</span><br><span class="line"><span class="number">+0xfca</span> RtlExceptionAttached          : Pos <span class="number">9</span>, <span class="number">1</span> Bit</span><br><span class="line"><span class="number">+0xfca</span> InitialThread                 : Pos <span class="number">10</span>, <span class="number">1</span> Bit</span><br><span class="line"><span class="number">+0xfca</span> SpareSameTebBits              : Pos <span class="number">11</span>, <span class="number">5</span> Bits</span><br><span class="line"><span class="number">+0xfcc</span> TxnScopeEnterCallback         : Ptr32 Void</span><br><span class="line"><span class="number">+0xfd0</span> TxnScopeExitCallback          : Ptr32 Void</span><br><span class="line"><span class="number">+0xfd4</span> TxnScopeContext               : Ptr32 Void</span><br><span class="line"><span class="number">+0xfd8</span> LockCount                     : Uint4B</span><br><span class="line"><span class="number">+0xfdc</span> SpareUlong0                   : Uint4B</span><br><span class="line"><span class="number">+0xfe0</span> ResourceRetValue              : Ptr32 Void</span><br></pre></td></tr></table></figure>
+
+<p>如上所示，借助 WinDbg 的符号文件，我们查看了 TEB 结构体的所有成员。仔细比较代码可以发现，Windows 7 下的 TEB 结构体比 Windows XP 下的 TEB 结构体大。</p>
+<h3 id="重要成员"><a href="#重要成员" class="headerlink" title="重要成员"></a>重要成员</h3><p>如上所示，TEB 结构体的成员多而复杂，在用户模式调试中起着重要作用的成员有 2 个，如下所示。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">+0x000 NtTib                         : _NT_TIB</span><br><span class="line"></span><br><span class="line">+0x030 ProcessEnvironmentBlock       : Ptr32 _PEB</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>NtTib 成员</strong></p>
+<p>TEB 结构体的第一个成员为 <code>_NT_TIB</code> 结构体（TIB 是 Thread Information Block 的简称，意为“线程信息块”），<code>NT_TIB</code> 结构体的定义如下所示：</p>
+<figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">typedef</span> <span class="keyword">struct</span> <span class="title class_">_NT_TIB</span> &#123;</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">_EXCEPTION_REGISTRATION_RECORD</span> *ExceptionList;</span><br><span class="line">    PVOID StackBase;</span><br><span class="line">    PVOID StackLimit;</span><br><span class="line">    PVOID SubSystemTib;</span><br><span class="line">    <span class="keyword">union</span> &#123;</span><br><span class="line">        PVOID FiberData;</span><br><span class="line">        DWORD Version;</span><br><span class="line">    &#125;;</span><br><span class="line">    PVOID ArbitraryUserPointer;</span><br><span class="line">    <span class="keyword">struct</span> <span class="title class_">_NT_TIB</span> *Self;</span><br><span class="line">&#125; NT_TIB;</span><br><span class="line"><span class="keyword">typedef</span> NT_TIB *PNT_TIB;</span><br></pre></td></tr></table></figure>
+
+<p><code>ExceptionList</code> 成员指向 <code>_EXCEPTION_REGISTRATION_RECORD</code> 结构体组成的链表，它用于 Windows OS 的 SEH。</p>
+<p><code>Self</code> 成员是 <code>_NT_TIB</code> 结构体的自引用指针，也是 TEB 结构体的指针（因为 TEB 结构体的第一个成员就是 <code>NT_TIB</code> 结构体）。</p>
+<p><strong>ProcessEnvironmentBlock 成员</strong></p>
+<p>ProcessEnvironmentBlock 成员，它是指向 PEB（Process Environment Block，进程环境块）结构体的指针。PEB 是进程环境块，每个进程对应 1 个 PEB 结构体。</p>
+<h2 id="TEB访问方法"><a href="#TEB访问方法" class="headerlink" title="TEB访问方法"></a>TEB访问方法</h2><p>前面讲解过，借助 WinDbg 内核调试器可以很容易地访问 TEB 结构体。那么，该如何在用户模式下访问它呢？答案就是，通过 OS 提供的相关 API 访问。</p>
+<p><strong>提示</strong></p>
+<p>请注意：下面示例中出现的地址会随用户计算机环境的不同而不同。</p>
+<h3 id="Ntdll-NtCurrentTeb"><a href="#Ntdll-NtCurrentTeb" class="headerlink" title="Ntdll.NtCurrentTeb()"></a>Ntdll.NtCurrentTeb()</h3><p><code>Ntdll.NtCurrentTeb()</code> API 用来返回当前线程的 TEB 结构体的地址。</p>
+<p>该函数内部是如何实现的呢？下面使用 Dbg 工具查看。首先在Dbg 中打开 Notepad.exe 程序（也可以打开其他任一程序），然后在鼠标右键菜单中选择 <code>Search for Name in all modules</code> 菜单，在 <code>Name in all modules</code> 对话框中查找 <code>ntdll.NtCurrentTeb()</code> API，如图所示</p>
+<p><img src="/images/image-20260903204939567.png" alt="image-20260903204939567" loading='lazy'></p>
+<p>查找到 NtCurrentTeb 函数后，使用鼠标双击即可跳转到该 API 的代码处，如图所示。</p>
+<p><img src="/images/image-20260903205436178.png" alt="image-20260903205436178" loading='lazy'></p>
+<p>我用的是Dbg,和原著不一样,也没注释显示地址啊</p>
+<p>但是其实这里执行完mov,ret后看eax就是TEB地址了</p>
+<p><img src="/images/image-20260903210103958.png" alt="image-20260903210103958" loading='lazy'></p>
+<p>那我当前线程的 TEB 起始地址就是：002B0000</p>
+<p>这里拿书上的结论来验证(TEB结构体的地址和FS段寄存器所指的段内存基址相等),即</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">FS:[0x18] =  address of TEB</span><br><span class="line">其中FS:[18]指的是从 FS 段基址 + 0x18 的位置读取 4 字节数据</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/image-20260903210251656.png" alt="image-20260903210251656" loading='lazy'></p>
+<p>那么我的环境中,FS:[18]应该是</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">FS:[18] 实际访问的内存地址 = 002B0000 + 18</span><br><span class="line">                         = 002B0018</span><br></pre></td></tr></table></figure>
+
+<p>我们再去内存中看看002B0018保存的四字节内容</p>
+<p><img src="/images/image-20260903211146900.png" alt="image-20260903211146900" loading='lazy'></p>
+<p>也确实如此,也验证了<strong>FS:[18] 保存的是当前 TEB 自己的地址</strong></p>
+<h3 id="FS段寄存器"><a href="#FS段寄存器" class="headerlink" title="FS段寄存器"></a>FS段寄存器</h3><p><strong>SDT</strong></p>
+<p>其实，FS 段寄存器用来指示当前线程的 TEB 结构体。</p>
+<p>IA-32 系统中进程的虚拟内存大小为 4GB，因而需要 32 位的指针才能访问整个内存空间。但是 FS 寄存器的大小只有 16 位，那么它如何表示进程内存空间中的 TEB 结构体的地址呢？实际上，FS 寄存器并非直接指向 TEB 结构体的地址，它持有 SDT 的索引，而该索引持有实际 TEB 地址。</p>
+<p><strong>提示</strong></p>
+<p>SDT 位于内核内存区域，其地址存储在特殊的寄存器 GDTR（Global Descriptor Table Register，全局描述符表寄存器）中。</p>
+<p><img src="/images/image-20260903212020443.png" alt="image-20260903212020443" loading='lazy'></p>
+<p>由于段寄存器实际存储的是 SDT 的索引，所以它也被称为“段选择符”（Segment Selector）。从上图中可以看到，TEB 结构体位于 FS 段选择符所指的段内存的起始地址（base address）处。</p>
+<p><strong>FS:[0x18]&#x3D;TEB 起始地址</strong></p>
+<p>如果掌握了上述内容，那么就很容易理解下面公式的含义。</p>
+<figure class="highlight text"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FS:[0x18] = TEB.NtTib.Self = address of TIB = address of TEB = FS:0 = 002B0000</span><br></pre></td></tr></table></figure>
+
+<p><code>*FS:0</code> 是段内存的起始地址，FS 寄存器指向（Indexing）一个段描述符，而该描述符又指向段内存的起始地址。</p>
+<p>从上图可知，<code>FS:[0x18]</code> 与 <code>[002B0018]</code>（→ <code>002B0000</code>）具有相同含义。由 <code>_NT_TIB</code> 结构体的定义得知，结构体的最后一个 <code>Self</code> 成员恰好位于从 TEB 结构体偏移 <code>018</code> 的位置。<code>Self</code> 指针变量指向 <code>_NT_TIB</code> 结构体的起始地址，也就是 TEB 的起始地址。</p>
+<p><strong>FS:[0x30]&#x3D;PEB 起始地址</strong></p>
+<p>通过对Windows XP SP3 和Windows 7 的结构体成员比较，<code>FS:[0x30]</code> 可表示为如下等式：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FS:[0x30] = TEB.ProcessEnvironmentBlock = address of PEB</span><br></pre></td></tr></table></figure>
+
+<p><img src="/images/image-20260903212953444.png" alt="image-20260903212953444" loading='lazy'></p>
+<p>从图中可以知道，<code>FS:[0x30]</code> 与 <code>[002B0030]</code>（→ <code>002AD000</code>）具有相同含义。也就是说，通过 TEB 的 <code>ProcessEnvironmentBlock</code> 成员可以获取 PEB 结构体的起始地址。PEB 结构体多用于反调试。</p>
+<p><strong>FS:[0]&#x3D;SEH 起始地址</strong></p>
+<p>此外还要了解一下 <code>FS:[0]</code>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">FS:[0] = TEB.NtTib.ExceptionList = address of SEH</span><br></pre></td></tr></table></figure>
+
+<p>从图46-2中可以知道，<code>FS:[0]</code> 与 <code>[002B0000]</code>（→ <code>000EFA70</code>）具有相同含义。</p>
+<p>SEH 是 Windows 操作系统中的结构化异常处理机制，常用于反调试技术。</p>
+<p>封面来自XilmO@夕末</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="https://ksenrii.github.io">ksenr</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="https://ksenrii.github.io/2026/08/26/TEB/">https://ksenrii.github.io/2026/08/26/TEB/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="https://ksenrii.github.io" target="_blank">ksenr's blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Reverse/">Reverse</a></div><div class="post-share"><div class="social-share" data-image="/images/22.jpg" data-sites="facebook,x,wechat,weibo,qq"></div><link rel="stylesheet" href="https://unpkg.com/butterfly-extsrc@1.1.6/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://unpkg.com/butterfly-extsrc@1.1.6/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2026/08/25/PEB/" title="PEB"><img class="cover" src="/images/23.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post" loading='lazy'><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">PEB</div></div><div class="info-2"><div class="info-item-1">PEB本章将学习有关 PEB（Process Environment Block，进程环境块）的知识。 PEB 是存放进程信息的结构体，尺寸非常大，其大部分内容都已被文档化。本章只讲解它的几个重要成员，调试中会经常接触。 PEB访问方法先了解访问 PEB 结构体的方法。 在前面 TEB 结构体的学习中我们已经知道，TEB.ProcessEnvironmentBlock 成员就是 PEB 结构体的地址。TEB 结构体位于 FS 段选择符所指的段内存的起始地址上，且 ProcessEnvironmentBlock 成员位于距 TEB 结构体 Offset 30 的位置。所以有如下等式成立： 1FS:[30] = TEB.ProcessEnvironmentBlock = address of PEB  用如下汇编代码表示上述等式： 方法 #1：直接获取 PEB 地址 1MOV EAX, DWORD PTR FS:[30] ; FS[30] = address of PEB  方法 #2：先获取 TEB 地址，再通过 ProcessEnvironmentBlock 成员（+30 偏移）...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2026/07/29/PE%E6%96%87%E4%BB%B6%E6%A0%BC%E5%BC%8FReview/" title="PE文件格式Review"><img class="cover" src="/images/16.jpg" alt="cover" loading='lazy'><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-29</div><div class="info-item-2">PE文件格式Review</div></div><div class="info-2"><div class="info-item-1">PE文件格式还是内容很多的,再来整体的复习一遍^^ PE文件PE 文件是 Windows 操作系统下使用的可执行文件格式。它是微软在 UNIX 平台的 COFF（Common Object File Format，通用对象文件格式）基础上制作而成的。最初（正如 Portable 这个单词所代表的那样）设计用来提高程序在不同操作系统上的移植性，但实际上这种文件格式仅用在 Windows 系列的操作系统下。 PE 文件是指 32 位的可执行文件，也称为 PE32。64 位的可执行文件称为 PE + 或 PE32+，是 PE（PE32）文件的一种扩展形式（请注意不是 PE64）。 PE文件种类 基本结构 DOS头微软创建 PE 文件格式时，人们正广泛使用 DOS 文件，所以微软充分考虑了 PE 文件对 DOS 文件的兼容性。其结果是在 PE 头的最前面添加了一个 IMAGE_DOS_HEADER 结构体，用来扩展已有的 DOS EXE 头。 123456789101112131415161718192021typedef struct _IMAGE_DOS_HEADER &#123; ...</div></div></div></a><a class="pagination-related" href="/2026/07/17/%E8%BF%90%E8%A1%8C%E6%97%B6%E5%8E%8B%E7%BC%A9/" title="运行时压缩"><img class="cover" src="/images/17.jpg" alt="cover" loading='lazy'><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-07-17</div><div class="info-item-2">运行时压缩</div></div><div class="info-2"><div class="info-item-1">运行时压缩运行时压缩器（Run-Time Packer）是软件逆向分析学的常见主题。为了理解好它，需要掌握有关 PE 文件格式、操作系统的基本知识（进程、内存、DLL 等），同时也要了解有关压缩 &#x2F; 解压缩算法的基本内容。 数据压缩数据压缩（Data Compression）是计算机工程的主要研究内容，经过数十年发展已经有了深入研究，今后还会不断出现更多、更好的算法。 如果日常生活中能够非常容易地压缩某个物体该多么方便啊！也就不再需要仓库、停车场、集装箱了，当然，得能压缩才行。而在数码世界，（只要不是压缩过的信息）任何信息都能轻松压缩。 不论哪种形态的文件（数据）都是由二进制（0 或 1）组成的，只要使用合适的压缩算法，就能缩减其大小。经过压缩的文件若能 100% 恢复，则称该压缩为 “无损压缩”（Lossless Data Compression）；若不能恢复原状，则称该压缩为 “有损压缩”（Loss Data Compression）。 无损压缩无损压缩用来缩减文件（数据）的大小，压缩后的文件更易保管、移动。使用经过压缩的文件之前，需要先对文件解压缩（此过程中应该保...</div></div></div></a><a class="pagination-related" href="/2026/08/23/dll%E6%B3%A8%E5%85%A5-2/" title="DLL注入-2"><img class="cover" src="/images/19.jpg" alt="cover" loading='lazy'><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-23</div><div class="info-item-2">DLL注入-2</div></div><div class="info-2"><div class="info-item-1">通过修改PE加载DLL除了前面讲过的 DLL 动态注入技术外，还可以采用“手工修改可执行文件”的方式加载用户指定的 DLL 文件。本章将向各位介绍这种方法。学习这种技术前，首先要掌握有关 PE 文件格式的知识。 前面我们学过向“运行中的进程”强制注入指定 DLL 文件的方法。下面我们将使用另外一种方法，通过“直接修改目标程序的可执行文件”，使其运行时强制加载指定的 DLL 文件。这种方法只要应用过一次后，不需要另外的注入操作，每当进程开始运行时就会自动加载指定的 DLL 文件。其实，这是一种破解的方法。 练习文件将做个简单练习以帮助大家更好地理解要学习的内容。我们的目标是，直接修改 TextView.exe 文件，使其在运行时自动加载 myhack3.dll 文件。 TextView.exeTextView.exe 是一个非常简单的文本查看程序，只要用鼠标将要查看的文本文件拖动到其中，即可通过它查看文本文件的内容，如图所示。 例如我在txt里面写了Hello World,把txt拖到exe,如下图  接下来，使用 PEView 工具查看 TextView.exe 可执行文件的 I...</div></div></div></a><a class="pagination-related" href="/2026/08/20/dll%E6%B3%A8%E5%85%A5-1/" title="DLL注入-1"><img class="cover" src="/images/18.jpg" alt="cover" loading='lazy'><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-20</div><div class="info-item-2">DLL注入-1</div></div><div class="info-2"><div class="info-item-1">DLL注入Windows消息钩取钩子英文 Hook 一词，翻成中文是 “钩子”、“鱼钩” 的意思，泛指钓取所需东西而使用的一切工具。“钩子” 这一基本含义延伸发展为 “偷看或截取信息时所用的手段或工具”。下面举例向各位进一步说明 “钩子” 这一概念。 “钩子” 的概念  假设有一个非常重要的军事设施，其外围设置了 3 层岗哨以进行保护。外部人员若想进入，需要经过 3 层岗哨复杂的检查程序（身份确认、随身物品查验、访问事由说明等）。若间谍在通往该军事设施的道路上私设一个岗哨，经过该岗哨的人员未起疑心，通过时履行同样的检查程序，那么间谍就可以坐享其成，轻松获取（甚至可以操纵）来往该岗哨的所有信息。 像这样，为了偷看或截取来往信息而在中间设置岗哨的行为称为 “挂钩”（或 “安装钩子”）。实际上，偷看或操作信息的行为就是人们常说的 “钩取”（Hooking）。 “钩取” 技术广泛应用于计算机领域。其实，我们不仅可以查看来往于 “OS‑应用程序‑用户” 之间的全部信息，也可以操作它们，并且神不知鬼不觉。具体方法有很多，其中最基本的是 “消息钩子”（Message Hook），下面会详细介绍...</div></div></div></a><a class="pagination-related" href="/2026/08/17/%E4%BB%A3%E7%A0%81%E6%B3%A8%E5%85%A5/" title="代码注入"><img class="cover" src="/images/24.jpg" alt="cover" loading='lazy'><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-17</div><div class="info-item-2">代码注入</div></div><div class="info-2"><div class="info-item-1">代码注入本章将讲解代码注入（Code Injection）相关技术，并借助一个练习示例向各位展示代码注入的实施原理与方法。通过比较分析，了解代码注入与 DLL 注入的不同点。 代码注入代码注入是一种向目标进程插入独立运行代码并使之运行的技术，它一般调用 CreateRemoteThread() API 以远程线程形式运行插入的代码，所以也被称为线程注入。下图描述了代码注入技术的实现原理。  首先向目标进程 target.exe 插入代码与数据，在此过程中，代码以线程过程（Thread Procedure）形式插入，而代码中使用的数据则以线程参数的形式传入。也就是说，代码与数据是分别注入的。 如上所言，代码注入的原理非常简单，但具体实现过程中有一些内容必须注意。下面就通过与 DLL 注入比较来讲解实现代码注入的注意事项。 DLL 注入与代码注入请看下面这段简单的代码，它用来弹出 Windows 消息框。 12345678// ThreadProc()DWORD WINAPI ThreadProc(LPVOID lParam)&#123;    MessageBoxA(NULL, &...</div></div></div></a><a class="pagination-related" href="/2026/08/03/%E5%9F%BA%E5%9D%80%E9%87%8D%E5%AE%9A%E4%BD%8D%E8%A1%A8/" title="基址重定位表"><img class="cover" src="/images/15.jpg" alt="cover" loading='lazy'><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2026-08-03</div><div class="info-item-2">基址重定位表</div></div><div class="info-2"><div class="info-item-1">基址重定位表PE文件在重定位过程中会用到基址重定位表（Base Relocation Table）。 PE 重定位向进程的虚拟内存加载PE文件（EXE&#x2F;DLL&#x2F;SYS）时，文件会被加载到PE头的ImageBase所指的地址处。若加载的是DLL（SYS）文件，且在ImageBase位置处已经加载了其他DLL（SYS）文件，那么PE装载器就会将其加载到其他未被占用的空间。 这就涉及PE文件重定位的问题。PE重定位是指PE文件无法加载到ImageBase所指位置，而是被加载到其他地址时发生的一系列处理行为。 提示 使用SDK（Software Development Kit，软件开发工具包）或Visual C++创建PE文件时，EXE默认的ImageBase为00400000，DLL默认的ImageBase为10000000。此外，使用DDK（Driver Development Kit，驱动开发工具包）创建的SYS文件默认的ImageBase为10000。 DLL&#x2F;SYS例如,A.DLL被加载到TEST.EXE进程的10000000地址处。此后，B.DL...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/images/avatar-jointed.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/ loading='lazy'></div><div class="author-info-name">ksenr</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">23</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/ksenrii"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/ksenrii" target="_blank" title="GitHub"><i class="fab fa-github" style="color: #24292e;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到 ksenr's blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#TEB"><span class="toc-number">1.</span> <span class="toc-text">TEB</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#TEB-1"><span class="toc-number">1.1.</span> <span class="toc-text">TEB</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#TEB-%E7%BB%93%E6%9E%84%E4%BD%93%E7%9A%84%E5%AE%9A%E4%B9%89"><span class="toc-number">1.1.1.</span> <span class="toc-text">TEB 结构体的定义</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TEB%E7%BB%93%E6%9E%84%E6%88%90%E5%91%98"><span class="toc-number">1.1.2.</span> <span class="toc-text">TEB结构成员</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8D%E8%A6%81%E6%88%90%E5%91%98"><span class="toc-number">1.1.3.</span> <span class="toc-text">重要成员</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#TEB%E8%AE%BF%E9%97%AE%E6%96%B9%E6%B3%95"><span class="toc-number">1.2.</span> <span class="toc-text">TEB访问方法</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Ntdll-NtCurrentTeb"><span class="toc-number">1.2.1.</span> <span class="toc-text">Ntdll.NtCurrentTeb()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#FS%E6%AE%B5%E5%AF%84%E5%AD%98%E5%99%A8"><span class="toc-number">1.2.2.</span> <span class="toc-text">FS段寄存器</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2026/08/26/TEB/" title="TEB"><img src="/images/22.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="TEB"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/08/26/TEB/" title="TEB">TEB</a><time datetime="2026-08-26T04:12:18.000Z" title="发表于 2026-08-26 12:12:18">2026-08-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/25/PEB/" title="PEB"><img src="/images/23.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="PEB"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/08/25/PEB/" title="PEB">PEB</a><time datetime="2026-08-25T05:32:54.000Z" title="发表于 2026-08-25 13:32:54">2026-08-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/25/dll%E6%B3%A8%E5%85%A5Review/" title="DLL注入Review"><img src="/images/20.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="DLL注入Review"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/08/25/dll%E6%B3%A8%E5%85%A5Review/" title="DLL注入Review">DLL注入Review</a><time datetime="2026-08-25T04:27:07.000Z" title="发表于 2026-08-25 12:27:07">2026-08-25</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/23/dll%E6%B3%A8%E5%85%A5-2/" title="DLL注入-2"><img src="/images/19.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="DLL注入-2"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/08/23/dll%E6%B3%A8%E5%85%A5-2/" title="DLL注入-2">DLL注入-2</a><time datetime="2026-08-23T04:12:18.000Z" title="发表于 2026-08-23 12:12:18">2026-08-23</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2026/08/20/dll%E6%B3%A8%E5%85%A5-1/" title="DLL注入-1"><img src="/images/18.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="DLL注入-1"/ loading='lazy'></a><div class="content"><a class="title" href="/2026/08/20/dll%E6%B3%A8%E5%85%A5-1/" title="DLL注入-1">DLL注入-1</a><time datetime="2026-08-20T08:32:14.000Z" title="发表于 2026-08-20 16:32:14">2026-08-20</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2026 By ksenr</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 8.1.1</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.7.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js?v=5.7.0"></script><script src="/js/main.js?v=5.7.0"></script><script src="https://unpkg.com/@fancyapps/ui@6.1.14/dist/fancybox/fancybox.umd.js"></script><script src="https://unpkg.com/instant.page@5.2.0/instantpage.js" type="module"></script><script src="https://unpkg.com/node-snackbar@0.1.16/dist/snackbar.min.js"></script><div class="js-pjax"><script>(() => {
+  const changeScriptToMath = article => {
+    article.querySelectorAll('script[type^="math/tex"]').forEach(el => {
+      const display = /mode=display/.test(el.type)
+      const node = document.createElement(display ? 'div' : 'span')
+      node.textContent = display
+        ? `$$${el.textContent}$$`
+        : `$${el.textContent}$`
+      el.parentNode.replaceChild(node, el)
+    })
+  }
+
+  const loadMathjax = () => {
+    const article = document.getElementById('article-container')
+    if (!article || article.querySelector('.hbe-container')) return
+    changeScriptToMath(article)
+
+    if (!window.MathJax) {
+      window.MathJax = {
+        loader: {
+          load: [
+            // Four font extension packages (optional)
+            //- '[tex]/bbm',
+            //- '[tex]/bboldx',
+            //- '[tex]/dsfont',
+            '[tex]/mhchem',
+            'ui/lazy'
+          ],
+          paths: {
+            'mathjax-newcm': '[mathjax]/../@mathjax/mathjax-newcm-font',
+
+            //- // Four font extension packages (optional)
+            //- 'mathjax-bbm-extension': '[mathjax]/../@mathjax/mathjax-bbm-font-extension',
+            //- 'mathjax-bboldx-extension': '[mathjax]/../@mathjax/mathjax-bboldx-font-extension',
+            //- 'mathjax-dsfont-extension': '[mathjax]/../@mathjax/mathjax-dsfont-font-extension',
+            'mathjax-mhchem-extension': '[mathjax]/../@mathjax/mathjax-mhchem-font-extension'
+          }
+        },
+        output: {
+          font: 'mathjax-newcm',
+        },
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']],
+          tags: 'none',
+          packages: {
+            '[+]': [
+              'mhchem'
+            ]
+          }
+        },
+        chtml: {
+          scale: 1.1
+        },
+        options: {
+          lazyMargin: '200px',
+          enableMenu: true,
+          menuOptions: {
+            settings: {
+              enrich: false  // Turn off Braille and voice narration text automatic generation
+            }
+          },
+        }
+      }
+
+      const script = document.createElement('script')
+      script.src = 'https://unpkg.com/mathjax@4.1.3/tex-mml-chtml.js'
+      script.id = 'MathJax-script'
+      script.async = true
+      document.head.appendChild(script)
+    } else {
+      MathJax.typesetClear()
+      MathJax.typesetPromise([ article ])
+    }
+  }
+
+  btf.addGlobalFn('encrypt', loadMathjax, 'mathjax')
+  window.pjax ? loadMathjax() : window.addEventListener('load', loadMathjax)
+})()</script></div><div id="global-music-player" data-server="netease" data-type="playlist" data-id="18342059095"></div><script src="https://cdn.jsdelivr.net/npm/aplayer@1.10.1/dist/APlayer.min.js"></script><script src="/js/music-player.js?v=20260901-2"></script><script src="/js/bg-rotate.js"></script><script src="https://unpkg.com/pjax@0.2.8/pjax.min.js" defer="defer"></script><script>document.addEventListener('DOMContentLoaded', () => {
+  const pjaxSelectors = ["head > title","#config-diff","#body-wrap","#rightside-config-hide","#rightside-config-show",".js-pjax"]
+
+  window.pjax = new Pjax({
+    elements: 'a:not([target="_blank"]):not([data-fancybox])',
+    selectors: pjaxSelectors,
+    cacheBust: false,
+    analytics: false,
+    scrollRestoration: false
+  })
+
+  const triggerPjaxFn = (val) => {
+    if (!val) return
+    Object.values(val).forEach(fn => {
+      try {
+        fn()
+      } catch (err) {
+        console.debug('Pjax callback failed:', err)
+      }
+    })
+  }
+
+  document.addEventListener('pjax:send', () => {
+    // removeEventListener
+    btf.removeGlobalFnEvent('pjaxSendOnce')
+    btf.removeGlobalFnEvent('themeChange')
+
+    // reset readmode
+    const $bodyClassList = document.body.classList
+    if ($bodyClassList.contains('read-mode')) $bodyClassList.remove('read-mode')
+
+    triggerPjaxFn(window.globalFn.pjaxSend)
+  })
+
+  document.addEventListener('pjax:complete', () => {
+    btf.removeGlobalFnEvent('pjaxCompleteOnce')
+    document.querySelectorAll('script[data-pjax]').forEach(item => {
+      if (!item.parentNode) return
+      const newScript = document.createElement('script')
+      const content = item.text || item.textContent || ''
+      Array.from(item.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value))
+      newScript.appendChild(document.createTextNode(content))
+      item.parentNode.replaceChild(newScript, item)
+    })
+
+    triggerPjaxFn(window.globalFn.pjaxComplete)
+  })
+
+  document.addEventListener('pjax:error', e => {
+    const responseURL = e.request && e.request.responseURL
+    if (e.request && e.request.status === 404) {
+      true
+        ? pjax.loadUrl('/404.html')
+        : responseURL && (window.location.href = responseURL)
+    } else if (responseURL) {
+      window.location.href = responseURL
+    }
+  })
+})</script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><i class="fas fa-spinner fa-pulse" id="loading-status" hidden="hidden"></i><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="text-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据加载中</span></div><div class="local-search-input"><input placeholder="搜索文章..." type="text"/></div><hr/><div id="local-search-results"></div><div class="ais-Pagination" id="local-search-pagination" style="display:none;"><ul class="ais-Pagination-list"></ul></div><div id="local-search-stats"></div></div><div id="search-mask"></div><script src="/js/search/local-search.js?v=5.7.0"></script></div></div></body></html>
