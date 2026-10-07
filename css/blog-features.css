@@ -1,0 +1,124 @@
+/* Friend cards: compact avatar and two lines of text. */
+#article-container .flink-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  padding: 18px 0;
+  overflow: visible;
+  text-align: left;
+}
+#article-container .flink-list > .flink-list-item {
+  float: none;
+  width: auto !important;
+  height: auto;
+  min-height: 94px;
+  margin: 0;
+  border-radius: 18px;
+  background: var(--card-bg, #fff);
+  box-shadow: 0 8px 28px rgba(35, 48, 75, .06);
+  transition: transform .2s, box-shadow .2s;
+}
+#article-container .flink-list-item::before { display: none; }
+#article-container .flink-list-item:hover { transform: translateY(-3px); box-shadow: 0 12px 30px rgba(35, 48, 75, .1); }
+#article-container .flink-list-item a {
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  gap: 4px 14px;
+  align-content: center;
+  padding: 20px;
+  min-height: 94px;
+}
+#article-container .flink-list-item a .flink-item-icon {
+  grid-row: 1 / 3;
+  float: none;
+  width: 54px;
+  height: 54px;
+  margin: 0;
+  border-radius: 50%;
+  align-self: center;
+}
+#article-container .flink-list-item .flink-item-name { height: auto; padding: 0; align-self: end; font-size: 16px; line-height: 1.5; font-weight: 600; }
+#article-container .flink-list-item .flink-item-desc { height: auto; padding: 0; color: var(--font-color); opacity: .65; font-size: 13px; line-height: 1.5; }
+
+/* Password UI is separate from the plugin's animated input themes. */
+#article-container .post-password-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  overflow: hidden;
+  margin: 24px 0;
+  border: 1px solid rgba(145, 133, 172, .16);
+  border-radius: 20px;
+  background: var(--card-bg, #fff);
+  box-shadow: 0 10px 35px rgba(75, 58, 100, .06);
+}
+#article-container .post-password-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  margin: 0;
+  object-fit: cover;
+  object-position: 54% center;
+  border-radius: 0;
+}
+#article-container .post-password-panel { align-self: center; padding: 32px; min-width: 0; }
+#article-container .post-password-eyebrow { color: #9c88b8; font-size: 11px; font-weight: 600; letter-spacing: .18em; }
+#article-container .post-password-form { margin-top: 24px; }
+#article-container .post-password-controls { display: flex; gap: 8px; }
+#article-container #hbePass {
+  min-width: 0;
+  width: 100%;
+  height: 44px;
+  padding: 0 13px;
+  border: 1px solid rgba(145, 133, 172, .35);
+  border-radius: 10px;
+  background: transparent;
+  color: var(--font-color);
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  transition: border-color .2s, box-shadow .2s;
+}
+#article-container #hbePass:focus { border-color: #9c88b8; box-shadow: 0 0 0 3px rgba(156, 136, 184, .12); }
+#article-container .post-password-button {
+  flex-shrink: 0;
+  width: auto;
+  height: 44px;
+  margin: 0;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 10px;
+  background: #9380ad;
+  box-shadow: none;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+#article-container .post-password-button:hover { background: #806b9c; }
+#article-container .post-password-button:focus-visible { outline: 2px solid #9380ad; outline-offset: 3px; }
+#article-container .post-password-button:disabled { opacity: .6; cursor: wait; }
+#article-container .post-password-error,
+#article-container .post-password-error:not(:empty) {
+  min-height: 22px;
+  margin: 10px 0 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #c97585;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.7;
+}
+@media (max-width: 1000px) {
+  #article-container .flink-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  #article-container .post-password-panel { padding: 24px; }
+  #article-container .post-password-controls { flex-wrap: wrap; }
+  #article-container .post-password-button { width: 100%; }
+}
+@media (max-width: 600px) {
+  #article-container .flink-list { grid-template-columns: minmax(0, 1fr); }
+  #article-container .post-password-card { grid-template-columns: minmax(0, 1fr); }
+  #article-container .post-password-image { height: 200px; min-height: 0; object-position: center 38%; }
+}
